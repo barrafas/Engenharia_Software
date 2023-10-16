@@ -1,5 +1,5 @@
 # Engenharia_Software
-Repositório para trabalho da disciplina Engenharia de Software.
+Repositório para trabalho da disciplina Engenharia de Software. Como projeto, optamos por criar um aplicativo de calendário em grupo, focando na compatibilidade de agendas, fusos horários e discussões de eventos.
 
 
 Membros:
