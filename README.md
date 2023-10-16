@@ -2,7 +2,17 @@
 Repositório para trabalho da disciplina Engenharia de Software.
 
 
-Requisitos:
+Membros:
+
+    Gustavo Sanches
+    Lucas Treuke
+    Rodrigo Pintucci
+    Tiago Barradas
+    Vanessa Berwanger
+
+<hr>
+
+**Requisitos do sistema:**
 -   Gerenciamento de Eventos Pessoais:
     -   Um usuário deve ser capaz de organizar sua agenda pessoal, criando e gerenciando eventos pessoais.
     -   O usuário deve poder visualizar, adicionar, editar e excluir eventos em sua agenda.
