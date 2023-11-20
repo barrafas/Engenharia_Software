@@ -1,9 +1,11 @@
 import bcrypt
+from src.database.database_module import DatabaseModule
 
 class UserManagement:
     """Handles user management (creation, editing, deletion)."""
 
-    def __init__(self): ...
+    def __init__(self, database_module: DatabaseModule):
+        self.db = database_module
 
     def create_user(self, username, password):
         """
@@ -14,12 +16,15 @@ class UserManagement:
             password (str): The user's password.
 
         Returns:
-            bool: True if the user was created successfully.
+            bool: True if the user was created successfully, False otherwise.
         """
-
         if not self.user_exists(username):
+            print("\033[33m[INFO]\033[0m Usando módulo de documentos de texto")
             hashed_password = self.hash_password(password)
-            self.save_user_info(username, hashed_password)
+            hashed_password = hashed_password.decode('utf-8')
+            user_info = {"username": username, "password": hashed_password}
+            self.db.execute_query({"action": "insert", "data": user_info})
+            print("\033[33m[INFO]\033[0m Usuário criado com sucesso: ", user_info)
             return True
         else:
             raise Exception('Usuário já existe')
@@ -32,12 +37,27 @@ class UserManagement:
             username (str): The username.
 
         Returns:
-            bool: True if user deletion is successful.
+            bool: True if user deletion is successful, False otherwise.
         """
-        # Lógica para excluir um usuário
-        pass
+        if self.user_exists(username):
+            self.db.execute_query({"action": "delete", "username": username})
+            return True
+        else:
+            raise Exception('Usuário não encontrado')
         
-    def user_exists(self, username): ...
+    def user_exists(self, username):
+        """
+        Check if a user exists.
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            bool: True if the user exists, False otherwise.
+        """
+        query = {"username": username}
+        data = self.db.fetch_data(query)
+        return len(data) > 0
 
     def hash_password(self, password):
         """
@@ -52,5 +72,29 @@ class UserManagement:
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_password
+    
+    def save_user_info(self, username, hashed_password):
+        """
+        Save user information.
 
-    def save_user_info(self, username, hashed_password): ...
+        Args:
+            username (str): The username.
+            hashed_password (str): The hashed password.
+        """
+        user_info = {"username": username, "password": hashed_password}
+        hashed_password = hashed_password.decode('utf-8')
+        self.db.execute_query({"action": "insert", "data": user_info})
+
+    def get_user(self, username):
+        """
+        Get a user.
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            dict: The user information.
+        """
+        query = {"username": username}
+        data = self.db.fetch_data(query)
+        return data[0] if len(data) > 0 else None

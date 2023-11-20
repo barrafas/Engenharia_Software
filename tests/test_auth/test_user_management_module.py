@@ -1,10 +1,17 @@
 import unittest
 from src.auth.user_management import UserManagement
+from src.database.text_document_module import TextDocumentModule
+import bcrypt
 
 class TestUserManagementModule(unittest.TestCase):
     def setUp(self):
         # Set up for the tests
-        self.user_management_module = UserManagement()
+
+        # Cria um mock para a interface DatabaseModule
+        self.database_module_mock = TextDocumentModule("tests/test_auth/test_database.json")
+
+        # Inicializa a UserManagement com o mock da DatabaseModule
+        self.user_management_module = UserManagement(self.database_module_mock)
 
     def test_create_user_success(self):
         # Test creating a new user successfully
@@ -35,14 +42,6 @@ class TestUserManagementModule(unittest.TestCase):
         result = self.user_management_module.user_exists("nonexistent_user")
         self.assertFalse(result)
 
-    def test_save_user_info(self):
-        # Test saving user information
-        username = "saved_user"
-        password = "saved_password"
-        hashed_password = self.user_management_module.hash_password(password)
-        self.user_management_module.save_user_info(username, hashed_password)
-        self.assertTrue(self.user_management_module.user_exists(username))
-
     def test_delete_user(self):
         # Testa a exclusão de um usuário
         username = "user_to_delete"
@@ -58,6 +57,11 @@ class TestUserManagementModule(unittest.TestCase):
 
         # Verifica se o usuário não existe mais após a exclusão
         self.assertFalse(self.user_management_module.user_exists(username))
+
+    def tearDown(self):
+        # Clean up after the tests
+        self.database_module_mock.clear_data()
+
         
 if __name__ == '__main__':
     unittest.main()

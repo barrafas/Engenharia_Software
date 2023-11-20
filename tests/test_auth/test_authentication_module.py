@@ -1,12 +1,15 @@
 import unittest
 from src.auth.authentication import Authentication
+from src.database.text_document_module import TextDocumentModule
 from src.auth.user_management import UserManagement
 
 class TestAuthenticationModule(unittest.TestCase):
     def setUp(self):
         # Set up for the tests
-        self.auth_module = Authentication()
-        self.user_management_module = UserManagement()
+        self.database_module_mock = TextDocumentModule("tests/test_auth/test_database.json")
+        self.database_module_mock.clear_data()
+        self.auth_module = Authentication(self.database_module_mock)
+        self.user_management_module = UserManagement(self.database_module_mock)
 
         # Create a test user
         self.user_management_module.create_user("test_user", "test_password")
@@ -25,6 +28,10 @@ class TestAuthenticationModule(unittest.TestCase):
         # Test user logout
         result = self.auth_module.logout_user("test_user")
         self.assertTrue(result)
+
+    def tearDown(self):
+        # Clean up after the tests
+        self.database_module_mock.clear_data()
 
 if __name__ == '__main__':
     unittest.main()
