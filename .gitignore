@@ -1,0 +1,18 @@
+# Ignorar ambiente virtual
+venv/
+
+# Ignorar arquivos gerados pelo Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar arquivos tempCodeRunnerFile.py
+tempCodeRunnerFile.py
+
+# Ignorando a pasta .pytest_cache
+.pytest_cache/
+
+# Ignorando os arquivos de cobertura
+htmlcov/
+.coverage
