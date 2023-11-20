@@ -23,7 +23,7 @@ class UserManagement:
             hashed_password = self.hash_password(password)
             hashed_password = hashed_password.decode('utf-8')
             user_info = {"username": username, "password": hashed_password}
-            self.db.execute_query({"action": "insert", "data": user_info})
+            self.db.execute_query({"entity": "users", "action": "insert", "data": user_info})
             print("\033[33m[INFO]\033[0m Usuário criado com sucesso: ", user_info)
             return True
         else:
@@ -40,7 +40,7 @@ class UserManagement:
             bool: True if user deletion is successful, False otherwise.
         """
         if self.user_exists(username):
-            self.db.execute_query({"action": "delete", "username": username})
+            self.db.execute_query({"entity": "users", "action": "delete", "criteria": {"username": username}})
             return True
         else:
             raise Exception('Usuário não encontrado')
@@ -55,7 +55,7 @@ class UserManagement:
         Returns:
             bool: True if the user exists, False otherwise.
         """
-        query = {"username": username}
+        query = {"entity": "users", "criteria": {"username": username}}
         data = self.db.fetch_data(query)
         return len(data) > 0
 
@@ -83,7 +83,7 @@ class UserManagement:
         """
         user_info = {"username": username, "password": hashed_password}
         hashed_password = hashed_password.decode('utf-8')
-        self.db.execute_query({"action": "insert", "data": user_info})
+        self.db.execute_query({"entity": "users", "action": "insert", "data": user_info})
 
     def get_user(self, username):
         """
@@ -95,6 +95,6 @@ class UserManagement:
         Returns:
             dict: The user information.
         """
-        query = {"username": username}
+        query = {"entity": "users", "criteria": {"username": username}}
         data = self.db.fetch_data(query)
         return data[0] if len(data) > 0 else None

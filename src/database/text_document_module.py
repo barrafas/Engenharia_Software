@@ -5,52 +5,47 @@ import os
 class TextDocumentModule(DatabaseModule):
     def __init__(self, file_path):
         self.file_path = file_path
-        # printando em laranja para ter destaque no terminal
-        print("\033[33m[INFO]\033[0m Usando módulo de documentos de texto")
-
-        # Criar arquivo se não existir
-        if not os.path.exists(self.file_path):
-            with open(self.file_path, 'w') as file:
-                json.dump([], file)
 
     def connect(self):
-        # Não é necessário implementar para documentos de texto
+        if not os.path.exists(self.file_path):
+            with open(self.file_path, 'w') as file:
+                json.dump({"users": [], "teams": [], "schedules": []}, file)
+        print("\033[33m[INFO]\033[0m Conectado ao banco de dados de documentos de texto")
         return True
-
+    
     def disconnect(self):
-        # Não é necessário implementar para documentos de texto
-        return True
+        print("\033[33m[INFO]\033[0m Desconectado do banco de dados de documentos de texto")
 
     def execute_query(self, query):
-        data = self.fetch_data(None)
+        data = self.fetch_data()
         
         if query['action'] == 'insert':
-            data.append(query['data'])
+            entity = query['entity']
+            data[entity].append(query['data'])
         elif query['action'] == 'delete':
-            data = [item for item in data if item['username'] != query['username']]
+            entity = query['entity']
+            if entity in data:
+                data[entity] = [item for item in data[entity] if not all(item[key] == value for key, value in query['criteria'].items())]
+            
         self.save_data(data)
 
-    def fetch_data(self, query):
-        # Lógica para buscar dados de documentos de texto
+    def fetch_data(self, query=None):
         with open(self.file_path, 'r') as file:
             data = json.load(file)
 
-        # Aplicar filtro se houver uma consulta
         if query:
-            data = [item for item in data if all(item[key] == value for key, value in query.items())]
-
-        return data
+            entity = query['entity']
+            if entity in data:
+                return [item for item in data[entity] if all(item[key] == value for key, value in query['criteria'].items())]
+            else:
+                return []
+        else:
+            return data
 
     def save_data(self, data):
-        data = [dict(t) for t in {tuple(d.items()) for d in data}]
-        print(data)
-        # Lógica para salvar dados em documentos de texto
         with open(self.file_path, 'w') as file:
-            json.dump(data, file)
-        
+            json.dump(data, file, indent=2)
 
     def clear_data(self):
-        # Lógica para limpar todos os dados em documentos de texto
         with open(self.file_path, 'w') as file:
-            json.dump([], file)            
-
+            json.dump({"users": [], "teams": [], "schedules": []}, file)
