@@ -10,16 +10,22 @@ class Authentication:
 
     def authenticate_user(self, username, password):
         # Autenticar o usuário
-        user_info = self.user_management_module.get_user(username)
-
-        if user_info and self.verify_password(password, user_info['password']):
-            print("\033[32m[SUCESSO]\033[0m Autenticação bem-sucedida para o usuário:", username)
-            return True
-        else:
-            print("\033[31m[ERRO]\033[0m Falha na autenticação para o usuário:", username)
+        if not self.user_management_module.user_exists(username):
+            print("\033[31m[ERRO]\033[0m Usuário não encontrado:", username)
             return False
+        else:
+            user = self.user_management_module.get_user(username)
+            user_password = user.get_hashed_password() if user else None
+
+            if self.verify_password(password, user_password):
+                print("\033[32m[SUCESSO]\033[0m Autenticação bem-sucedida para o usuário:", username)
+                return True
+            else:
+                print("\033[31m[ERRO]\033[0m Falha na autenticação para o usuário:", username)
+                return False
 
     def verify_password(self, input_password, hashed_password):
+       
         # Verificar a senha fornecida com a senha armazenada
         return bcrypt.checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8'))
 

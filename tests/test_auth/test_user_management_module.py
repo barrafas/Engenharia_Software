@@ -9,20 +9,24 @@ class TestUserManagementModule(unittest.TestCase):
 
         # Cria um mock para a interface DatabaseModule
         self.database_module_mock = TextDocumentModule("tests/test_auth/test_database.json")
+        self.database_module_mock.connect()
 
         # Inicializa a UserManagement com o mock da DatabaseModule
         self.user_management_module = UserManagement(self.database_module_mock)
 
+        # limpando os dados do mock
+        self.database_module_mock.clear_data()
+
     def test_create_user_success(self):
         # Test creating a new user successfully
-        result = self.user_management_module.create_user("new_user", "new_password")
+        result = self.user_management_module.create_user(username="test_user", email="test_email", password="test_password")
         self.assertTrue(result)
 
     def test_create_existing_user(self):
         # Test creating a user that already exists
-        self.user_management_module.create_user("existing_user", "password123")
+        self.user_management_module.create_user("existing_user", "existing_email", "existing_password")
         with self.assertRaises(Exception) as context:
-            self.user_management_module.create_user("existing_user", "new_password")
+            self.user_management_module.create_user("existing_user", "existing_email", "existing_password")
         self.assertEqual(str(context.exception), 'Usuário já existe')
 
     def test_hash_password(self):
@@ -33,7 +37,7 @@ class TestUserManagementModule(unittest.TestCase):
 
     def test_user_exists(self):
         # Test checking if a user exists
-        self.user_management_module.create_user("check_user", "check_password")
+        self.user_management_module.create_user("check_user", "check_email", "check_password")
         result = self.user_management_module.user_exists("check_user")
         self.assertTrue(result)
 
@@ -46,7 +50,7 @@ class TestUserManagementModule(unittest.TestCase):
         # Testa a exclusão de um usuário
         username = "user_to_delete"
         password = "password123"
-        self.user_management_module.create_user(username, password)
+        self.user_management_module.create_user(username, "delete_email@mail.com", password)
 
         # Verifica se o usuário existe antes da exclusão
         self.assertTrue(self.user_management_module.user_exists(username))

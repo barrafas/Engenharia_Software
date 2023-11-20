@@ -12,7 +12,7 @@ class TestAuthenticationModule(unittest.TestCase):
         self.user_management_module = UserManagement(self.database_module_mock)
 
         # Create a test user
-        self.user_management_module.create_user("test_user", "test_password")
+        self.user_management_module.create_user(username="test_user", email="test_email", password="test_password")
 
     def test_successful_authentication(self):
         # Test successful authentication
