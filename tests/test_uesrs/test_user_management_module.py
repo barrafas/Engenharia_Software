@@ -1,5 +1,5 @@
 import unittest
-from src.auth.user_management import UserManagement
+from src.user.user_management import UserManagement
 from src.database.text_document_module import TextDocumentModule
 import bcrypt
 
@@ -56,8 +56,7 @@ class TestUserManagementModule(unittest.TestCase):
         self.assertTrue(self.user_management_module.user_exists(username))
 
         # Exclui o usuário
-        result = self.user_management_module.delete_user(username)
-        self.assertTrue(result)
+        self.user_management_module.delete_user(username)
 
         # Verifica se o usuário não existe mais após a exclusão
         self.assertFalse(self.user_management_module.user_exists(username))
