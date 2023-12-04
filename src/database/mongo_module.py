@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from database_module import DatabaseModule
+from .database_module import DatabaseModule
 
 class MongoModule(DatabaseModule):
     def __init__(self, db_url, db_name):

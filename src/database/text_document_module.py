@@ -1,4 +1,4 @@
-from src.database.database_module import DatabaseModule
+from .database_module import DatabaseModule
 import json
 import os
 
