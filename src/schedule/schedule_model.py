@@ -11,7 +11,8 @@ class Schedule:
         and each element can be assigned to one or more schedules.
         Each user can have a different permission in a schedule.
     """
-    def __init__(self, schedule_id: str, title: str, description: str, permissions: [tuple], elements: [Element]):
+    def __init__(self, schedule_id: str, title: str, description: str, 
+            permissions: [tuple] = None, elements: [Element] = None):
         """
             Schedule constructor.
             Arguments:
@@ -60,6 +61,24 @@ class Schedule:
 
             Returns:
                 [User] -- List of users that have the specified permission types.
+        '''
+        pass
+
+    def set_title(self, title: str) -> None:
+        '''
+            Sets the title of the schedule.
+
+            Arguments:
+                title -- title of the schedule.
+        '''
+        pass
+
+    def set_description(self, description: str) -> None:
+        '''
+            Sets the description of the schedule.
+
+            Arguments:
+                description -- description of the schedule.
         '''
         pass
 
