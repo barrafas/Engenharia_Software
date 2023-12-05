@@ -41,7 +41,7 @@ class Schedule:
         return self._elements
 
 
-    def get_elements(self):
+    def get_elements(self) -> list:
         '''
             Returns a list of elements in the schedule.
 
@@ -50,7 +50,7 @@ class Schedule:
         '''
         pass
 
-    def get_users(self, permission_types = None):
+    def get_users(self, permission_types = None) -> list:
         '''
             Returns a list of users that have the specified permission types.
             If no permission types are specified, returns all the users in the schedule.
@@ -63,7 +63,7 @@ class Schedule:
         '''
         pass
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         '''
             Returns a dictionary representation of the schedule,
             which can be used to create a JSON object.
