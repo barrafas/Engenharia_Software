@@ -59,6 +59,16 @@ class TestScheduleModel(unittest.TestCase):
         max_length_title = "a" * 50
         self.schedule.set_title(max_length_title)
         self.assertEqual(self.schedule.title, max_length_title)
+    
+    def test_set_title_whitespace(self):
+        # Test setting a title that contains only whitespace
+        with self.assertRaises(ValueError):
+            self.schedule.set_title("   ")
+
+    def test_set_title_empty(self):
+        # Test setting an empty title
+        with self.assertRaises(ValueError):
+            self.schedule.set_title("")
 
     def test_set_description_valid(self):
         # Test setting a valid description
