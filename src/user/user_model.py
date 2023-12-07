@@ -10,6 +10,7 @@ class User:
         self.schedules = schedules if schedules else []
         self.hashed_password = hashed_password
         self.user_preferences = user_preferences if user_preferences else {}
+        self.schedule_management = ScheduleManagement.get_instance()
 
     def __str__(self) -> str:
         return f"User({self.id}, {self.username}, {self.email}," \
@@ -38,7 +39,7 @@ class User:
 
         elements = []
         for schedule in schedules:
-            schedule = ScheduleManagement().get_schedule(schedule)
+            schedule = self.schedule_management.get_schedule(schedule)
             elements += schedule.get_elements()
 
         elements = list(set(elements)) # remove duplicates

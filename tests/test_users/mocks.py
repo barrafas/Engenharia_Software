@@ -10,6 +10,15 @@ class Schedule:
         return self.elements
 
 class ScheduleManagement:
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if not cls._instance:
+            cls._instance = ScheduleManagement()
+        return cls._instance
+
+
     def __init__(self):
         self.schedules = {
         'id1': Schedule(['elementid1', 'elementid2', 'elementid5']),
@@ -30,6 +39,14 @@ class Element:
         return (self.start_time, self.end_time)
     
 class ElementManagement:
+    _instance = None
+
+    @classmethod
+    def get_instance(cls):
+        if not cls._instance:
+            cls._instance = ScheduleManagement()
+        return cls._instance
+    
     def __init__(self):
         self.elements = {
             'elementid1': Element(
@@ -53,3 +70,6 @@ class ElementManagement:
                 datetime.now() + timedelta(hours=19), 
                 datetime.now() + timedelta(hours=20), 'evento'),
         }
+
+    def get_element(self, id: str):
+        return self.elements[id]
