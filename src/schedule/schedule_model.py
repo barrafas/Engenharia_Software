@@ -12,7 +12,7 @@ class Schedule:
         Each user can have a different permission in a schedule.
     """
     def __init__(self, schedule_id: str, title: str, description: str, 
-            permissions: [tuple] = None, elements: [Element] = None):
+            permissions: [tuple] = None, elements: [str] = None):
         """
             Schedule constructor.
             Arguments:
@@ -21,33 +21,33 @@ class Schedule:
                 description -- description of the schedule.
                 permissions -- list of tuples (user_id, permission_type) 
                         that represent the permissions of the users in the schedule.
-                elements -- list of elements that are displayed in the schedule.
+                elements -- list of elements ids that are displayed in the schedule.
         """
-        self.id = schedule_id
-        self.title = title
-        self.description = description
-        self.permissions = permissions if permissions else []
-        self.elements = elements if elements else []
+        self.__id = schedule_id
+        self.set_title(title)
+        self.set_description(description)
+        self.__permissions = permissions if permissions else []
+        self.__elements = elements if elements else []
 
     @property
     def id(self):
-        return self._id
+        return self.__id
 
     @property
     def permissions(self):
-        return self._permissions
+        return self.__permissions
 
     @property
     def elements(self):
-        return self._elements
+        return self.__elements
 
 
     def get_elements(self) -> list:
         '''
-            Returns a list of elements in the schedule.
+            Returns a list of elements IDs for elements that are displayed in the schedule.
 
             Returns:
-                [Element] -- List of elements in the schedule.
+                [str] -- List of elements IDs in the schedule.
         '''
         pass
 
@@ -62,6 +62,7 @@ class Schedule:
             Returns:
                 [User] -- List of users that have the specified permission types.
         '''
+        
         pass
 
     def set_title(self, title: str) -> None:
@@ -71,7 +72,8 @@ class Schedule:
             Arguments:
                 title -- title of the schedule.
         '''
-        pass
+
+        self.title = title
 
     def set_description(self, description: str) -> None:
         '''
@@ -80,7 +82,7 @@ class Schedule:
             Arguments:
                 description -- description of the schedule.
         '''
-        pass
+        self.description = description
 
     def to_dict(self) -> dict:
         '''
