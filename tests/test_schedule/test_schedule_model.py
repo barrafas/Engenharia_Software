@@ -120,5 +120,17 @@ class TestScheduleModel(unittest.TestCase):
         schedule_dict = self.schedule.to_dict()
         self.assertEqual(schedule_dict["elements"], self.elements)
 
+    def test_to_dict_none_empty(self):
+        # Test to_dict when attributes are None or empty
+        empty_schedule = Schedule(self.id, self.title, None, [], [])
+        schedule_dict = empty_schedule.to_dict()
+        self.assertEqual(schedule_dict, {
+            "id": self.id,
+            "title": self.title,
+            "description": None,
+            "permissions": [],
+            "elements": []
+        })
+
 if __name__ == '__main__':
     unittest.main()
