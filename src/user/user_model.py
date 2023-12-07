@@ -1,3 +1,5 @@
+from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
+
 class User:
     def __init__(self, id: str, username: str, email: str, schedules: list=None, 
                  hashed_password: str=None, user_preferences: dict=None):
@@ -9,7 +11,8 @@ class User:
         self.user_preferences = user_preferences if user_preferences else {}
 
     def __str__(self):
-        return f"User({self.user_id}, {self.username}, {self.email}, {self.events})"
+        return f"User({self.id}, {self.username}, {self.email}," \
+        "{self.schedules}, {self.user_preferences})"
 
     def to_dict(self):
         return {
@@ -31,13 +34,24 @@ class User:
         '''
         if not schedules:
             schedules = self.schedules
-        # necessário ter ScheduleManagement e ElementManagement para implementar
+
+        elements = []
+        for schedule in schedules:
+            schedule = ScheduleManagement().get_schedule(schedule)
+            elements += schedule.get_elements()
+
+        return elements
 
     def get_hashed_password(self):
         return self.hashed_password
     
     def set_username(self, username: str):
-        self.username = username
+        if type(username) != str:
+            raise Exception("Name must be a string")
+        elif username == "":
+            raise Exception("Name cannot be empty or blank")
+        else:
+            self.username = username.strip()
     
     def set_email(self, email: str):
         self.email = email
