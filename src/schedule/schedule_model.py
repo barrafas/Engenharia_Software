@@ -104,4 +104,10 @@ class Schedule:
             Returns:
                 dict -- Dictionary representation of the schedule.
         '''
-        pass
+        return {
+            "id": self.__id,
+            "title": self.title,
+            "description": self.description,
+            "permissions": self.__permissions,
+            "elements": self.__elements
+        }

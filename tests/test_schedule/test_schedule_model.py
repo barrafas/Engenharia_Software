@@ -97,6 +97,19 @@ class TestScheduleModel(unittest.TestCase):
         self.schedule.set_description(max_length_description)
         self.assertEqual(self.schedule.description, max_length_description)
 
+    def test_to_dict(self):
+        # Call the to_dict method
+        schedule_dict = self.schedule.to_dict()
+
+        # Check that the dictionary has the correct keys and values
+        self.assertEqual(schedule_dict, {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "permissions": self.permissions,
+            "elements": self.elements
+        })
+
 
 if __name__ == '__main__':
     unittest.main()
