@@ -110,6 +110,15 @@ class TestScheduleModel(unittest.TestCase):
             "elements": self.elements
         })
 
+    def test_to_dict_permissions(self):
+        # Test that to_dict correctly converts permissions
+        schedule_dict = self.schedule.to_dict()
+        self.assertEqual(schedule_dict["permissions"], self.permissions)
+
+    def test_to_dict_elements(self):
+        # Test that to_dict correctly converts elements
+        schedule_dict = self.schedule.to_dict()
+        self.assertEqual(schedule_dict["elements"], self.elements)
 
 if __name__ == '__main__':
     unittest.main()
