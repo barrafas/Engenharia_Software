@@ -76,6 +76,8 @@ class Schedule:
             raise ValueError("Title cannot be None")
         if not isinstance(title, str):
             raise TypeError("Title must be a string")
+        if len(title) > 50:
+            raise ValueError("Title must have at most 50 characters")
         self.title = title
 
     def set_description(self, description: str) -> None:
@@ -85,10 +87,11 @@ class Schedule:
             Arguments:
                 description -- description of the schedule.
         '''
-        if description is None:
-            raise ValueError("Description cannot be None")
-        if not isinstance(description, str):
-            raise TypeError("Description must be a string")
+        if description is not None:
+            if type(description) != str:
+                raise TypeError("Description must be a string")
+            elif len(description) > 500:
+                raise ValueError("Description cannot have more than 500 characters")
         self.description = description
 
     def to_dict(self) -> dict:

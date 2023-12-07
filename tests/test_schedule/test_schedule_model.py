@@ -73,8 +73,8 @@ class TestScheduleModel(unittest.TestCase):
 
     def test_set_description_none(self):
         # Test setting a description that is None
-        with self.assertRaises(ValueError):
-            self.schedule.set_description(None)
+        self.schedule.set_description(None)
+        self.assertEqual(self.schedule.description, None)
 
     def test_set_description_too_long(self):
         # Test setting a description that is too long
