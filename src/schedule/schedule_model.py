@@ -76,6 +76,8 @@ class Schedule:
             raise ValueError("Title cannot be None")
         if not isinstance(title, str):
             raise TypeError("Title must be a string")
+        if len(title.strip()) == 0:
+            raise ValueError("Title cannot be empty")
         if len(title) > 50:
             raise ValueError("Title must have at most 50 characters")
         self.title = title
