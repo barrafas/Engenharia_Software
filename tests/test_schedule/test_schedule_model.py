@@ -49,6 +49,17 @@ class TestScheduleModel(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.schedule.set_title(None)
 
+    def test_set_title_too_long(self):
+        # Test setting a title that is too long
+        with self.assertRaises(ValueError):
+            self.schedule.set_title("a" * 51)
+    
+    def test_set_title_max_length(self):
+        # Test setting a title that is exactly at the maximum length
+        max_length_title = "a" * 50
+        self.schedule.set_title(max_length_title)
+        self.assertEqual(self.schedule.title, max_length_title)
+
     def test_set_description_valid(self):
         # Test setting a valid description
         valid_description = "Valid Description"
@@ -64,6 +75,17 @@ class TestScheduleModel(unittest.TestCase):
         # Test setting a description that is None
         with self.assertRaises(ValueError):
             self.schedule.set_description(None)
+
+    def test_set_description_too_long(self):
+        # Test setting a description that is too long
+        with self.assertRaises(ValueError):
+            self.schedule.set_description("a" * 501)
+
+    def test_set_description_max_length(self):
+        # Test setting a description that is exactly at the maximum length
+        max_length_description = "a" * 500
+        self.schedule.set_description(max_length_description)
+        self.assertEqual(self.schedule.description, max_length_description)
 
 
 if __name__ == '__main__':
