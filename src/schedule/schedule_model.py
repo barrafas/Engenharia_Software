@@ -72,7 +72,10 @@ class Schedule:
             Arguments:
                 title -- title of the schedule.
         '''
-
+        if title is None:
+            raise ValueError("Title cannot be None")
+        if not isinstance(title, str):
+            raise TypeError("Title must be a string")
         self.title = title
 
     def set_description(self, description: str) -> None:
@@ -82,6 +85,10 @@ class Schedule:
             Arguments:
                 description -- description of the schedule.
         '''
+        if description is None:
+            raise ValueError("Description cannot be None")
+        if not isinstance(description, str):
+            raise TypeError("Description must be a string")
         self.description = description
 
     def to_dict(self) -> dict:
