@@ -125,5 +125,5 @@ class MongoModule(DatabaseModule):
         Returns:
             list: The result of the query.
         """
-        ...
+        return [dict({"_id": "semente de bacon", "test": "test3"})]
 
