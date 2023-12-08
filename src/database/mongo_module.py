@@ -29,6 +29,7 @@ class MongoModule(DatabaseModule):
     def disconnect(self):
         self.client = None
         self.db = None
+        self.collection = None
 
     def insert_data(self, query):
         ...
