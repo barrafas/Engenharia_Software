@@ -34,6 +34,8 @@ class MongoModule(DatabaseModule):
         self.collection = None
 
     def insert_data(self, data):
+        if not self.client:
+            raise Exception("Not connected to the database.")
         self.collection.insert_one(data)
 
     def delete_data(self, query):
