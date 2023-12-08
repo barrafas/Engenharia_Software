@@ -45,6 +45,8 @@ class TestMongoModule(unittest.TestCase):
         self._connect_insert_and_select_data_internal(query={"test": "test3"}, expected_result=expected_result)
         expected_result2 = [{"_id": unittest.mock.ANY, "test": "test4"}]
         self._connect_insert_and_select_data_internal(query={"test": "test4"}, expected_result=expected_result2)
+        expected_result3 = [{"_id": unittest.mock.ANY, "test": "test5"}]
+        self._connect_insert_and_select_data_internal(query={"test": "test5"}, expected_result=expected_result3)
 
 
     def _connect_to_database(self):
