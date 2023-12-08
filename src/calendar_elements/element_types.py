@@ -4,6 +4,8 @@
 """
 from datetime import datetime, timedelta
 from .element_interface import CalendarElement
+from tests.test_events.mocks import Schedule, ScheduleManagement, User, UserManagement
+
 
 
 class EventElement(CalendarElement):
@@ -74,7 +76,8 @@ class EventElement(CalendarElement):
         Returns:
             list -- The schedules of the event.
         """
-        pass
+        schedule_manager = ScheduleManagement.get_instance()
+        return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
     
     def get_users(self, schedules = []) -> [str]:
         """
@@ -230,7 +233,8 @@ class TaskElement(CalendarElement):
         Returns:
             list -- The schedules of the task.
         """
-        pass
+        schedule_manager = ScheduleManagement.get_instance()
+        return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
     def get_users(self, schedules = []) -> [str]:
         """
@@ -399,7 +403,9 @@ class ReminderElement(CalendarElement):
         Returns:
             list -- The schedules of the reminder.
         """
-        pass
+        schedule_manager = ScheduleManagement.get_instance()
+        return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
+        
 
     def get_users(self, schedules = []) -> [str]:
         """
