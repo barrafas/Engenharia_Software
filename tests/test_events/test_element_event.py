@@ -1,13 +1,36 @@
 import unittest
 from datetime import datetime, timedelta
-from src.calendar_elements.element_types import EventElement, TaskElement, ReminderElement
+from src.calendar_elements.element_types import EventElement
 
 class TestEventElement(unittest.TestCase):
 
     def setUp(self):
-        self.event = EventElement("1", "Test Event", "event_description", datetime(2023, 1, 1), 
-                                  datetime(2023, 1, 2))
+        self.id = "1"
+        self.title = "Test Event"
+        self.start = datetime(2023, 1, 1)
+        self.end = datetime(2023, 1, 2)
+        self.description = "Description"
+        self.schedules = ['schedule_1', 'schedule_2']
+        self.type = "event"
+        self.event = EventElement(self.id, self.title, self.start, self.end, 
+                                    self.description, self.schedules)
+        # Access private attributes for testing
+        self.event._EventElement__id = self.id
+        self.event._EventElement__schedules = self.schedules
+        self.event._EventElement__type = self.type
         
+    def test_id_property(self):
+        # Test the id property
+        self.assertEqual(self.event.id, self.id)
+
+    def test_type_property(self):
+        # Test the schedules property
+        self.assertEqual(self.event.type, self.type)
+
+    def test_schedules_property(self):
+        # Test the schedules property
+        self.assertEqual(self.event.schedules, self.schedules)
+
     def test_get_display_interval(self):
         # Verify if the interval returned matches the one that was set in 
         # the constructor
@@ -15,14 +38,51 @@ class TestEventElement(unittest.TestCase):
         self.assertEqual(self.event.get_display_interval(), expected_interval)
 
     def test_get_type(self):
-        # Verify if the type returned is "evento"
-        self.assertEqual(self.event.get_type(), "evento")
+        # Verify if the type returned is "event"
+        self.assertEqual(self.event.get_type(), "event")
 
     def test_get_schedules(self):
         pass
 
-    def test_get_users(self):    
+    def test_get_schedules_empty(self):
         pass
+
+    def test_get_users(self):
+        pass
+
+    def test_get_users_empty(self):
+        pass
+
+    def test_get_users_with_filter_by_schedules(self):
+        pass
+
+    def test_set_interval_valid(self):
+        # Test setting a valid interval
+        valid_start = datetime(2023, 1, 1)
+        valid_end = datetime(2023, 1, 2)
+        self.event.set_interval(valid_start, valid_end)
+        self.assertEqual(self.event.start, valid_start)
+        self.assertEqual(self.event.end, valid_end)
+
+    def test_set_interval_not_datetime(self):
+        # Test setting an interval that is not a datetime
+        with self.assertRaises(TypeError):
+            self.event.set_interval(123, 456)
+
+    def test_set_interval_start_after_end(self):
+        # Test setting an interval where the start is after the end
+        with self.assertRaises(ValueError):
+            self.event.set_interval(self.end, self.start)
+
+    def test_set_interval_start_none(self):
+        # Test setting an interval where the start is None
+        with self.assertRaises(ValueError):
+            self.event.set_interval(None, self.end)
+
+    def test_set_interval_end_none(self):
+        # Test setting an interval where the end is None
+        with self.assertRaises(ValueError):
+            self.event.set_interval(self.start, None)
 
     def test_set_title_valid(self):
         # Test setting a valid title
@@ -91,93 +151,31 @@ class TestEventElement(unittest.TestCase):
     def test_to_dict(self):
         # Verify if the dictionary returned has the expected keys and values
         expected_dict = {
-            "id": "1",
-            "title": "Test Event",
-            "description": "Description",
-            "start": datetime(2023, 1, 1),
-            "end": datetime(2023, 1, 2),
-            "type": "evento",
-            "schedules": []
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "type": self.type,
+            "schedules": self.schedules,
+            "start": self.start,
+            "end": self.end
         }
         self.assertDictEqual(self.event.to_dict(), expected_dict)
 
-    
 
-class TestTaskElement(unittest.TestCase):
-
-    def setUp(self):
-        self.task = TaskElement("1", "Test Task", "Description", 
-                                datetime(2023, 1, 1))
-
-    def test_get_display_interval(self):
-        # Verify if the interval returned matches the one that was set in the 
-        # constructor
-        expected_interval = (
-            datetime(2022, 12, 31, 23, 50), datetime(2023, 1, 1))
-        self.assertEqual(self.task.get_display_interval(), expected_interval)
-
-    def test_get_type(self):
-        # Verify if the type returned is "tarefa"
-        self.assertEqual(self.task.get_type(), "tarefa")
-
-    def test_get_title(self):
-        # Verify if the title returned is the same that was set in the 
-        # constructor
-        self.assertEqual(self.task.get_title(), "Test Task")
-
-    def test_to_dict(self):
+    def test_to_dict_empty_kwargs(self):
         # Verify if the dictionary returned has the expected keys and values
+        # when the event is instantiated with empty kwargs
+        empty_event = EventElement(self.id, self.title, self.start, self.end)
         expected_dict = {
-            "id": "1",
-            "title": "Test Task",
-            "description": "Description",
-            "state": "incompleta",
-            "due_date": datetime(2023, 1, 1),
-            "type": "tarefa",
+            "id": self.id,
+            "title": self.title,
+            "start": self.start,
+            "end": self.end,
+            "description": None,
+            "type": 'event',
             "schedules": []
         }
-        self.assertDictEqual(self.task.to_dict(), expected_dict)
-
-    def test_set_state(self):
-        # Verify if the state is set correctly
-        self.task.set_state("completa")
-        self.assertEqual(self.task.state, "completa")
-        pass
-
-    def test_get_users(self):
-        pass
-
-class TestReminderElement(unittest.TestCase):
-
-    def setUp(self):
-        self.reminder = ReminderElement("1", "Test Reminder", "Description", 
-                                        datetime(2023, 1, 1))
-
-    def test_get_display_interval(self):
-        # Verify if the interval returned matches the one that was set in 
-        # the constructor
-        expected_interval = (
-            datetime(2022, 12, 31, 23, 50), datetime(2023, 1, 1))
-        self.assertEqual(self.reminder.get_display_interval(), expected_interval)
-
-    def test_get_type(self):
-        # Verify if the type returned is "lembrete"
-        self.assertEqual(self.reminder.get_type(), "lembrete")
-
-    def test_to_dict(self):
-        # Verify if the dictionary returned has the expected keys and values
-        expected_dict = {
-            "id": "1",
-            "title": "Test Reminder",
-            "description": "Description",
-            "reminder_date": datetime(2023, 1, 1),
-            "type": "lembrete",
-            "schedules": []
-        }
-        self.assertDictEqual(self.reminder.to_dict(), expected_dict)
-
-    def test_get_users(self):
-        pass
+        self.assertDictEqual(empty_event.to_dict(), expected_dict)
 
 if __name__ == '__main__':
     unittest.main()

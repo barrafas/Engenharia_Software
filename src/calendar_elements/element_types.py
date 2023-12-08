@@ -5,6 +5,159 @@
 from datetime import datetime, timedelta
 from .element_interface import CalendarElement
 
+
+class EventElement(CalendarElement):
+    """
+        A class that represents an event.
+
+        'Event with determined beginning and end dates, which can be
+        scheduled for a specific time, and which can be
+        assigned to one or more schedules.'
+    """
+
+    def __init__(self, element_id: str, title: str, start: datetime, end: datetime, 
+                 description: str = None, schedules: [str] = None, type: str = "event"):
+        """
+        EventElement constructor.
+
+        Arguments:
+            element_id -- The id of the event.
+            title -- The title of the event.
+            description -- The description of the event.
+            start -- The start date of the event.
+            end -- The end date of the event.
+            schedules -- The schedules that the event is assigned to.
+            type -- The type of the event.
+        """
+        self.__schedules = schedules if schedules else []
+        self.__type = type
+
+        self.__id = element_id
+        self.set_title(title)
+        self.set_description(description)
+        self.set_interval(start, end)
+
+    @property
+    def id(self):
+        return self.__id
+    
+    @property
+    def schedules(self):
+        return self.__schedules
+    
+    @property
+    def type(self):
+        return self.__type
+
+    def get_display_interval(self) -> (datetime, datetime):
+        """
+        Returns the interval that the event should ocupate in the calendar.
+
+        Returns:
+            (datetime, datetime) -- The interval that the event should ocupate in the calendar.
+        """
+        return (self.start, self.end)
+
+    def get_type(self) -> str:
+        """
+        Returns the type of the event.
+
+        Returns:
+            str -- The type of the event.
+        """
+        return self.__type
+
+    def get_schedules(self) -> list:
+        """
+        Returns the schedules of the event.
+
+        Returns:
+            list -- The schedules of the event.
+        """
+        pass
+    
+    def get_users(self, schedules = []) -> [str]:
+        """
+        Returns the users that are assigned to the event.
+
+        Returns:
+            [str] -- The users that are assigned to the event.
+        """
+        pass
+    
+    def set_interval(self, start: datetime, end: datetime) -> None:
+        '''
+            Sets the interval of the event.
+
+            Arguments:
+                start -- start date of the event.
+                end -- end date of the event.
+        '''
+        if start is None:
+            raise ValueError("Start cannot be None")
+        elif type(start) != datetime:
+            raise TypeError("Start must be a datetime object")
+        elif end is None:
+            raise ValueError("End cannot be None")
+        elif type(end) != datetime:
+            raise TypeError("End must be a datetime object")
+        elif start >= end:
+            raise ValueError("Start must be before end")
+        else:
+            self.start = start
+            self.end = end
+
+    def set_title(self, title: str) -> None:
+        '''
+            Sets the title of the event.
+
+            Arguments:
+                title -- title of the event.
+        '''
+
+        if title is None:
+            raise ValueError("Title cannot be None")
+        elif type(title) != str:
+            raise TypeError("Title must be a string")
+        elif not title.strip():
+            raise ValueError("Title cannot be empty or blank")
+        elif len(title) > 50:
+            raise ValueError("Title cannot have more than 50 characters")
+        else:   
+            self.title = title
+
+    def set_description(self, description: str) -> None:
+        '''
+            Sets the description of the event.
+
+            Arguments:
+                description -- description of the event.
+        '''
+        if description is not None:
+            if type(description) != str:
+                raise TypeError("Description must be a string")
+            elif len(description) > 500:
+                raise ValueError("Description cannot have more than 500 characters")
+        self.description = description
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the event.
+
+        Returns:
+            dict -- The dictionary representation of the event.
+        """
+        return {
+            "id": self.__id,
+            "title": self.title,
+            "start": self.start,
+            "end": self.end,
+            "type": self.__type,
+            "description": self.description,
+            "schedules": self.__schedules
+        }
+
+
 class TaskElement(CalendarElement):
     """
         A class that represents a task.
