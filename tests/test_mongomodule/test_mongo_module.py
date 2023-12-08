@@ -10,15 +10,18 @@ from src.database.mongo_module import MongoModule
 class TestMongoModule(unittest.TestCase):
 
     def setUp(self):
+        # connection to the local database
         self.HOST = "localhost"
         self.mongo_module = MongoModule(host=self.HOST, collection_name="test_collection", database_name="test_db", port=27017)
 
     def tearDown(self):
+        # delete all documents from the collection
         if self.mongo_module.client:
             self.mongo_module.collection.delete_many({})
             self.mongo_module.disconnect()
 
     def test_connect(self):
+        # assert connection
         with unittest.mock.patch('pymongo.MongoClient') as mock_mongo:
             self.mongo_module.connect()
             mock_mongo.assert_called_once_with(host=self.HOST, port=27017, username=None, password=None)
@@ -28,7 +31,7 @@ class TestMongoModule(unittest.TestCase):
             self.assertIsNotNone(self.mongo_module.db)
             self.assertIsNotNone(self.mongo_module.collection)
 
-            # assert error
+            # assert error if already connected
             with self.assertRaises(Exception):
                 self.mongo_module.connect()
 
@@ -87,7 +90,6 @@ class TestMongoModule(unittest.TestCase):
         
         self.assertEqual(result, [{"_id": unittest.mock.ANY, "test": "test3"}])
         self.assertEqual(type(result), list)
-
 
         print(result)
 if __name__ == '__main__':
