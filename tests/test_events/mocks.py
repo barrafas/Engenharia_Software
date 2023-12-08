@@ -2,13 +2,21 @@ from datetime import datetime, timedelta
 
 class Schedule:
 
-    def __init__(self, elements: list=None):
+    def __init__(self, elements: list=None, users: list=None):
         self.elements = elements if elements else []
+        self.users = users if users else []
 
     def get_elements(self, type: str=None):
         if type:
             return [element for element in self.elements if element.type == type]
         return self.elements
+    
+    def get_users(self, type: str=None):
+        if type:
+            return [user for user in self.users if user.type == type]
+        return self.users
+        
+        
 
 class ScheduleManagement:
     _instance = None

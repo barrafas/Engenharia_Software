@@ -13,8 +13,8 @@ class TestEventElement(unittest.TestCase):
         self.description = "Description"
         self.schedules = ['schedule1', 'schedule2']
         self.type = "event"
-        self.event = EventElement(self.id, self.title, self.start, self.end, 
-                                    self.description, self.schedules)
+        self.event = EventElement(self.id, self.title, self.start, self.end, self.schedules,
+                                    self.description)
         # Access private attributes for testing
         self.event._EventElement__id = self.id
         self.event._EventElement__schedules = self.schedules
@@ -46,16 +46,11 @@ class TestEventElement(unittest.TestCase):
         # Verify if the schedules returned match the ones that were set in 
         # the constructor
         schedule_management = ScheduleManagement.get_instance()
-        event = EventElement(self.id, self.title, self.start, self.end, self.description, 
-                             ['id1', 'id2', 'id3'])
+        event = EventElement(self.id, self.title, self.start, self.end, ['id1', 'id2', 'id3'],
+                              self.description)
         schedules = event.get_schedules()
         expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
         self.assertEqual(schedules, expected_schedule)
-
-    def test_get_schedules_empty(self):
-        # Verify if the schedules returned are empty when no schedules were set
-        event = EventElement(self.id, self.title, self.start, self.end, self.description)
-        self.assertEqual(event.get_schedules(), [])
 
     def test_get_users(self):
         pass
@@ -171,21 +166,6 @@ class TestEventElement(unittest.TestCase):
         }
         self.assertDictEqual(self.event.to_dict(), expected_dict)
 
-
-    def test_to_dict_empty_kwargs(self):
-        # Verify if the dictionary returned has the expected keys and values
-        # when the event is instantiated with empty kwargs
-        empty_event = EventElement(self.id, self.title, self.start, self.end)
-        expected_dict = {
-            "id": self.id,
-            "title": self.title,
-            "start": self.start,
-            "end": self.end,
-            "description": None,
-            "type": 'event',
-            "schedules": []
-        }
-        self.assertDictEqual(empty_event.to_dict(), expected_dict)
 
 if __name__ == '__main__':
     unittest.main()

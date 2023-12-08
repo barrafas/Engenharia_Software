@@ -14,7 +14,7 @@ class CalendarElementFactory:
     """
 
     @staticmethod
-    def create_element(element_type: str, element_id: str, title: str,
+    def create_element(element_type: str, element_id: str, title: str, schedules: list,
                         **kwargs) -> CalendarElement:
         """
         Create a calendar element based on the provided type.
@@ -23,16 +23,17 @@ class CalendarElementFactory:
             element_type -- The type of the calendar element to create.
             element_id -- The id of the element.
             title -- The title of the element.
+            schedules -- The schedules that the element belongs to.
             **kwargs -- Additional arguments specific to each element type.
 
         Returns:
             CalendarElement -- An instance of the specified calendar element type.
         """
         if element_type == "event":
-            return EventElement(element_id, title, kwargs['start'], kwargs['end'])
+            return EventElement(element_id, title, kwargs['start'], kwargs['end'], schedules)
         elif element_type == "task":
-            return TaskElement(element_id, title, kwargs['due_date'])
+            return TaskElement(element_id, title, kwargs['due_date'], schedules)
         elif element_type == "reminder":
-            return ReminderElement(element_id, title, kwargs['reminder_date'])
+            return ReminderElement(element_id, title, kwargs['reminder_date'], schedules)
         else:
             raise ValueError(f"Unsupported element type: {element_type}")

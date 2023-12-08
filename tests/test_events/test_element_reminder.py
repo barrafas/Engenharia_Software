@@ -12,8 +12,8 @@ class TestReminderElement(unittest.TestCase):
         self.reminder_date = datetime(2023, 1, 1)
         self.schedules = ['schedule_1', 'schedule_2']
         self.type = "reminder"
-        self.reminder = ReminderElement(self.id, self.title, self.reminder_date, 
-                                        self.description, self.schedules, self.type)
+        self.reminder = ReminderElement(self.id, self.title, self.reminder_date, self.schedules,
+                                        self.description, self.type)
         
         # Access private attributes for testing
         self.reminder._ReminderElement__id = self.id
@@ -47,16 +47,11 @@ class TestReminderElement(unittest.TestCase):
         # Verify if the schedules returned match the ones that were set in
         # the constructor
         schedule_management = ScheduleManagement.get_instance()
-        reminder = ReminderElement(self.id, self.title, self.reminder_date, self.description, 
-                             ['id1', 'id2', 'id3'])
+        reminder = ReminderElement(self.id, self.title, self.reminder_date, ['id1', 'id2', 'id3'],
+                                   self.description)
         schedules = reminder.get_schedules()
         expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
         self.assertEqual(schedules, expected_schedule)
-
-    def test_get_schedules_empty(self):
-        # Verify if the schedules returned are empty when no schedules were set
-        event = ReminderElement(self.id, self.title, self.reminder_date, self.description)
-        self.assertEqual(event.get_schedules(), [])
 
     def test_get_users(self):
         pass
@@ -158,21 +153,6 @@ class TestReminderElement(unittest.TestCase):
             "type": self.type
         }
         self.assertDictEqual(self.reminder.to_dict(), expected_dict)
-
-    def test_to_dict_empty(self):
-        # Verify if the dictionary returned has the expected keys and values
-        # when there are empty attributes
-        empty_reminder = ReminderElement(self.id, self.title, self.reminder_date)
-        expected_dict = {
-            "id": self.id,
-            "title": self.title,
-            "description": None,
-            "reminder_date": self.reminder_date,
-            "schedules": [],
-            "type": "reminder"
-        }
-        
-        self.assertDictEqual(empty_reminder.to_dict(), expected_dict)
 
 
 if __name__ == '__main__':

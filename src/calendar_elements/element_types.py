@@ -17,8 +17,14 @@ class EventElement(CalendarElement):
         assigned to one or more schedules.'
     """
 
-    def __init__(self, element_id: str, title: str, start: datetime, end: datetime, 
-                 description: str = None, schedules: [str] = None, type: str = "event"):
+    def __init__(self, 
+                element_id: str, 
+                title: str, 
+                start: datetime, 
+                end: datetime, 
+                schedules: [str], 
+                description: str = None, 
+                type: str = "event"):
         """
         EventElement constructor.
 
@@ -169,9 +175,14 @@ class TaskElement(CalendarElement):
         time, and which can be assigned to one or more schedules.'
     """
 
-    def __init__(self, element_id: str, title: str, due_date: datetime, 
-                description: str = None, state: str = None,
-                schedules: [str] = None, type: str = "task"):
+    def __init__(self, 
+                element_id: str, 
+                title: str, 
+                due_date: datetime, 
+                schedules: [str], 
+                description: str = None, 
+                state: str = None,
+                type: str = "task"):
         """
         TaskElement constructor.
 
@@ -243,7 +254,20 @@ class TaskElement(CalendarElement):
         Returns:
             [str] -- The users that are assigned to the task.
         """
-        pass
+        schedule_manager = ScheduleManagement.get_instance()
+        if schedules == []: 
+            filter_schedules = self.__schedules
+        else:
+            filter_schedules = [schedule for schedule in self.__schedules if schedule in schedules]
+        
+        users = []
+        for schedule_id in filter_schedules:
+            schedule = schedule_manager.get_schedule(schedule_id)
+            users += [user_id for user_id, _ in schedule.get_user()]
+        
+        users = list(dict.fromkeys(users))
+
+        return users
     
     def set_due_date(self, due_date: datetime) -> None:
         '''
@@ -341,8 +365,13 @@ class ReminderElement(CalendarElement):
             _type -- The type of the reminder.
     """
 
-    def __init__(self, element_id: str, title: str, reminder_date: datetime, 
-                 description: str = None, schedules: [str] = None, type: str = "reminder"):
+    def __init__(self, 
+                element_id: str, 
+                title: str, 
+                reminder_date: datetime, 
+                schedules: [str], 
+                description: str = None, 
+                type: str = "reminder"):
         """
         ReminderElement constructor.
 

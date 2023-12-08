@@ -13,9 +13,13 @@ class TestTaskElement(unittest.TestCase):
         self.state = 'incomplete'
         self.schedules = ['schedule_1', 'schedule_2']
         self.type = "task"
-        self.task = TaskElement(self.id, self.title, self.due_date, 
-                                self.description, self.state,
-                                self.schedules, self.type)
+        self.task = TaskElement(self.id, 
+                                self.title, 
+                                self.due_date, 
+                                self.schedules, 
+                                self.description, 
+                                self.state,
+                                self.type)
         
         # Access private attributes for testing
         self.task._TaskElement__id = self.id
@@ -48,19 +52,24 @@ class TestTaskElement(unittest.TestCase):
         # Verify if the schedules returned match the ones that were set in
         # the constructor
         schedule_management = ScheduleManagement.get_instance()
-        task = TaskElement(self.id, self.title, self.due_date, self.description,
-                                schedules=['id1', 'id2', 'id3'])
+        task = TaskElement(element_id=self.id, 
+                            title=self.title, 
+                            due_date=self.due_date, 
+                            schedules=['id1', 'id2', 'id3'],
+                            description=self.description)
         schedules = task.get_schedules()
-        expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
+        print(schedules)
+        expected_schedule = [schedule_management.schedules[id] for id in ['id1', 'id2', 'id3']]
         self.assertEqual(schedules, expected_schedule)
 
-    def test_get_schedules_empty(self):
-        # Verify if the schedules returned are empty when no schedules were set
-        event = TaskElement(self.id, self.title, self.due_date, self.description)
-        self.assertEqual(event.get_schedules(), [])
-
     def test_get_users(self):
+        # Verify if the users returned match the ones that were set in
+        # the constructor
+        # schedule_management = ScheduleManagement.get_instance()
+        # task = TaskElement(self.id, self.title, self.due_date, self.description,
+        #                         schedules=['id1', 'id2', 'id3'])
         pass
+        
 
     def test_get_users_empty(self):
         pass
@@ -183,21 +192,6 @@ class TestTaskElement(unittest.TestCase):
             "type": self.type
         }
         self.assertDictEqual(self.task.to_dict(), expected_dict)
-
-    def test_to_dict_empty(self):
-        # Verify if the dictionary returned has the expected keys and values
-        # when the task has empty attributes
-        empty_task = TaskElement(self.id, self.title, self.due_date)
-        expected_dict = {
-            "id": self.id,
-            "title": self.title,
-            "description": None,
-            "due_date": self.due_date,
-            "state": 'incomplete',
-            "schedules": [],
-            "type": "task"
-        }
-        self.assertDictEqual(empty_task.to_dict(), expected_dict)
 
     
 
