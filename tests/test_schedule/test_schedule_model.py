@@ -140,12 +140,28 @@ class TestScheduleModel(unittest.TestCase):
         expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid2']]
         self.assertEqual(elements, expected_elements)
 
+    def test_get_elements_with_types(self):
+        # Test that get_elements returns the correct elements with the specified types
+        element_management = ElementManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', [], ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
+        elements = schedule.get_elements(['evento'])
+        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid4']]
+        self.assertEqual(elements, expected_elements)
+
     def test_get_users(self):
         # Test that get_users returns the correct users
         user_management = UserManagement.get_instance()
         schedule = Schedule('id', 'title', 'description', [('userid1', 'permissiontype1'), ('userid2', 'permissiontype2')], [])
         users = schedule.get_users()
         expected_users = [user_management.users['userid1'], user_management.users['userid2']]
+        self.assertEqual(users, expected_users)
+
+    def test_get_users_with_permission_types(self):
+        # Test that get_users returns the correct users with the specified permission types
+        user_management = UserManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', [('userid1', 'permissiontype1'), ('userid2', 'permissiontype2'), ('userid3', 'permissiontype1')], [])
+        users = schedule.get_users(['permissiontype1'])
+        expected_users = [user_management.users['userid1'], user_management.users['userid3']]
         self.assertEqual(users, expected_users)
 
 

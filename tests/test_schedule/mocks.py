@@ -22,7 +22,7 @@ class ElementManagement:
                 datetime.now(), datetime.now() + timedelta(hours=1), 'evento'),
             'elementid2': Element(
                 datetime.now() + timedelta(hours=15), 
-                datetime.now() + timedelta(hours=16), 'evento'),
+                datetime.now() + timedelta(hours=16), 'tarefa'),
             'elementid3': Element(
                 datetime.now() + timedelta(hours=8), 
                 datetime.now() + timedelta(hours=9), 'tarefa'),
