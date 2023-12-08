@@ -21,6 +21,7 @@ class MongoModule(DatabaseModule):
     def connect(self):
         self.client = pymongo.MongoClient(host=self.host, port=self.port, username=self.user, password=self.password)
         self.db = self.client[self.database_name]
+        self.collection = self.db[self.collection_name]
         
     def disconnect(self):
         ...

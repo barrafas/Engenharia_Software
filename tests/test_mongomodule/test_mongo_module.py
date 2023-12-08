@@ -21,6 +21,7 @@ class TestMongoModule(unittest.TestCase):
             mock_mongo.assert_called_once()
             self.assertIsNotNone(self.mongo_module.client)
             self.assertIsNotNone(self.mongo_module.db)
+            self.assertIsNotNone(self.mongo_module.collection)
             
 
 
