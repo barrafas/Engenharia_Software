@@ -103,7 +103,7 @@ class TestScheduleModel(unittest.TestCase):
 
         # Check that the dictionary has the correct keys and values
         self.assertEqual(schedule_dict, {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": self.description,
             "permissions": self.permissions,
@@ -125,7 +125,7 @@ class TestScheduleModel(unittest.TestCase):
         empty_schedule = Schedule(self.id, self.title, None, [('userid1', 'permissiontype1')], [])
         schedule_dict = empty_schedule.to_dict()
         self.assertEqual(schedule_dict, {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": None,
             "permissions": [('userid1', 'permissiontype1')],

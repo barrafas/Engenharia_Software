@@ -1,6 +1,6 @@
 #from src.calendar_elements.element_interface import Element
 from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
-
+ 
 
 class Schedule:
     """
@@ -123,7 +123,7 @@ class Schedule:
                 dict -- Dictionary representation of the schedule.
         '''
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "description": self.description,
             "permissions": self.__permissions,
