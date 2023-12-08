@@ -27,6 +27,8 @@ class MongoModule(DatabaseModule):
         self.collection = self.db[self.collection_name]
         
     def disconnect(self):
+        if not self.client:
+            raise Exception("Not connected to the database.")
         self.client = None
         self.db = None
         self.collection = None

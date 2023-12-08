@@ -34,6 +34,9 @@ class TestMongoModule(unittest.TestCase):
         self.assertIsNone(self.mongo_module.db)
         self.assertIsNone(self.mongo_module.collection)
 
+        with self.assertRaises(Exception):
+            self.mongo_module.disconnect()
+
     def test_insert_data(self):
         pass
 
