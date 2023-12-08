@@ -10,12 +10,19 @@ from src.database.mongo_module import MongoModule
 class TestMongoModule(unittest.TestCase):
 
     def setUp(self):
-        self.mongo_module = MongoModule(host="localhost", collection_name="test_collection")
+        self.HOST = "localhost"
+        self.mongo_module = MongoModule(host=self.HOST, collection_name="test_collection", database_name="test_db", port=27017)
 
     def test_connect(self):
         with unittest.mock.patch('pymongo.MongoClient') as mock_mongo:
             self.mongo_module.connect()
-            mock_mongo.assert_called_once_with(host="localhost")
+            mock_mongo.assert_called_once_with(host=self.HOST, port=27017, username=None, password=None)
+            mock_mongo.assert_called_with(host=self.HOST, port=27017, username=None, password=None)
+            mock_mongo.assert_called_once()
+            self.assertIsNotNone(self.mongo_module.client)
+            self.assertIsNotNone(self.mongo_module.db)
+            
+
 
     def test_disconnect(self):
         pass

@@ -2,16 +2,26 @@ import pymongo
 from src.database.database_module import DatabaseModule
 
 class MongoModule(DatabaseModule):
-    def __init__(self, host, collection_name):
+    def __init__(self, 
+                 host: str, 
+                 port: int, 
+                 database_name: str,
+                 collection_name: str,
+                 user: str = None,
+                 password: str = None,):
         self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+        self.database_name = database_name
         self.collection_name = collection_name
         self.client = None
         self.db = None
-        self.collection = None
 
     def connect(self):
-        self.client = pymongo.MongoClient(host=self.host)
-
+        self.client = pymongo.MongoClient(host=self.host, port=self.port, username=self.user, password=self.password)
+        self.db = self.client[self.database_name]
+        
     def disconnect(self):
         ...
 
