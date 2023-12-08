@@ -125,8 +125,5 @@ class MongoModule(DatabaseModule):
         Returns:
             list: The result of the query.
         """
-        result = list(self.collection.find(query))
-
-        return result
-
+        ...
 
