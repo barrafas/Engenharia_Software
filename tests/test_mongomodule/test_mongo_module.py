@@ -6,7 +6,6 @@ sys.path.append('/home/gustavo/ES/Engenharia_Software/')
 
 from src.database.mongo_module import MongoModule
 
-
 class TestMongoModule(unittest.TestCase):
 
     def setUp(self):
@@ -61,7 +60,17 @@ class TestMongoModule(unittest.TestCase):
             self.mongo_module.delete_data({"test": "test"})
 
     def test_update_data(self):
-        pass
+        self.mongo_module.connect()
+
+        self.mongo_module.insert_data({"test": "test"})
+
+        with unittest.mock.patch.object(self.mongo_module.collection, 'update_one') as mock_update:
+            self.mongo_module.update_data({"test": "test"}, {"test": "test2"})
+            mock_update.assert_called_once_with({"test": "test"}, {"test": "test2"})
+
+        self.mongo_module.disconnect()
+        with self.assertRaises(Exception):
+            self.mongo_module.update_data({"test": "test"}, {"test": "test"})
 
     def test_select_data(self):
         pass

@@ -38,11 +38,12 @@ class MongoModule(DatabaseModule):
             raise Exception("Not connected to the database.")
         self.collection.insert_one(data)
 
-    def delete_data(self, query):
-        self.collection.delete_one(query)
+    def delete_data(self, data):
+        self.collection.delete_one(data)
 
-    def update_data(self, query):
-        ...
+    def update_data(self, where, data):
+        self.collection.update_one(where, data)
+
 
     def select_data(self, query):
         ...
