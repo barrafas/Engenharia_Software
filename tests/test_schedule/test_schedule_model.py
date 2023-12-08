@@ -148,6 +148,18 @@ class TestScheduleModel(unittest.TestCase):
         expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid4']]
         self.assertEqual(elements, expected_elements)
 
+    def test_get_elements_empty(self):
+        # Test that get_elements returns an empty list when there are no elements
+        schedule = Schedule('id', 'title', 'description', [], [])
+        elements = schedule.get_elements()
+        self.assertEqual(elements, [])
+    
+    def test_get_elements_nonexistent_type(self):
+        # Test that get_elements returns an empty list when there are no elements with the specified type
+        schedule = Schedule('id', 'title', 'description', [], ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
+        elements = schedule.get_elements(['citrico'])
+        self.assertEqual(elements, [])
+
     def test_get_users(self):
         # Test that get_users returns the correct users
         user_management = UserManagement.get_instance()
@@ -163,6 +175,18 @@ class TestScheduleModel(unittest.TestCase):
         users = schedule.get_users(['permissiontype1'])
         expected_users = [user_management.users['userid1'], user_management.users['userid3']]
         self.assertEqual(users, expected_users)
+
+    def test_get_users_empty(self):
+        # Test that get_users returns an empty list when there are no users
+        schedule = Schedule('id', 'title', 'description', [], [])
+        users = schedule.get_users()
+        self.assertEqual(users, [])
+
+    def test_get_users_nonexistent_permission_type(self):
+        # Test that get_users returns an empty list when there are no users with the specified permission type
+        schedule = Schedule('id', 'title', 'description', [('userid1', 'permissiontype1'), ('userid2', 'permissiontype2'), ('userid3', 'permissiontype1')], [])
+        users = schedule.get_users(['permissiontype3'])
+        self.assertEqual(users, [])
 
 
 if __name__ == '__main__':
