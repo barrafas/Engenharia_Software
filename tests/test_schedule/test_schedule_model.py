@@ -1,6 +1,6 @@
 import unittest
-from unittest import mock
 from src.schedule.schedule_model import Schedule
+from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
 
 class TestScheduleModel(unittest.TestCase):
 
@@ -131,6 +131,23 @@ class TestScheduleModel(unittest.TestCase):
             "permissions": [],
             "elements": []
         })
+
+    def test_get_elements(self):
+        # Test that get_elements returns the correct elements
+        element_management = ElementManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', [], ['elementid1', 'elementid2'])
+        elements = schedule.get_elements()
+        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid2']]
+        self.assertEqual(elements, expected_elements)
+
+    def test_get_users(self):
+        # Test that get_users returns the correct users
+        user_management = UserManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', [('userid1', 'permissiontype1'), ('userid2', 'permissiontype2')], [])
+        users = schedule.get_users()
+        expected_users = [user_management.users['userid1'], user_management.users['userid2']]
+        self.assertEqual(users, expected_users)
+
 
 if __name__ == '__main__':
     unittest.main()

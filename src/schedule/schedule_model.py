@@ -1,4 +1,5 @@
-from src.calendar_elements.element_interface import Element
+#from src.calendar_elements.element_interface import Element
+from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
 
 class Schedule:
     """
@@ -42,16 +43,25 @@ class Schedule:
         return self.__elements
 
 
-    def get_elements(self) -> list:
+    def get_elements(self, types =  []) -> list:
         '''
             Returns a list of elements IDs for elements that are displayed in the schedule.
 
-            Returns:
-                [str] -- List of elements IDs in the schedule.
-        '''
-        pass
+            Arguments:
+                types -- list of element types.
 
-    def get_users(self, permission_types = None) -> list:
+            Returns:
+                [Element] -- List of element instances in the schedule that have the specified types.
+        '''
+        element_management = ElementManagement.get_instance()
+        elements = []
+        for element_id in self.__elements:
+            element = element_management.get_element(element_id)
+            elements.append(element)
+        return elements
+
+
+    def get_users(self, permission_types = []) -> list:
         '''
             Returns a list of users that have the specified permission types.
             If no permission types are specified, returns all the users in the schedule.
@@ -63,7 +73,12 @@ class Schedule:
                 [User] -- List of users that have the specified permission types.
         '''
         
-        pass
+        user_management = UserManagement.get_instance()
+        users = []
+        for user_id, permission_type in self.__permissions:
+            user = user_management.get_user(user_id)
+            users.append(user)
+        return users
 
     def set_title(self, title: str) -> None:
         '''
