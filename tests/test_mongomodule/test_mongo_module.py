@@ -22,6 +22,11 @@ class TestMongoModule(unittest.TestCase):
             self.assertIsNotNone(self.mongo_module.client)
             self.assertIsNotNone(self.mongo_module.db)
             self.assertIsNotNone(self.mongo_module.collection)
+
+            # assert error
+            with self.assertRaises(Exception):
+                self.mongo_module.connect()
+            
             
 
 

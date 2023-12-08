@@ -19,6 +19,9 @@ class MongoModule(DatabaseModule):
         self.db = None
 
     def connect(self):
+        if self.client:
+            raise Exception("Already connected to the database.")
+        
         self.client = pymongo.MongoClient(host=self.host, port=self.port, username=self.user, password=self.password)
         self.db = self.client[self.database_name]
         self.collection = self.db[self.collection_name]
