@@ -49,13 +49,15 @@ class TestTaskElement(unittest.TestCase):
         # the constructor
         schedule_management = ScheduleManagement.get_instance()
         task = TaskElement(self.id, self.title, self.due_date, self.description,
-                                ['id1', 'id2', 'id3'])
+                                schedules=['id1', 'id2', 'id3'])
         schedules = task.get_schedules()
         expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
         self.assertEqual(schedules, expected_schedule)
 
     def test_get_schedules_empty(self):
-        pass
+        # Verify if the schedules returned are empty when no schedules were set
+        event = TaskElement(self.id, self.title, self.due_date, self.description)
+        self.assertEqual(event.get_schedules(), [])
 
     def test_get_users(self):
         pass

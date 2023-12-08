@@ -54,7 +54,9 @@ class TestReminderElement(unittest.TestCase):
         self.assertEqual(schedules, expected_schedule)
 
     def test_get_schedules_empty(self):
-        pass
+        # Verify if the schedules returned are empty when no schedules were set
+        event = ReminderElement(self.id, self.title, self.reminder_date, self.description)
+        self.assertEqual(event.get_schedules(), [])
 
     def test_get_users(self):
         pass
