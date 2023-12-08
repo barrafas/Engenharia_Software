@@ -33,8 +33,8 @@ class MongoModule(DatabaseModule):
         self.db = None
         self.collection = None
 
-    def insert_data(self, query):
-        ...
+    def insert_data(self, data):
+        self.collection.insert_one(data)
 
     def delete_data(self, query):
         ...
