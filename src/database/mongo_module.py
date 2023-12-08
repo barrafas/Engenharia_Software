@@ -17,6 +17,7 @@ class MongoModule(DatabaseModule):
         self.collection_name = collection_name
         self.client = None
         self.db = None
+        self.collection = None
 
     def connect(self):
         if self.client:
@@ -45,7 +46,9 @@ class MongoModule(DatabaseModule):
         self.collection.update_one(where, data)
 
 
-    def select_data(self, query):
-        ...
+    def select_data(self, query=None):
+        result = list(self.collection.find(query))
+
+        return result
 
 

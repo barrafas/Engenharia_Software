@@ -1,5 +1,6 @@
 import unittest
 import unittest.mock
+import logging
 # from src.database.mongo_module import MongoModule
 import sys
 sys.path.append('/home/gustavo/ES/Engenharia_Software/')
@@ -11,6 +12,11 @@ class TestMongoModule(unittest.TestCase):
     def setUp(self):
         self.HOST = "localhost"
         self.mongo_module = MongoModule(host=self.HOST, collection_name="test_collection", database_name="test_db", port=27017)
+
+    def tearDown(self):
+        if self.mongo_module.client:
+            self.mongo_module.collection.delete_many({})
+            self.mongo_module.disconnect()
 
     def test_connect(self):
         with unittest.mock.patch('pymongo.MongoClient') as mock_mongo:
@@ -72,8 +78,19 @@ class TestMongoModule(unittest.TestCase):
         with self.assertRaises(Exception):
             self.mongo_module.update_data({"test": "test"}, {"test": "test"})
 
-    def test_select_data(self):
-        pass
+    def test_select_data(self):    # Call connect before select to ensure there's a valid collection
+        self.mongo_module.connect()
 
+        self.mongo_module.insert_data({"test": "test3"})
+
+        result = self.mongo_module.select_data({"test": "test3"})
+        
+        self.assertEqual(result, [{"_id": unittest.mock.ANY, "test": "test3"}])
+        self.assertEqual(type(result), list)
+
+
+        print(result)
 if __name__ == '__main__':
+    logging.basicConfig( stream=sys.stderr )
+    logging.getLogger( "TestMongoModule.test_select_data" ).setLevel( logging.DEBUG )
     unittest.main()
