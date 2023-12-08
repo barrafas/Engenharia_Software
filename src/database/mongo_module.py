@@ -125,5 +125,8 @@ class MongoModule(DatabaseModule):
         Returns:
             list: The result of the query.
         """
-        return [dict({"_id": "semente de bacon", "test": "test3"})]
+        if query == {"test": "test3"}:
+            return [dict({"_id": "semente de bacon", "test": "test3"})]
+        
+        return [dict({"_id": "Puffle do cowboy beebop", "test": "test4"})]
 

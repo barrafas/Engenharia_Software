@@ -42,9 +42,9 @@ class TestMongoModule(unittest.TestCase):
     def test_select_data(self):
         self._connect_to_database()
         expected_result = [{"_id": unittest.mock.ANY, "test": "test3"}]
-        self._connect_insert_and_select_data_internal(expected_result)
+        self._connect_insert_and_select_data_internal(query={"test": "test3"}, expected_result=expected_result)
         expected_result2 = [{"_id": unittest.mock.ANY, "test": "test4"}]
-        self._connect_insert_and_select_data_internal(expected_result2)
+        self._connect_insert_and_select_data_internal(query={"test": "test4"}, expected_result=expected_result2)
 
 
     def _connect_to_database(self):
@@ -116,12 +116,12 @@ class TestMongoModule(unittest.TestCase):
             self.mongo_module.update_data({"test": "test"}, {"test": "test2"})
             mock_update.assert_called_once_with({"test": "test"}, {"test": "test2"})
 
-    def _connect_insert_and_select_data_internal(self, expected_result):
-        self.mongo_module.insert_data({"test": "test3"})
+    def _connect_insert_and_select_data_internal(self, query, expected_result):
+        self.mongo_module.insert_data(query)
         
         with unittest.mock.patch.object(self.mongo_module.collection, 'find') as mock_find:
             mock_find.return_value = expected_result
-            result = self.mongo_module.select_data({"test": "test3"})
+            result = self.mongo_module.select_data(query)
 
         self.assertEqual(result, expected_result)
 
