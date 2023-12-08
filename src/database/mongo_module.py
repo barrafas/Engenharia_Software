@@ -39,7 +39,7 @@ class MongoModule(DatabaseModule):
         self.collection.insert_one(data)
 
     def delete_data(self, query):
-        ...
+        self.collection.delete_one(query)
 
     def update_data(self, query):
         ...

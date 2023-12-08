@@ -49,9 +49,16 @@ class TestMongoModule(unittest.TestCase):
             self.mongo_module.insert_data({"test": "test"})
 
 
-
     def test_delete_data(self):
-        pass
+        self.mongo_module.connect()
+
+        with unittest.mock.patch.object(self.mongo_module.collection, 'delete_one') as mock_delete:
+            self.mongo_module.delete_data({"test": "test"})
+            mock_delete.assert_called_once_with({"test": "test"})
+
+        self.mongo_module.disconnect()
+        with self.assertRaises(Exception):
+            self.mongo_module.delete_data({"test": "test"})
 
     def test_update_data(self):
         pass
