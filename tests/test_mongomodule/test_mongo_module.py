@@ -26,12 +26,11 @@ class TestMongoModule(unittest.TestCase):
             # assert error
             with self.assertRaises(Exception):
                 self.mongo_module.connect()
-            
-            
-
 
     def test_disconnect(self):
-        pass
+        self.mongo_module.connect()
+        self.mongo_module.disconnect()
+        self.assertIsNone(self.mongo_module.client)
 
     def test_insert_data(self):
         pass
