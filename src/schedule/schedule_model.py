@@ -57,7 +57,8 @@ class Schedule:
         elements = []
         for element_id in self.__elements:
             element = element_management.get_element(element_id)
-            elements.append(element)
+            if not types or element.type in types:
+                elements.append(element)
         return elements
 
 
@@ -76,8 +77,9 @@ class Schedule:
         user_management = UserManagement.get_instance()
         users = []
         for user_id, permission_type in self.__permissions:
-            user = user_management.get_user(user_id)
-            users.append(user)
+            if not permission_types or permission_type in permission_types:
+                user = user_management.get_user(user_id)
+                users.append(user)
         return users
 
     def set_title(self, title: str) -> None:
