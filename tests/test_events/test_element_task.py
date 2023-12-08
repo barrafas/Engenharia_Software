@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from src.calendar_elements.element_types import TaskElement
+from tests.test_events.mocks import Schedule, ScheduleManagement, User, UserManagement
 
 class TestTaskElement(unittest.TestCase):
 
@@ -43,11 +44,15 @@ class TestTaskElement(unittest.TestCase):
         # Verify if the type returned is "task"
         self.assertEqual(self.task.get_type(), "task")
 
-    def test_get_users(self):    
-        pass
-
     def test_get_schedules(self):
-        pass
+        # Verify if the schedules returned match the ones that were set in
+        # the constructor
+        schedule_management = ScheduleManagement.get_instance()
+        task = TaskElement(self.id, self.title, self.due_date, self.description,
+                                ['id1', 'id2', 'id3'])
+        schedules = task.get_schedules()
+        expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
+        self.assertEqual(schedules, expected_schedule)
 
     def test_get_schedules_empty(self):
         pass
