@@ -31,6 +31,7 @@ class TestMongoModule(unittest.TestCase):
         self.mongo_module.connect()
         self.mongo_module.disconnect()
         self.assertIsNone(self.mongo_module.client)
+        self.assertIsNone(self.mongo_module.db)
 
     def test_insert_data(self):
         pass
