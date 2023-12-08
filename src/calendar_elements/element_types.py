@@ -321,3 +321,154 @@ class TaskElement(CalendarElement):
             "type": self.__type,
             "schedules": self.__schedules
         }
+    
+class ReminderElement(CalendarElement):
+    """
+        A class that represents a reminder.
+
+        'Reminder with a date and time, which can be scheduled for a specific
+        time, and which can be assigned to one or more schedules.'
+
+        Attributes:
+            _id -- The id of the reminder.
+            title -- The title of the reminder.
+            description -- The description of the reminder.
+            reminder_date -- The date of the reminder.
+            _type -- The type of the reminder.
+    """
+
+    def __init__(self, element_id: str, title: str, reminder_date: datetime, 
+                 description: str = None, schedules: [str] = None, type: str = "reminder"):
+        """
+        ReminderElement constructor.
+
+        Arguments:
+            element_id -- The id of the reminder.
+            title -- The title of the reminder.
+            description -- The description of the reminder.
+            reminder_date -- The date of the reminder.
+        """
+        self.__schedules = schedules if schedules else []
+        self.__type = type
+
+        self.__id = element_id
+        self.set_title(title)
+        self.set_description(description)
+        self.set_reminder_date(reminder_date)
+
+    @property
+    def id(self):
+        return self.__id
+    
+    @property
+    def schedules(self):
+        return self.__schedules
+    
+    @property
+    def type(self):
+        return self.__type
+
+    def get_display_interval(self) -> (datetime, datetime):
+        """
+        Returns the interval that the reminder should ocupate in the calendar.
+        In the case of the reminder, it will be 10 minutes before
+        the reminder date untill the reminder date.
+        Returns:
+            (datetime, datetime) -- The interval that the reminder should ocupate in the calendar.
+        """
+        ending_date = self.reminder_date
+        # The reminder will be displayed 10 minutes before the reminder date.
+        ten_minutes = timedelta(minutes=10)
+        starting_date = ending_date - ten_minutes
+
+        return (starting_date, ending_date)
+
+    def get_type(self) -> str:
+        """
+        Returns the type of the reminder.
+
+        Returns:
+            str -- The type of the reminder.
+        """
+        return self.__type
+
+    def get_schedules(self) -> list:
+        """
+        Returns the schedules of the reminder.
+
+        Returns:
+            list -- The schedules of the reminder.
+        """
+        pass
+
+    def get_users(self, schedules = []) -> [str]:
+        """
+        Returns the users that are assigned to the reminder.
+
+        Returns:
+            [str] -- The users that are assigned to the reminder.
+        """
+        pass
+    
+    def set_reminder_date(self, reminder_date: datetime) -> None:
+        '''
+            Sets the reminder date of the reminder.
+
+            Arguments:
+                reminder_date -- reminder date of the reminder.
+        '''
+        if reminder_date is None:
+            raise ValueError("Reminder date cannot be None")
+        elif type(reminder_date) != datetime:
+            raise TypeError("Reminder date must be a datetime object")
+        else:
+            self.reminder_date = reminder_date
+
+    def set_title(self, title: str) -> None:
+        '''
+            Sets the title of the reminder.
+
+            Arguments:
+                title -- title of the reminder.
+        '''
+
+        if title is None:
+            raise ValueError("Title cannot be None")
+        elif type(title) != str:
+            raise TypeError("Title must be a string")
+        elif not title.strip():
+            raise ValueError("Title cannot be empty or blank")
+        elif len(title) > 50:
+            raise ValueError("Title cannot have more than 50 characters")
+        else:   
+            self.title = title
+
+    def set_description(self, description: str) -> None:
+        '''
+            Sets the description of the reminder.
+
+            Arguments:
+                description -- description of the reminder.
+        '''
+        if description is not None:
+            if type(description) != str:
+                raise TypeError("Description must be a string")
+            elif len(description) > 500:
+                raise ValueError("Description cannot have more than 500 characters")
+        self.description = description
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the reminder.
+
+        Returns:
+            dict -- The dictionary representation of the reminder.
+        """
+        return {
+            "id": self.__id,
+            "title": self.title,
+            "description": self.description,
+            "reminder_date": self.reminder_date,
+            "type": self.__type,
+            "schedules": self.__schedules
+        }
