@@ -1,6 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from src.calendar_elements.element_types import EventElement
+from tests.test_events.mocks import Schedule, ScheduleManagement, User, UserManagement
 
 class TestEventElement(unittest.TestCase):
 
@@ -10,7 +11,7 @@ class TestEventElement(unittest.TestCase):
         self.start = datetime(2023, 1, 1)
         self.end = datetime(2023, 1, 2)
         self.description = "Description"
-        self.schedules = ['schedule_1', 'schedule_2']
+        self.schedules = ['schedule1', 'schedule2']
         self.type = "event"
         self.event = EventElement(self.id, self.title, self.start, self.end, 
                                     self.description, self.schedules)
@@ -42,7 +43,14 @@ class TestEventElement(unittest.TestCase):
         self.assertEqual(self.event.get_type(), "event")
 
     def test_get_schedules(self):
-        pass
+        # Verify if the schedules returned match the ones that were set in 
+        # the constructor
+        schedule_management = ScheduleManagement.get_instance()
+        event = EventElement(self.id, self.title, self.start, self.end, self.description, 
+                             ['id1', 'id2', 'id3'])
+        schedules = event.get_schedules()
+        expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
+        self.assertEqual(schedules, expected_schedule)
 
     def test_get_schedules_empty(self):
         pass
