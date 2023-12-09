@@ -15,6 +15,12 @@ class EmailCantBeBlank(Exception):
     Custom exception class for when a email is blank.
     """
 
+class TupleWithLessThanTwoDatetimeObjects(Exception):
+    """
+    Custom exception class for when a tuple with less than two datetime objects
+    is passed to the check_disponibility method.
+    """
+
 class User:
     """
     User class

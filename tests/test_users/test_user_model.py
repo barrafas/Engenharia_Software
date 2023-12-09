@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
 from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank, \
-                                EmailCantBeBlank
+                                EmailCantBeBlank, TupleWithLessThanTwoDatetimeObjects
 import bcrypt
 
 class TestUserModel(unittest.TestCase):
@@ -127,6 +127,14 @@ class TestUserModel(unittest.TestCase):
             user.check_disponibility(time)
         self.assertEqual(str(context.exception), 
                          "A tupla de horário deve conter objetos datetime")
+        
+    def test_check_disponibility_short_tuple(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        time = (datetime.now())
+        with self.assertRaises(TupleWithLessThanTwoDatetimeObjects) as context:
+            user.check_disponibility(time)
+        self.assertEqual(str(context.exception), 
+                         "A tupla de horário deve conter pelo menos dois objetos datetime")
 
 if __name__ == '__main__':
     unittest.main()
