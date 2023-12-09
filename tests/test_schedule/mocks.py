@@ -99,6 +99,9 @@ class ElementManagement:
 
     def get_element(self, element_id: str) -> Element:
         return self.elements[element_id]
+    
+    def element_exists(self, element_id: str) -> bool:
+        return "teste"
 
 class User:
     def __init__(self, user_id: str):
@@ -133,3 +136,6 @@ class UserManagement:
 
     def get_user(self, user_id: str) -> User:
         return self.users[user_id]
+    
+    def user_exists(self, user_id: str) -> bool:
+        return "teste"

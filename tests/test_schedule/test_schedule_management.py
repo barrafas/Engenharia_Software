@@ -2,7 +2,10 @@ import unittest
 from src.schedule.schedule_management import ScheduleManagement
 from src.schedule.schedule_management import EmptyPermissionsError, DuplicatedIDError, NonExistentIDError
 from src.schedule.schedule_model import Schedule
-from unittest.mock import Mock, MagicMock
+from tests.test_schedule.mocks import Element, ElementManagement
+from src.user.user_model import User
+from src.user.user_management import UserManagement
+from unittest.mock import Mock, MagicMock, patch
 
 class TestScheduleManagement(unittest.TestCase):
     def setUp(self):
@@ -283,6 +286,18 @@ class TestScheduleManagement(unittest.TestCase):
         self.schedule_management.add_element_to_schedule(schedule_id, element_id)
         # Assert
         self.assertIn(element_id, self.schedule_management.schedules[schedule_id].elements)
+
+    @patch.object(ElementManagement, 'get_instance')
+    def test_add_element_to_schedule_raises_error_for_nonexistent_element(self, mock_get_instance):
+        # Arrange
+        mock_element_manager = Mock()
+        mock_element_manager.element_exists.return_value = False
+        mock_get_instance.return_value = mock_element_manager
+        schedule_id = "schedule1"
+        element_id = "nonexistent_element"
+        # Act & Assert
+        with self.assertRaises(NonExistentIDError):
+            self.schedule_management.add_element_to_schedule(schedule_id, element_id)
 
 if __name__ == '__main__':
     unittest.main()

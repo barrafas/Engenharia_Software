@@ -1,5 +1,9 @@
 from src.schedule.schedule_model import Schedule
 from src.database.mongo_module import MongoModule
+from src.user.user_model import User
+from src.user.user_management import UserManagement
+from tests.test_schedule.mocks import Element, ElementManagement
+
 
 class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
@@ -154,7 +158,6 @@ class ScheduleManagement:
             schedule_id: Schedule ID
             element_id: Element ID
         """
-
         schedule = self.schedules[schedule_id]
         if element_id not in schedule.elements:
             schedule.elements = schedule.elements + [element_id]
