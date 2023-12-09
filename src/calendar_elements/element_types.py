@@ -311,7 +311,7 @@ class TaskElement(CalendarElement):
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
-    def get_users(self, filter_schedules) -> list:
+    def get_users(self, filter_schedules = []) -> list:
         """
         Returns the users that are assigned to the task.
 
@@ -322,7 +322,10 @@ class TaskElement(CalendarElement):
             [str] -- The users that are assigned to the task.
         """
         schedule_manager = ScheduleManagement.get_instance()
-        filter_schedules = [schedule for schedule in self.__schedules if schedule in filter_schedules]
+        if filter_schedules == []:
+            filter_schedules = self.__schedules
+        else:
+            filter_schedules = [schedule for schedule in self.__schedules if schedule in filter_schedules]
         users = []
         for schedule_id in filter_schedules:
             schedule = schedule_manager.get_schedule(schedule_id)
