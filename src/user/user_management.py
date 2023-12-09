@@ -4,11 +4,11 @@ Responsible for managing the users in the database
 
 Attributes:
     db: Database module
+    users: Dict of users, where the key is the id
 """
 import bcrypt
 from ..database.database_module import DatabaseModule
 from .user_model import User
-
 
 class UserAlreadyExistsError(Exception):
     """
@@ -29,6 +29,7 @@ class UserManagement:
 
     Attributes:
         db: Database module
+        users: Dict of users, where the key is the id
     """
 
     def __init__(self, database_module: DatabaseModule):
@@ -39,9 +40,10 @@ class UserManagement:
             database_module: Database module
         """
         self.db = database_module
+        self.users = {}
 
     def create_user(self, username: str, email: str, password: str,
-                    user_id: str = None) -> User:
+                    user_preferences: dict, id: str = None) -> User:
         """
         Create a new user
 
@@ -49,7 +51,7 @@ class UserManagement:
             username: Username
             email: Email
             password: Password
-            user_id: User ID
+            id: User ID
 
         Returns:
             The created user
@@ -58,18 +60,21 @@ class UserManagement:
         if self.user_exists(username):
             raise UserAlreadyExistsError(f'Usuário {username} já existe')
 
+
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
 
-        if not user_id:
-            user_id = self.db.get_next_id("users")
+        if not id:
+            id = self.db.get_next_id("users")
 
-        user_info = {"user_id": user_id, "username": username,
-                     "email": email, "password": hashed_password, "events": []}
+        user_info = {"id": id, "username": username,
+                     "email": email, "schedules": [], 
+                     "hashed_password": hashed_password, "user_preferences": user_preferences}
         self.db.execute_query(
             {"entity": "users", "action": "insert", "data": user_info})
 
-        user = User(user_id, username, email, hashed_password)
+        user = User(**user_info)
+        self.users[id] = user
         return user
 
     def delete_user(self, username: str) -> None:
@@ -117,7 +122,7 @@ class UserManagement:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_password
 
-    def get_user(self, username: str) -> User or None:
+    def get_user(self, username: str) -> User:
         """
         Get a user
 
@@ -129,11 +134,13 @@ class UserManagement:
         """
         query = {"entity": "users", "criteria": {"username": username}}
         data = self.db.fetch_data(query)
-        return User.from_json(data[0]) if len(data) > 0 else None
+        user = User(**data[0])
+        self.users[user.id] = user
+        return 
 
-    def update_user(self, user: str) -> None:
+    def update_user(self, id: str) -> None:
         """
-        Update a user
+        Updates a user in the db based on its current local state
 
         Args:
             user: User
@@ -141,6 +148,16 @@ class UserManagement:
         Returns:
             Void
         """
+        if not self.user_exists(id):
+            raise UserDoesNotExistError(f'Usuário {id} não existe')
+        
+        user = self.users[id]
+        user_info = user.to_dict()
+        self.db.execute_query(
+            {"entity": "users", "action": "update", "data": user_info})
+        return
+
+
 
     def add_schedule_to_user(self, user_id: str, schedule_id: str) -> None:
         """Function to add a schedule to a user
@@ -152,3 +169,10 @@ class UserManagement:
         Returns:
             None
         """
+        if not self.user_exists(user_id):
+            raise UserDoesNotExistError(f'Usuário {user_id} não existe')
+
+        user = self.users[user_id]
+        user.schedules.append(schedule_id)
+        self.update_user(user_id)
+        return
