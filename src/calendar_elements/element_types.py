@@ -148,7 +148,8 @@ class EventElement(CalendarElement):
             [user] -- The users that are assigned to the reminder.
         """
         schedule_manager = ScheduleManagement.get_instance()
-        filter_schedules = [schedule for schedule in self.__schedules if schedule in filter_schedules]
+        filter_schedules = [schedule for schedule in self.__schedules
+                                if schedule in filter_schedules]
         users = []
         for schedule_id in filter_schedules:
             schedule = schedule_manager.get_schedule(schedule_id)
@@ -306,7 +307,7 @@ class TaskElement(CalendarElement):
         Returns the schedules of the task.
 
         Returns:
-            list -- The schedules of the task.
+            [schedules] -- The schedules of the task.
         """
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
@@ -319,24 +320,18 @@ class TaskElement(CalendarElement):
             filter_schedules -- A list of schedules to filter the users.
 
         Returns:
-            [str] -- The users that are assigned to the task.
+            [user] -- The users that are assigned to the task.
         """
         schedule_manager = ScheduleManagement.get_instance()
-        if filter_schedules == []:
-            filter_schedules = self.__schedules
-        else:
-            filter_schedules = [schedule for schedule in self.__schedules if schedule in filter_schedules]
-        users = []
-        for schedule_id in filter_schedules:
-            schedule = schedule_manager.get_schedule(schedule_id)
-            users += list(schedule.permissions.keys())
+        schedules_to_use = filter_schedules or self.__schedules
         
-        users = list(set(users)) # Remove duplicates
+        users = set()
+        for schedule_id in schedules_to_use:
+            schedule = schedule_manager.get_schedule(schedule_id)
+            users.update(schedule.permissions.keys())
         
         user_manager = UserManagement.get_instance()
-
-        users = [user_manager.get_user(id) for id in users]
-        return users
+        return [user_manager.get_user(id) for id in users]
 
     def set_due_date(self, due_date: datetime) -> None:
         """
@@ -385,7 +380,7 @@ class TaskElement(CalendarElement):
             raise ValueError("Title cannot be empty or blank")
         elif len(title) > 50:
             raise ValueError("Title cannot have more than 50 characters")
-        else:   
+        else:
             self.title = title
 
     def set_description(self, description: str) -> None:
