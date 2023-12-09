@@ -85,6 +85,10 @@ class User:
         '''
         if not schedules:
             schedules = self.get_schedules()
+        else:
+            for schedule in schedules:
+                if schedule not in self.get_schedules():
+                    raise UserNotInSchedule("Usuário não está nessa agenda")
 
         elements = []
         for schedule in schedules:
