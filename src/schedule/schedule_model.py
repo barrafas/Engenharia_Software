@@ -14,7 +14,7 @@ class Schedule:
         Each user can have a different permission in a schedule.
     """
     def __init__(self, schedule_id: str, title: str, description: str, 
-            permissions: [tuple], elements: [str] = None):
+            permissions: dict, elements: [str] = None):
         """
             Schedule constructor.
             Arguments:
@@ -28,7 +28,7 @@ class Schedule:
         self.__id = schedule_id
         self.set_title(title)
         self.set_description(description)
-        self.__permissions = permissions if permissions else []
+        self.__permissions = permissions
         self.__elements = elements if elements else []
 
     @property
@@ -77,7 +77,7 @@ class Schedule:
         
         user_management = UserManagement.get_instance()
         users = []
-        for user_id, permission_type in self.__permissions:
+        for user_id, permission_type in self.__permissions.items():
             if not permission_types or permission_type in permission_types:
                 user = user_management.get_user(user_id)
                 users.append(user)
