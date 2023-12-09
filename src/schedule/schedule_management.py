@@ -1,7 +1,7 @@
 from src.schedule.schedule_model import Schedule
 from src.database.mongo_module import MongoModule
 
-class EmptyPermissionsException(Exception):
+class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
     pass
 
@@ -48,7 +48,8 @@ class ScheduleManagement:
 
         # Get the schedules from the database that match the given ID
         schedule = self.db_module.select_data('schedules', {'_id': schedule_id})
-
+        print("################################")
+        print(schedule)
         # If the list is not empty, the schedule exists
         return bool(schedule)
         
