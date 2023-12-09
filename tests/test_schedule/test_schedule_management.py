@@ -274,6 +274,15 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.delete_schedule(schedule_id)
 
+    def test_add_element_to_schedule_updates_elements(self):
+        # Arrange
+        schedule_id = "schedule10"
+        element_id = "element1"
+        self.schedule_management.schedules[schedule_id] = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, [])
+        # Act
+        self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+        # Assert
+        self.assertIn(element_id, self.schedule_management.schedules[schedule_id].elements)
 
 if __name__ == '__main__':
     unittest.main()
