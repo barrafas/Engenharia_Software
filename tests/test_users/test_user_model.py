@@ -61,6 +61,12 @@ class TestUserModel(unittest.TestCase):
             user.set_username("")
         self.assertEqual(str(context.exception), 
                          "O nome de usuário não pode ser vazio")
+        
+    def test_set_email(self):
+        # Test setting an email
+        user = User("id", "username", "email", ["id1", "id2"])
+        user.set_email("new_email")
+        self.assertEqual(user.email, "new_email")
 
 
 if __name__ == '__main__':
