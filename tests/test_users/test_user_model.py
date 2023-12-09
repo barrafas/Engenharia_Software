@@ -68,6 +68,12 @@ class TestUserModel(unittest.TestCase):
         user.set_email("new_email")
         self.assertEqual(user.email, "new_email")
 
+    def test_set_email_with_trailing_space(self):
+        # Test setting an email with trailing space
+        user = User("id", "username", "email", ["id1", "id2"])
+        user.set_email("new_email ")
+        self.assertEqual(user.email, "new_email")
+
 
 if __name__ == '__main__':
     unittest.main()
