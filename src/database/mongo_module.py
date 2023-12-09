@@ -11,7 +11,6 @@ class MongoModule(DatabaseModule):
         user (str): The user of the database.
         password (str): The password of the database.
         database_name (str): The name of the database.
-        collection_name (str): The name of the collection.
         client (MongoClient): The MongoClient object.
         db (Database): The Database object.
 
@@ -27,7 +26,6 @@ class MongoModule(DatabaseModule):
                  host: str, 
                  port: int, 
                  database_name: str,
-                 collection_name: str,
                  user: str = None,
                  password: str = None,):
         """
@@ -37,7 +35,6 @@ class MongoModule(DatabaseModule):
             host (str): The host address of the database.
             port (int): The port of the database.
             database_name (str): The name of the database.
-            collection_name (str): The name of the collection.
             user (str): The user of the database.
             password (str): The password of the database.
         """
@@ -46,10 +43,8 @@ class MongoModule(DatabaseModule):
         self.user = user
         self.password = password
         self.database_name = database_name
-        self.collection_name = collection_name
         self.client = None
         self.db = None
-        self.collection = None
 
     def connect(self):
         """
@@ -62,7 +57,6 @@ class MongoModule(DatabaseModule):
         
         self.client = pymongo.MongoClient(host=self.host, port=self.port, username=self.user, password=self.password)
         self.db = self.client[self.database_name]
-        self.collection = self.db[self.collection_name]
         
     def disconnect(self):
         """
@@ -72,11 +66,15 @@ class MongoModule(DatabaseModule):
         """
         if not self.client:
             raise Exception("Not connected to the database.")
+        # disconnect from the database
+        self.client.close()
+
         self.client = None
         self.db = None
         self.collection = None
 
-    def insert_data(self, data):
+
+    def insert_data(self, collection_name, data):
         """
         Execute a database query.
         
@@ -88,9 +86,9 @@ class MongoModule(DatabaseModule):
         """
         if not self.client:
             raise Exception("Not connected to the database.")
-        self.collection.insert_one(data)
+        self.db[collection_name].insert_one(data)
 
-    def delete_data(self, data):
+    def delete_data(self, collection_name, condition):
         """
         Delete data from the database.
 
@@ -100,9 +98,9 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
-        self.collection.delete_one(data)
+        self.db[collection_name].delete_one(condition)
 
-    def update_data(self, where, data):
+    def update_data(self, collection_name, condition, new_data):
         """
         Update data in the database.
 
@@ -113,9 +111,9 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
-        self.collection.update_one(where, data)
+        self.db[collection_name].update_one(condition, new_data)
 
-    def select_data(self, query=None):
+    def select_data(self, collection_name, condition):
         """
         Fetch data from the database.
 
@@ -125,6 +123,6 @@ class MongoModule(DatabaseModule):
         Returns:
             list: The result of the query.
         """
-        result = list(self.collection.find(query))
+        result = list(self.db[collection_name].find(condition))
 
         return result

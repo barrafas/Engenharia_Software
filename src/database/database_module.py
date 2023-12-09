@@ -2,7 +2,12 @@ from abc import ABC, abstractmethod
 
 class DatabaseModule(ABC):
     @abstractmethod
-    def connect(self, host, db_name):
+    def connect(self, 
+                 host: str, 
+                 port: int, 
+                 database_name: str,
+                 user: str = None,
+                 password: str = None,):
         """Connect to the database."""
 
     @abstractmethod
@@ -14,11 +19,11 @@ class DatabaseModule(ABC):
         """Execute a database query."""
 
     @abstractmethod
-    def delete_data(self, collection_name, data):
+    def delete_data(self, collection_name, condition):
         """Delete data from the database."""
 
     @abstractmethod
-    def update_data(self, collection_name, condition, data):
+    def update_data(self, collection_name, condition, new_data):
         """Update data in the database."""
 
     @abstractmethod

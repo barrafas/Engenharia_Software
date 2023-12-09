@@ -9,11 +9,11 @@ class TestMongoModule(unittest.TestCase):
 
     def setUp(self):
         self.HOST = "localhost"
-        self.mongo_module = MongoModule(host=self.HOST, collection_name="test_collection", database_name="test_db", port=27017)
+        self.mongo_module = MongoModule(host=self.HOST, database_name="test_db", port=27018)
 
     def tearDown(self):
         if self.mongo_module.client:
-            self.mongo_module.collection.delete_many({})
+            self.mongo_module.db['teste'].delete_many({})
             self.mongo_module.disconnect()
 
     def test_connect(self):
@@ -52,12 +52,11 @@ class TestMongoModule(unittest.TestCase):
     def _connect_to_database(self):
         with unittest.mock.patch('pymongo.MongoClient') as mock_mongo:
             self.mongo_module.connect()
-            mock_mongo.assert_called_once_with(host=self.HOST, port=27017, username=None, password=None)
-            mock_mongo.assert_called_with(host=self.HOST, port=27017, username=None, password=None)
+            mock_mongo.assert_called_once_with(host=self.HOST, port=27018, username=None, password=None)
+            mock_mongo.assert_called_with(host=self.HOST, port=27018, username=None, password=None)
             mock_mongo.assert_called_once()
             self.assertIsNotNone(self.mongo_module.client)
             self.assertIsNotNone(self.mongo_module.db)
-            self.assertIsNotNone(self.mongo_module.collection)
 
     def _assert_connection(self):
         with self.assertRaises(Exception):
@@ -71,7 +70,6 @@ class TestMongoModule(unittest.TestCase):
         self.mongo_module.disconnect()
         self.assertIsNone(self.mongo_module.client)
         self.assertIsNone(self.mongo_module.db)
-        self.assertIsNone(self.mongo_module.collection)
 
     def _assert_disconnected(self):
         with self.assertRaises(Exception):
@@ -83,19 +81,22 @@ class TestMongoModule(unittest.TestCase):
 
     def _connect_and_insert_data(self):
         self._connect_to_database()
-        with unittest.mock.patch.object(self.mongo_module.collection, 'insert_one') as mock_insert:
-            self.mongo_module.insert_data({"test": "test"})
+        with unittest.mock.patch.object(self.mongo_module.db['teste'], 'insert_one') as mock_insert:
+            self.mongo_module.insert_data(collection_name='teste',
+                                          data={"test": "test"})
             mock_insert.assert_called_once_with({"test": "test"})
 
     def _disconnect_and_insert_data(self):
         self._disconnect_from_database()
         with self.assertRaises(Exception):
-            self.mongo_module.insert_data({"test": "test"})
+            self.mongo_module.insert_data(collection_name='teste',
+                                          data={"test": "test"})
 
     def _connect_and_delete_data(self):
         self._connect_to_database()
-        with unittest.mock.patch.object(self.mongo_module.collection, 'delete_one') as mock_delete:
-            self.mongo_module.delete_data({"test": "test"})
+        with unittest.mock.patch.object(self.mongo_module.db['teste'], 'delete_one') as mock_delete:
+            self.mongo_module.delete_data(collection_name='teste',
+                                          condition={"test": "test"})
             mock_delete.assert_called_once_with({"test": "test"})
 
     def _disconnect_and_delete_data(self):
@@ -110,20 +111,31 @@ class TestMongoModule(unittest.TestCase):
     def _disconnect_and_update_data(self):
         self._disconnect_from_database()
         with self.assertRaises(Exception):
-            self.mongo_module.update_data({"test": "test"}, {"test": "test"})
+            self.mongo_module.update_data(collection_name='teste',
+                                          condition={"test": "test"}, 
+                                          new_data={"test": "test"})
 
     def _connect_insert_and_update_data_internal(self):
-        self.mongo_module.insert_data({"test": "test"})
-        with unittest.mock.patch.object(self.mongo_module.collection, 'update_one') as mock_update:
-            self.mongo_module.update_data({"test": "test"}, {"test": "test2"})
+        self.mongo_module.insert_data(collection_name='teste',
+                                      data={"test": "test"})
+
+        with unittest.mock.patch.object(self.mongo_module.db['teste'], 'update_one') as mock_update:
+            self.mongo_module.update_data(collection_name='teste',
+                                          condition={"test": "test"}, 
+                                          new_data={"test": "test2"})
+            
             mock_update.assert_called_once_with({"test": "test"}, {"test": "test2"})
 
     def _connect_insert_and_select_data_internal(self, query, expected_result):
-        self.mongo_module.insert_data(query)
+        self.mongo_module.insert_data(collection_name='teste',
+                                      data={"test": "test3"})
+
         
-        with unittest.mock.patch.object(self.mongo_module.collection, 'find') as mock_find:
+        
+        with unittest.mock.patch.object(self.mongo_module.db['teste'], 'find') as mock_find:
             mock_find.return_value = expected_result
-            result = self.mongo_module.select_data(query)
+            result = self.mongo_module.select_data(collection_name='teste', 
+                                                   condition=query)
 
         self.assertEqual(result, expected_result)
 
