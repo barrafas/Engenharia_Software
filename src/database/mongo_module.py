@@ -1,3 +1,33 @@
+"""
+mongo_module.py
+
+This module defines a MongoDB implementation of the DatabaseModule interface and demonstrates the Singleton pattern.
+
+Classes:
+    - MongoModule(DatabaseModule): Implements the DatabaseModule interface for MongoDB.
+        Attributes:
+            - host (str): The host address of the database.
+            - port (int): The port of the database.
+            - user (str): The user of the database.
+            - password (str): The password of the database.
+            - database_name (str): The name of the database.
+            - client (MongoClient): The MongoClient object.
+            - db (Database): The Database object.
+
+        Methods:
+            - connect(): Connects to the database.
+            - disconnect(): Disconnects from the database.
+            - insert_data(collection_name, data): Inserts data into the database.
+            - delete_data(collection_name, condition): Deletes data from the database.
+            - update_data(collection_name, condition, new_data): Updates data in the database.
+            - select_data(collection_name, condition): Selects data from the database.
+
+    Note: The MongoModule class follows the Singleton pattern to ensure a single instance throughout the program.
+
+Usage:
+    The module can be used to interact with a MongoDB database by creating an instance of the MongoModule class. The Singleton pattern ensures that multiple instances of the class refer to the same database connection.
+"""
+
 import pymongo
 import sys
 from src.database.database_module import DatabaseModule
