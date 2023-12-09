@@ -164,6 +164,9 @@ class User:
         Returns:
             True if the user is available, False otherwise
         """
+        if type(time) != tuple:
+            raise TypeError("O horário deve ser uma tupla")
+
         element_ids = self.get_elements()
         element_management = ElementManagement.get_instance()
 
