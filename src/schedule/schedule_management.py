@@ -155,4 +155,6 @@ class ScheduleManagement:
             element_id: Element ID
         """
 
-        pass
+        schedule = self.schedules[schedule_id]
+        if element_id not in schedule.elements:
+            schedule.elements = schedule.elements + [element_id]
