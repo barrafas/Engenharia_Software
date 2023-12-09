@@ -3,8 +3,66 @@
     elements that can be displayed in the calendar.
 """
 from datetime import datetime, timedelta
-from tests.test_events.mocks import ScheduleManagement
 from .element_interface import CalendarElement
+from src.user.user_model import User
+
+class Schedule:
+    """Mock class for Schedule"""
+    def __init__(self, id, title, description, permissions, elements):
+        self.__id = id
+        self.tilte = "title"
+        self.description = "description"
+        self.__permissions = permissions
+        self.__elements = elements
+
+    @property
+    def id(self):
+        return self.__id
+
+    @property
+    def permissions(self):
+        return self.__permissions
+
+    @property
+    def elements(self):
+        return self.__elements
+
+
+class ScheduleManagement:
+    """Mock class for ScheduleManagement"""
+
+    __instance = None
+
+    def __init__(self):
+        self.__schedules = {}
+
+    def get_schedule(self, id: str) -> Schedule:
+        ... 
+    
+    @classmethod
+    def get_instance(cls):
+        if cls.__instance is None:
+            cls.__instance = ScheduleManagement()
+        return cls.__instance
+
+class UserManagement:
+    """Mock class for UserManagement"""
+
+    __instance = None
+
+    def __init__(self):
+        self.__users = {}
+
+    def get_user(self, id: str) -> Schedule:
+        ... 
+    
+    @classmethod
+    def get_instance(cls):
+        if cls.__instance is None:
+            cls.__instance = UserManagement()
+        return cls.__instance
+  
+
 
 
 class EventElement(CalendarElement):
@@ -79,7 +137,7 @@ class EventElement(CalendarElement):
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
 
-    def get_users(self, filter_schedules) -> list:
+    def get_users(self, filter_schedules = []) -> list:
         """
         Returns the users that are assigned to the event.
 
@@ -89,6 +147,17 @@ class EventElement(CalendarElement):
         Returns:
             [user] -- The users that are assigned to the reminder.
         """
+        schedule_manager = ScheduleManagement.get_instance()
+        filter_schedules = [schedule for schedule in self.__schedules if schedule in filter_schedules]
+        users = []
+        for schedule_id in filter_schedules:
+            schedule = schedule_manager.get_schedule(schedule_id)
+            users += list(schedule.permissions.keys())
+        
+        user_manager = UserManagement.get_instance()
+
+        users = [user_manager.get_user(id) for id in users]
+        return users
 
     def set_interval(self, start: datetime, end: datetime) -> None:
         """
@@ -252,6 +321,17 @@ class TaskElement(CalendarElement):
         Returns:
             [str] -- The users that are assigned to the task.
         """
+        schedule_manager = ScheduleManagement.get_instance()
+        filter_schedules = [schedule for schedule in self.__schedules if schedule in filter_schedules]
+        users = []
+        for schedule_id in filter_schedules:
+            schedule = schedule_manager.get_schedule(schedule_id)
+            users += list(schedule.permissions.keys())
+        
+        user_manager = UserManagement.get_instance()
+
+        users = [user_manager.get_user(id) for id in users]
+        return users
 
     def set_due_date(self, due_date: datetime) -> None:
         """
