@@ -69,7 +69,13 @@ class ScheduleManagement:
             The created schedule instance
         """
 
-        pass
+        schedule = Schedule(schedule_id, title, description, permissions, elements)
+        self.db_module.insert_data('schedules', {'_id': schedule_id, 
+                                                 'title': title, 
+                                                 'description': description, 
+                                                 'permissions': permissions,
+                                                    'elements': elements})
+        return schedule
 
     def get_schedule(self, schedule_id: str) -> Schedule:
         """
