@@ -124,6 +124,9 @@ class ScheduleManagement:
         Args:
             schedule_id: Schedule ID
         """
+        if schedule_id not in self.schedules:
+            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
+
         schedule = self.schedules[schedule_id]
         new_data = schedule.to_dict()
         self.db_module.update_data('schedules', {'_id': schedule_id}, new_data)
