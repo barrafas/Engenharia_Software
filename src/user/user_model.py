@@ -141,7 +141,7 @@ class User:
         Args:
             username: user name
         """
-        self.email = email
+        self.email = email.strip()
 
     def check_disponibility(self, time: tuple) -> bool:
         """
