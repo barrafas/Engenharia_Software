@@ -133,14 +133,17 @@ class ScheduleManagement:
 
     def delete_schedule(self, schedule_id: str) -> None:
         """
-        Deletes a schedule from the database
+        Deletes a schedule from the database and the schedules dictionary
 
         Args:
             schedule_id: Schedule ID
-
         """
+        if not self.schedule_exists(schedule_id):
+            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
 
         self.db_module.delete_data('schedules', {'_id': schedule_id})
+        if schedule_id in self.schedules:
+            del self.schedules[schedule_id]
 
 
     def add_element_to_schedule(self, schedule_id: str, element_id: str) -> None:
