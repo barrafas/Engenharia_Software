@@ -100,11 +100,11 @@ class EventElement(CalendarElement):
         """
         if start is None:
             raise ValueError("Start cannot be None")
-        elif type(start) != datetime:
+        elif not isinstance(start, datetime):
             raise TypeError("Start must be a datetime object")
         elif end is None:
             raise ValueError("End cannot be None")
-        elif type(end) != datetime:
+        elif not isinstance(end, datetime):
             raise TypeError("End must be a datetime object")
         elif start >= end:
             raise ValueError("Start must be before end")
@@ -122,7 +122,7 @@ class EventElement(CalendarElement):
 
         if title is None:
             raise ValueError("Title cannot be None")
-        elif type(title) != str:
+        elif not isinstance(title, str):
             raise TypeError("Title must be a string")
         elif not title.strip():
             raise ValueError("Title cannot be empty or blank")
@@ -139,7 +139,7 @@ class EventElement(CalendarElement):
             description -- description of the event.
         """
         if description is not None:
-            if type(description) != str:
+            if not isinstance(description, str):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
@@ -262,7 +262,7 @@ class TaskElement(CalendarElement):
         """
         if due_date is None:
             raise ValueError("Due date cannot be None")
-        elif type(due_date) != datetime:
+        elif not isinstance(due_date, datetime):
             raise TypeError("Due date must be a datetime object")
         else:
             self.due_date = due_date
@@ -277,7 +277,7 @@ class TaskElement(CalendarElement):
         if state is None:
             self.state = 'incomplete'
         else:
-            if type(state) != str:
+            if not isinstance(state, str):
                 raise TypeError("State must be a string")
             elif state not in ["incomplete", "complete", "cancelled"]:
                 raise ValueError("State must be either 'incomplete' or 'complete' or 'cancelled'")
@@ -294,7 +294,7 @@ class TaskElement(CalendarElement):
 
         if title is None:
             raise ValueError("Title cannot be None")
-        elif type(title) != str:
+        elif not isinstance(title, str):
             raise TypeError("Title must be a string")
         elif not title.strip():
             raise ValueError("Title cannot be empty or blank")
@@ -311,7 +311,7 @@ class TaskElement(CalendarElement):
             description -- description of the task.
         """
         if description is not None:
-            if type(description) != str:
+            if not isinstance(description, str):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
@@ -426,7 +426,7 @@ class ReminderElement(CalendarElement):
         """
         if reminder_date is None:
             raise ValueError("Reminder date cannot be None")
-        elif type(reminder_date) != datetime:
+        elif not isinstance(reminder_date, datetime):
             raise TypeError("Reminder date must be a datetime object")
         else:
             self.reminder_date = reminder_date
@@ -441,7 +441,7 @@ class ReminderElement(CalendarElement):
 
         if title is None:
             raise ValueError("Title cannot be None")
-        elif type(title) != str:
+        elif not isinstance(title, str):
             raise TypeError("Title must be a string")
         elif not title.strip():
             raise ValueError("Title cannot be empty or blank")
@@ -458,7 +458,7 @@ class ReminderElement(CalendarElement):
             description -- description of the reminder.
         """
         if description is not None:
-            if type(description) != str:
+            if not isinstance(description, str):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
