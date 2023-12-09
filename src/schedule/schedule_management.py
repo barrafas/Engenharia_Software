@@ -52,8 +52,6 @@ class ScheduleManagement:
 
         # Get the schedules from the database that match the given ID
         schedule = self.db_module.select_data('schedules', {'_id': schedule_id})
-        print("################################")
-        print(schedule)
         # If the list is not empty, the schedule exists
         return bool(schedule)
         
