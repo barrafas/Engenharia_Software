@@ -154,5 +154,20 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(EmptyPermissionsError):
             self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
+    def test_get_schedule_id_exists_on_dict(self):
+        # Arrange
+        schedule_id = "schedule10"
+        title = "Schedule 2"
+        description = "This is schedule 2"
+        permissions = {"user1": "write", "user2": "read"}
+        elements = ["element2", "element3"]
+        schedule = Schedule(schedule_id, title, description, permissions, elements)
+        self.schedule_management.schedules[schedule_id] = schedule
+        # Act
+        result = self.schedule_management.get_schedule(schedule_id)
+        # Assert
+        self.assertEqual(result, schedule)
+
+
 if __name__ == '__main__':
     unittest.main()

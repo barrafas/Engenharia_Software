@@ -100,7 +100,8 @@ class ScheduleManagement:
             The schedule instance
         """
 
-        pass
+        if schedule_id in self.schedules:
+            return self.schedules[schedule_id]
 
     def update_schedule(self, schedule_id) -> None:
         """
