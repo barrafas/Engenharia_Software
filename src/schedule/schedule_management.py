@@ -124,8 +124,10 @@ class ScheduleManagement:
         Args:
             schedule_id: Schedule ID
         """
-        pass
-    
+        schedule = self.schedules[schedule_id]
+        new_data = schedule.to_dict()
+        self.db_module.update_data('schedules', {'_id': schedule_id}, new_data)
+
     def delete_schedule(self, schedule_id: str) -> None:
         """
         Deletes a schedule from the database
