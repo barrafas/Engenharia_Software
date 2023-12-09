@@ -147,6 +147,8 @@ class User:
         """
         if type(email) != str:
             raise TypeError("O email deve ser uma string")
+        elif email == "":
+            raise EmailCantBeBlank("O email não pode ser vazio")
         else:
             self.email = email.strip()
 
