@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
-from src.user.user_model import User, UserNotInSchedule
+from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank
 import bcrypt
 
 class TestUserModel(unittest.TestCase):
@@ -53,6 +53,14 @@ class TestUserModel(unittest.TestCase):
             user.set_username(123)
         self.assertEqual(str(context.exception), 
                          "O nome de usuário deve ser uma string")
+        
+    def test_set_blank_username(self):
+        # Test setting a blank username
+        user = User("id", "username", "email", ["id1", "id2"])
+        with self.assertRaises(UsernameCantBeBlank) as context:
+            user.set_username("")
+        self.assertEqual(str(context.exception), 
+                         "O nome de usuário não pode ser vazio")
 
 
 if __name__ == '__main__':
