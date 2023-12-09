@@ -2,8 +2,10 @@
 
 import unittest
 from datetime import datetime
-from tests.test_events.mocks import ScheduleManagement
-from src.calendar_elements.element_types import EventElement
+from src.calendar_elements.element_types import EventElement, ScheduleManagement, Schedule, UserManagement
+from unittest.mock import MagicMock, PropertyMock
+from src.user.user_model import User
+
 
 class TestEventElement(unittest.TestCase):
     """Test the EventElement class"""
@@ -14,7 +16,7 @@ class TestEventElement(unittest.TestCase):
         self.start = datetime(2023, 1, 1)
         self.end = datetime(2023, 1, 2)
         self.description = "Description"
-        self.schedules = ['schedule1', 'schedule2']
+        self.schedules = ['schedule_1', 'schedule_2']
         self.element_type = "event"
         self.event = EventElement(self.id,
                                     self.title,
@@ -52,25 +54,26 @@ class TestEventElement(unittest.TestCase):
         Test if the schedules returned match the ones that were set in the
         constructor
         """
-        schedule_management = ScheduleManagement.get_instance()
-        event = EventElement(element_id=self.id, 
-                            title=self.title, 
-                            start=self.start,
-                            end=self.end,
-                            schedules=['id1', 'id2', 'id3'],
-                            description=self.description)
-        schedules = event.get_schedules()
-        expected_schedule = [schedule_management.schedules[id] for id in ['id1', 'id2', 'id3']]
-        self.assertEqual(schedules, expected_schedule)
+        schedule_1 = MagicMock(spec=Schedule)
+        type(schedule_1).id = PropertyMock(return_value='schedule_1')
+
+        schedule_2 = MagicMock(spec=Schedule)
+        type(schedule_2).id = PropertyMock(return_value='schedule_2')
+
+        def get_schedule_mock(id: str) -> Schedule:
+            return {
+                'schedule_1': schedule_1,
+                'schedule_2': schedule_2
+            }.get(id, None)
+
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
+            schedules = self.event.get_schedules()
+            self.assertEqual(schedules, [schedule_1, schedule_2])
 
     def test_get_users(self):
-        """
-        Test if the users returned match the ones that were set in the 
-        constructor
-        """
-
-    def test_get_users_empty(self):
-        """Test if an empty list is returned when there are no users"""
+        """Test if the users returned match the ones that were set in the 
+        constructor"""
+        
 
     def test_get_users_with_filter_by_schedules(self):
         """
