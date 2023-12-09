@@ -98,6 +98,13 @@ class TestUserModel(unittest.TestCase):
         result = user.check_disponibility(time)
         self.assertTrue(result)
 
+    def test_check_disponibility_end_time_same_as_other_event_start_time(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        time = (datetime.now() + timedelta(hours=11), 
+                datetime.now() + timedelta(hours=12))
+        result = user.check_disponibility(time)
+        self.assertTrue(result)
+
 
 if __name__ == '__main__':
     unittest.main()

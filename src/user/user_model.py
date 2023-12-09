@@ -155,7 +155,8 @@ class User:
     def check_disponibility(self, time: tuple) -> bool:
         """
         Checks if the user is available at a given time, based on the user's
-        schedules and elements
+        schedules and elements. It should not raise a conflict if the type
+        of the element is not 'evento'.
 
         Args:
             time: tuple with the start and end time to be checked
