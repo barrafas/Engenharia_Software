@@ -100,5 +100,33 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(DuplicatedIDError):
             self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
+    def test_create_schedule_raises_error_with_invalid_title(self):
+        # Arrange
+        self.schedule_management.db_module.insert_data = MagicMock()
+        self.schedule_management.db_module.select_data = MagicMock(return_value=[])
+        invalid_titles = [None, 123, "", "   ", "a" * 51]  # Covers all restrictions
+        schedule_id = "schedule10"
+        description = "This is schedule 2"
+        permissions = {"user1": "write", "user2": "read"}
+        elements = ["element2", "element3"]
+        # Act & Assert
+        for title in invalid_titles:
+            with self.assertRaises((ValueError, TypeError)):
+                self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
+
+    def test_create_schedule_raises_error_with_invalid_description(self):
+        # Arrange
+        self.schedule_management.db_module.insert_data = MagicMock()
+        self.schedule_management.db_module.select_data = MagicMock(return_value=[])
+        invalid_descriptions = [123, "a" * 501]  # Covers all restrictions
+        schedule_id = "schedule10"
+        title = "Schedule 2"
+        permissions = {"user1": "write", "user2": "read"}
+        elements = ["element2", "element3"]
+        # Act & Assert
+        for description in invalid_descriptions:
+            with self.assertRaises((ValueError, TypeError)):
+                self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
+
 if __name__ == '__main__':
     unittest.main()
