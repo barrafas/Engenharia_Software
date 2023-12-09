@@ -8,6 +8,10 @@ class UsernameCantBeBlank(Exception):
     """
     Custom exception class for when a username is blank.
     """
+class EmailCantBeBlank(Exception):
+    """
+    Custom exception class for when a email is blank.
+    """
 
 class User:
     """

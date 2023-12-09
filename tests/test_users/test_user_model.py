@@ -1,7 +1,8 @@
 import unittest
 from datetime import datetime, timedelta
 from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
-from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank
+from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank, \
+                                EmailCantBeBlank
 import bcrypt
 
 class TestUserModel(unittest.TestCase):
@@ -81,6 +82,14 @@ class TestUserModel(unittest.TestCase):
             user.set_email(123)
         self.assertEqual(str(context.exception), 
                          "O email deve ser uma string")
+        
+    def test_set_blank_email(self):
+        # Test setting a blank email
+        user = User("id", "username", "email", ["id1", "id2"])
+        with self.assertRaises(EmailCantBeBlank) as context:
+            user.set_email("")
+        self.assertEqual(str(context.exception), 
+                         "O email não pode ser vazio")
 
 
 if __name__ == '__main__':
