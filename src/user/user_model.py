@@ -1,5 +1,7 @@
 from tests.test_users.mocks import Schedule, ScheduleManagement, \
                                    Element, ElementManagement
+from datetime import datetime
+
 class UserNotInSchedule(Exception):
     """
     Custom exception class for when a user already exists.
@@ -166,6 +168,8 @@ class User:
         """
         if type(time) != tuple:
             raise TypeError("O horário deve ser uma tupla")
+        if type(time[0]) != datetime or type(time[1]) != datetime:
+            raise TypeError("A tupla de horário deve conter objetos datetime")
 
         element_ids = self.get_elements()
         element_management = ElementManagement.get_instance()
