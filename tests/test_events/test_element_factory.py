@@ -3,7 +3,7 @@
 import unittest
 from datetime import datetime
 from unittest.mock import MagicMock
-from src.calendar_elements.element_factory import CalendarElementFactory
+from src.calendar_elements.element_factory import ElementFactory
 from src.calendar_elements.element_types import EventElement, TaskElement, ReminderElement
 
 class TestElementFactory(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestElementFactory(unittest.TestCase):
 
     def setUp(self):
         # Initialize the factory object
-        self.factory = CalendarElementFactory()
+        self.factory = ElementFactory()
 
     def test_create_element_event(self):
         """Test the creation of an event."""
