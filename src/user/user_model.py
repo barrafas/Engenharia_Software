@@ -130,7 +130,7 @@ class User:
         if type(username) != str:
             raise TypeError("O nome de usuário deve ser uma string")
         elif username == "":
-            raise Exception("O nome de usuário não pode ser vazio")
+            raise UsernameCantBeBlank("O nome de usuário não pode ser vazio")
         else:
             self.username = username.strip()
     
