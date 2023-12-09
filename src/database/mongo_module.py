@@ -1,6 +1,5 @@
 import pymongo
 import sys
-sys.path.append('/home/gustavo/ES/Engenharia_Software/')
 from src.database.database_module import DatabaseModule
 
 class MongoModule(DatabaseModule):
@@ -24,6 +23,8 @@ class MongoModule(DatabaseModule):
         update_data: Updates data in the database.
         select_data: Selects data from the database.
     """
+    _instance = None
+
     def __init__(self, 
                  host: str, 
                  port: int, 
@@ -48,6 +49,17 @@ class MongoModule(DatabaseModule):
         self._client = None
         self._db = None
 
+    def __new__(cls, *args, **kwargs):
+        """
+        Singleton constructor method.
+
+        Returns:
+            MongoModule: The MongoModule instance.
+        """
+        if not cls._instance:
+            cls._instance = super(MongoModule, cls).__new__(cls)
+        return cls._instance
+
     def connect(self):
         """
         Connect to the database.
@@ -57,7 +69,10 @@ class MongoModule(DatabaseModule):
         if self._client:
             raise Exception("Already connected to the database.")
         
-        self._client = pymongo.MongoClient(host=self._host, port=self._port, username=self._user, password=self._password)
+        self._client = pymongo.MongoClient(host=self._host, 
+                                            port=self._port, 
+                                            username=self._user, 
+                                            password=self._password)
         self._db = self._client[self._database_name]
         
     def disconnect(self):
@@ -128,3 +143,17 @@ class MongoModule(DatabaseModule):
         result = list(self._db[collection_name].find(condition))
 
         return result
+
+if __name__ == "__main__":
+    mongo_module = MongoModule(host="localhost", 
+                                port=27017, 
+                                database_name="test")
+    
+    mongo_module2 = MongoModule(host="localhost", 
+                                port=27017, 
+                                database_name="test")
+
+    if mongo_module == mongo_module2:
+        print("Singleton works, both variables contain the same instance.")
+    else:
+        print("Singleton failed, variables contain different instances.")
