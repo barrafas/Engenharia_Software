@@ -90,6 +90,13 @@ class TestUserModel(unittest.TestCase):
             user.set_email("")
         self.assertEqual(str(context.exception), 
                          "O email não pode ser vazio")
+        
+    def test_check_disponibility(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        time = (datetime.now() + timedelta(hours=2), 
+                datetime.now() + timedelta(hours=3))
+        result = user.check_disponibility(time)
+        self.assertTrue(result)
 
 
 if __name__ == '__main__':
