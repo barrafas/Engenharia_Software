@@ -141,7 +141,10 @@ class User:
         Args:
             username: user name
         """
-        self.email = email.strip()
+        if type(email) != str:
+            raise TypeError("O email deve ser uma string")
+        else:
+            self.email = email.strip()
 
     def check_disponibility(self, time: tuple) -> bool:
         """
