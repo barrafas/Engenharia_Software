@@ -105,6 +105,13 @@ class TestUserModel(unittest.TestCase):
         result = user.check_disponibility(time)
         self.assertTrue(result)
 
+    def test_check_disponibility_ignoring_non_event_elements(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        time = (self.ElementManagement.get_element("elementid3").start_time,
+                self.ElementManagement.get_element("elementid3").end_time)
+        result = user.check_disponibility(time)
+        self.assertTrue(result)
+
 
 if __name__ == '__main__':
     unittest.main()
