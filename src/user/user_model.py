@@ -164,15 +164,26 @@ class User:
             True if the user is available, False otherwise
         """
         element_ids = self.get_elements()
+        element_management = ElementManagement.get_instance()
 
-
-
-        # fazer query no banco de dados comparando o horário com os horários
-        # dos elementos da seguinte forma:
-        # verificar se em algum dos elementos, a condição
-        #  time[0] > element.end_time ou time[1] < element.start_time é falsa.
-        return
-
+        for element_id in element_ids:
+            element = element_management.get_element(element_id)
+            
+            # Check if the start time of the element is within the given time period
+            if time[0] <= element.start_time <= time[1]:
+                return False
+            
+            # Check if the end time of the element is within the given time period
+            if time[0] <= element.end_time <= time[1]:
+                return False
+            
+            # Check if the given time period is within the start 
+            # and end time of the element
+            if element.start_time <= time[0] <= element.end_time or \
+                element.start_time <= time[1] <= element.end_time:
+                return False
+        
+        return True
 
     def __repr__(self):
         return " <User>:"+str(self.to_dict())

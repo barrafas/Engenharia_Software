@@ -10,8 +10,8 @@ class TestUserModel(unittest.TestCase):
         # Set up for the tests
 
         # Create a  for ScheduleManagement and ElementManagement
-        self.ScheduleManagement = ScheduleManagement()
-        self.ElementManagement = ElementManagement()
+        self.ScheduleManagement = ScheduleManagement.get_instance()
+        self.ElementManagement = ElementManagement.get_instance()
 
     def test_get_all_elements(self):
         # Test getting all element ids from user schedules, without repetition

@@ -44,7 +44,7 @@ class ElementManagement:
     @classmethod
     def get_instance(cls):
         if not cls._instance:
-            cls._instance = ScheduleManagement()
+            cls._instance = ElementManagement()
         return cls._instance
     
     def __init__(self):
