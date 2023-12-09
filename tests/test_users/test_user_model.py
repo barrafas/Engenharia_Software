@@ -112,6 +112,14 @@ class TestUserModel(unittest.TestCase):
         result = user.check_disponibility(time)
         self.assertTrue(result)
 
+    def test_check_disponibility_input_type_exception(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        time = "time"
+        with self.assertRaises(TypeError) as context:
+            user.check_disponibility(time)
+        self.assertEqual(str(context.exception), 
+                         "O horário deve ser uma tupla")
+
 
 if __name__ == '__main__':
     unittest.main()
