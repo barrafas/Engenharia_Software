@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
-from src.user.user_model import User
+from src.user.user_model import User, UserNotInSchedule
 import bcrypt
 
 class TestUserModel(unittest.TestCase):
@@ -25,6 +25,13 @@ class TestUserModel(unittest.TestCase):
         result = user.get_elements(["id1", "id3"])        
         self.assertEqual(sorted(result), ['elementid1', 'elementid2', 
                                     'elementid5', 'elementid6', 'elementid7'])
+        
+    def test_get_elements_from_schedule_user_isnt_in(self):
+        # Test getting all element ids from a nonexistent schedule
+        user = User("id", "username", "email", ["id1", "id2"])
+        with self.assertRaises(UserNotInSchedule) as context:
+            user.get_elements(["id3"])
+        self.assertEqual(str(context.exception), 'Usuário não está nessa agenda')
         
     
 
