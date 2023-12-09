@@ -161,6 +161,9 @@ class ScheduleManagement:
         if not element_manager.element_exists(element_id):
             raise NonExistentIDError(f"No element found with ID {element_id}")
 
+        if not self.schedule_exists(schedule_id):
+            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
+
         schedule = self.schedules[schedule_id]
         if element_id not in schedule.elements:
             schedule.elements = schedule.elements + [element_id]
