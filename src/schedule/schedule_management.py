@@ -105,6 +105,17 @@ class ScheduleManagement:
         """
         if schedule_id in self.schedules:
             return self.schedules[schedule_id]
+        elif self.schedule_exists(schedule_id):
+            schedule_data = self.db_module.select_data('schedules', {'_id': schedule_id})
+            schedule = Schedule(schedule_id, 
+                                schedule_data['title'], 
+                                schedule_data['description'], 
+                                schedule_data['permissions'], 
+                                schedule_data['elements'])
+            self.schedules[schedule_id] = schedule
+            return schedule
+        else:
+            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
 
     def update_schedule(self, schedule_id) -> None:
         """
