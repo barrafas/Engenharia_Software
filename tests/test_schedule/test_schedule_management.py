@@ -199,6 +199,25 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.get_schedule(schedule_id)
 
+    def test_update_schedule_id_exists(self):
+        # Arrange
+        schedule_id = "schedule10"
+        title = "Schedule 2"
+        description = "This is schedule 2"
+        permissions = {"user1": "write", "user2": "read"}
+        elements = ["element2", "element3"]
+        schedule = Schedule(schedule_id, title, description, permissions, elements)
+        self.schedule_management.schedules[schedule_id] = schedule
+        self.schedule_management.db_module.update_data = MagicMock()
+        # Act
+        self.schedule_management.update_schedule(schedule_id)
+        # Assert
+        self.schedule_management.db_module.update_data.assert_called_once_with(
+            'schedules', 
+            {'_id': schedule_id}, 
+            schedule.to_dict()
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -117,17 +117,15 @@ class ScheduleManagement:
         else:
             raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
 
-    def update_schedule(self, schedule_id) -> None:
+    def update_schedule(self, schedule_id: str) -> None:
         """
         Updates a schedule in the database
 
         Args:
             schedule_id: Schedule ID
-
         """
-
         pass
-
+    
     def delete_schedule(self, schedule_id: str) -> None:
         """
         Deletes a schedule from the database
