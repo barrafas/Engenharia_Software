@@ -3,10 +3,10 @@
     elements that can be displayed in the calendar.
 """
 from datetime import datetime
-from .element_interface import CalendarElement
+from .element_interface import Element
 
 
-class EventElement(CalendarElement):
+class EventElement(Element):
     """
         A class that represents an event.
 
@@ -84,7 +84,7 @@ class EventElement(CalendarElement):
         }
 
 
-class TaskElement(CalendarElement):
+class TaskElement(Element):
     """
         A class that represents a task.
 
@@ -186,7 +186,7 @@ class TaskElement(CalendarElement):
         self.state = state
 
 
-class ReminderElement(CalendarElement):
+class ReminderElement(Element):
     """
         A class that represents a reminder.
 
