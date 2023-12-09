@@ -9,6 +9,10 @@ class DuplicatedIDError(Exception):
     """Raised when the ID already exists"""
     pass
 
+class NonExistentIDError(Exception):
+    """Raised when the ID does not exist"""
+    pass
+
 class ScheduleManagement:
     """
     ScheduleManagement class
@@ -99,7 +103,6 @@ class ScheduleManagement:
         Returns:
             The schedule instance
         """
-
         if schedule_id in self.schedules:
             return self.schedules[schedule_id]
 

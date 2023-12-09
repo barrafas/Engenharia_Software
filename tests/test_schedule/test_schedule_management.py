@@ -1,6 +1,6 @@
 import unittest
 from src.schedule.schedule_management import ScheduleManagement
-from src.schedule.schedule_management import EmptyPermissionsError, DuplicatedIDError
+from src.schedule.schedule_management import EmptyPermissionsError, DuplicatedIDError, NonExistentIDError
 from src.schedule.schedule_model import Schedule
 from unittest.mock import Mock, MagicMock
 
@@ -167,6 +167,37 @@ class TestScheduleManagement(unittest.TestCase):
         result = self.schedule_management.get_schedule(schedule_id)
         # Assert
         self.assertEqual(result, schedule)
+
+    def test_get_schedule_id_exists_in_database(self):
+        # Arrange
+        schedule_id = "schedule10"
+        title = "Schedule 2"
+        description = "This is schedule 2"
+        permissions = {"user1": "write", "user2": "read"}
+        elements = ["element2", "element3"]
+        self.schedule_management.db_module.select_data = MagicMock(return_value={
+            '_id': schedule_id, 
+            'title': title, 
+            'description': description, 
+            'permissions': permissions, 
+            'elements': elements
+        })
+        self.schedule_management.schedule_exists = MagicMock(return_value=True)
+        # Act
+        result = self.schedule_management.get_schedule(schedule_id)
+        # Assert
+        self.assertEqual(result.title, title)
+        self.assertEqual(result.description, description)
+        self.assertEqual(result.permissions, permissions)
+        self.assertEqual(result.elements, elements)
+
+    def test_get_schedule_id_doesnt_exist(self):
+        # Arrange
+        schedule_id = "schedule10"
+        self.schedule_management.schedule_exists = MagicMock(return_value=False)
+        # Act & Assert
+        with self.assertRaises(NonExistentIDError):
+            self.schedule_management.get_schedule(schedule_id)
 
 
 if __name__ == '__main__':
