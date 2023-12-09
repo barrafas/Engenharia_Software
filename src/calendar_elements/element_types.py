@@ -62,8 +62,7 @@ class UserManagement:
             cls.__instance = UserManagement()
         return cls.__instance
 
-
-class EventElement(CalendarElement):
+class EventElement(Element):
     """
     A class that represents an event.
 
@@ -230,7 +229,7 @@ class EventElement(CalendarElement):
         }
 
 
-class TaskElement(CalendarElement):
+class TaskElement(Element):
     """
     A class that represents a task.
 
@@ -410,7 +409,7 @@ class TaskElement(CalendarElement):
             "element_type": self.__element_type,
             "schedules": self.__schedules
         }
-    
+      
 class ReminderElement(CalendarElement):
     """
     A class that represents a reminder.

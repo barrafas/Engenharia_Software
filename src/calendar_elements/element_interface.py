@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 
-class CalendarElement(ABC):
+class Element(ABC):
     """
         Interface for all calendar elements.
 
