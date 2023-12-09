@@ -120,6 +120,13 @@ class TestUserModel(unittest.TestCase):
         self.assertEqual(str(context.exception), 
                          "O horário deve ser uma tupla")
 
+    def test_check_disponibility_not_datetime(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        time = (123, 123)
+        with self.assertRaises(TypeError) as context:
+            user.check_disponibility(time)
+        self.assertEqual(str(context.exception), 
+                         "A tupla de horário deve conter objetos datetime")
 
 if __name__ == '__main__':
     unittest.main()
