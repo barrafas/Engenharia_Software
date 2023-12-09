@@ -79,12 +79,10 @@ class TestEventElement(unittest.TestCase):
         schedule_1 = MagicMock(spec=Schedule)
         type(schedule_1).id = PropertyMock(return_value='schedule_1')
         type(schedule_1).permissions = PropertyMock(return_value={"user_1": "owner", "user_2": "editor"})
-        type(schedule_1).elements = PropertyMock(return_value=['element1', 'element2'])
 
         schedule_2 = MagicMock(spec=Schedule)
         type(schedule_2).id = PropertyMock(return_value='schedule_2')
         type(schedule_2).permissions = PropertyMock(return_value={"user_3": "owner", "user_4": "editor"})
-        type(schedule_2).elements = PropertyMock(return_value=['element3', 'element4'])
 
         user_1 = MagicMock(spec=User)
         type(user_1).id = PropertyMock(return_value='user_1')
@@ -115,7 +113,7 @@ class TestEventElement(unittest.TestCase):
         
         with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
             with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
-                users = self.event.get_users()
+                users = self.event.get_users(['schedule_1', 'schedule_2'])
                 self.assertEqual(len(users), 4)
                 for user in users:
                     self.assertIn(user, [user_1, user_2, user_3, user_4])
