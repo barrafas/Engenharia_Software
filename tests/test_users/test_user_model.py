@@ -46,6 +46,14 @@ class TestUserModel(unittest.TestCase):
         user.set_username("new_username ")
         self.assertEqual(user.username, "new_username")
 
+    def test_set_username_with_int(self):
+        # Test setting a username with trailing space
+        user = User("id", "username", "email", ["id1", "id2"])
+        with self.assertRaises(TypeError) as context:
+            user.set_username(123)
+        self.assertEqual(str(context.exception), 
+                         "O nome de usuário deve ser uma string")
+
 
 if __name__ == '__main__':
     unittest.main()
