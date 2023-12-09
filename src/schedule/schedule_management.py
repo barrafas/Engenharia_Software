@@ -46,7 +46,11 @@ class ScheduleManagement:
             True if the schedule exists, False otherwise
         """
 
-        pass
+        # Get the schedules from the database that match the given ID
+        schedule = self.db_module.select_data('schedules', {'_id': schedule_id})
+
+        # If the list is not empty, the schedule exists
+        return bool(schedule)
         
 
     def create_schedule(self, title: str, description: str, 
