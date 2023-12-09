@@ -331,6 +331,8 @@ class TaskElement(CalendarElement):
             schedule = schedule_manager.get_schedule(schedule_id)
             users += list(schedule.permissions.keys())
         
+        users = list(set(users)) # Remove duplicates
+        
         user_manager = UserManagement.get_instance()
 
         users = [user_manager.get_user(id) for id in users]
