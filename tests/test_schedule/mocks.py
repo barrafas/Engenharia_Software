@@ -1,5 +1,62 @@
 from datetime import datetime, timedelta
 
+class MongoModule:
+    def __init__(self):
+        self.db = {
+            "users": [
+                {
+                    "_id": "user1",
+                    "name": "Alice",
+                    "email": "alice@example.com",
+                    "password": "password1",
+                    "schedules": ["schedule1", "schedule2"]
+                },
+                {
+                    "_id": "user2",
+                    "name": "Bob",
+                    "email": "bob@example.com",
+                    "password": "password2",
+                    "schedules": ["schedule1"]
+                }
+            ],
+            "schedules": [
+                {
+                    "_id": "schedule1",
+                    "title": "Schedule 1",
+                    "description": "This is schedule 1",
+                    "permissions": {"user1": "read", "user2": "write"},
+                    "elements": ["element1", "element2"]
+                },
+                {
+                    "_id": "schedule2",
+                    "title": "Schedule 2",
+                    "description": "This is schedule 2",
+                    "permissions": {"user1": "write"},
+                    "elements": ["element3"]
+                }
+            ],
+            "elements": [
+                {
+                    "_id": "element1",
+                    "type": "type1",
+                    "description": "This is element 1",
+                    "schedules": ["schedule1"]
+                },
+                {
+                    "_id": "element2",
+                    "type": "type2",
+                    "description": "This is element 2",
+                    "schedules": ["schedule1"]
+                },
+                {
+                    "_id": "element3",
+                    "type": "type3",
+                    "description": "This is element 3",
+                    "schedules": ["schedule2"]
+                }
+            ],
+        }
+
     
 class Element:
     def __init__(self, start_time: datetime, end_time: datetime, element_type: str):

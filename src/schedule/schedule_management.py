@@ -1,4 +1,9 @@
 from src.schedule.schedule_model import Schedule
+from src.database.mongo_module import MongoModule
+
+class EmptyPermissionsException(Exception):
+    """Raised when the permissions list is empty"""
+    pass
 
 class ScheduleManagement:
     """
@@ -11,7 +16,15 @@ class ScheduleManagement:
             and the value is the schedule instance
     """
 
-    def __init__(self, database_module: DatabaseModule, schedules: dict = None):
+    _instance = None
+
+    @classmethod
+    def get_instance(cls, database_module: MongoModule, schedules: dict = None):
+        if cls._instance is None:
+            cls._instance = cls(database_module, schedules)
+        return cls._instance
+
+    def __init__(self, database_module: MongoModule, schedules: dict = None):
         """
         Constructor for the ScheduleManagement class
 
@@ -20,6 +33,21 @@ class ScheduleManagement:
 
         """
         self.db = database_module
+        self.schedules = schedules if schedules else {}
+
+    def schedule_exists(self, schedule_id: str) -> bool:
+        """
+        Check if a schedule exists
+
+        Args:
+            schedule_id: Schedule ID
+
+        Returns:
+            True if the schedule exists, False otherwise
+        """
+
+        pass
+        
 
     def create_schedule(self, title: str, description: str, 
             permissions: [tuple], schedule_id: str = None) -> Schedule:
@@ -73,18 +101,6 @@ class ScheduleManagement:
 
         pass
 
-    def schedule_exists(self, schedule_id: str) -> bool:
-        """
-        Check if a schedule exists
-
-        Args:
-            schedule_id: Schedule ID
-
-        Returns:
-            True if the schedule exists, False otherwise
-        """
-
-        pass
 
     def add_element_to_schedule(self, schedule_id: str, element_id: str) -> None:
         """
