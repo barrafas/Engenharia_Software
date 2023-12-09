@@ -140,7 +140,7 @@ class ScheduleManagement:
 
         """
 
-        pass
+        self.db_module.delete_data('schedules', {'_id': schedule_id})
 
 
     def add_element_to_schedule(self, schedule_id: str, element_id: str) -> None:
