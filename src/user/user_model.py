@@ -4,6 +4,10 @@ class UserNotInSchedule(Exception):
     """
     Custom exception class for when a user already exists.
     """
+class UsernameCantBeBlank(Exception):
+    """
+    Custom exception class for when a username is blank.
+    """
 
 class User:
     """
@@ -69,6 +73,10 @@ class User:
 
         Returns:
             A list of schedules ids the user is a part of
+
+        >>> user = User("id", "username", "email", ["id1", "id2"])
+        >>> user.get_schedules()
+        ['id1', 'id2']
         """
         return self.schedules
     
@@ -88,7 +96,8 @@ class User:
         else:
             for schedule in schedules:
                 if schedule not in self.get_schedules():
-                    raise UserNotInSchedule("Usuário não está nessa agenda")
+                    raise UserNotInSchedule(
+                        f"Usuário não está nessa agenda: {schedule}")
 
         elements = []
         for schedule in schedules:
@@ -104,6 +113,10 @@ class User:
 
         Returns:
             The user hashed password
+
+        >>> user = User("id", "username", "email", ["id1", "id2"], "hashed_password")
+        >>> user.get_hashed_password()
+        'hashed_password'
         """
         return self.hashed_password
     

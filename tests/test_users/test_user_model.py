@@ -31,7 +31,14 @@ class TestUserModel(unittest.TestCase):
         user = User("id", "username", "email", ["id1", "id2"])
         with self.assertRaises(UserNotInSchedule) as context:
             user.get_elements(["id3"])
-        self.assertEqual(str(context.exception), 'Usuário não está nessa agenda')
+        self.assertEqual(str(context.exception), 
+                         'Usuário não está nessa agenda: id3')
+        
+    def test_set_username(self):
+        # Test setting a username
+        user = User("id", "username", "email", ["id1", "id2"])
+        user.set_username("new_username")
+        self.assertEqual(user.username, "new_username")
         
     
 
