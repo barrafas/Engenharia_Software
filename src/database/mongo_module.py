@@ -29,7 +29,6 @@ Usage:
 """
 
 import pymongo
-import sys
 from src.database.database_module import DatabaseModule
 
 class MongoModule(DatabaseModule):
