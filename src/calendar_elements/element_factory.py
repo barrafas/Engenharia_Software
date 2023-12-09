@@ -15,7 +15,7 @@ class ElementFactory:
 
     @staticmethod
     def create_element(element_type: str, element_id: str, title: str, schedules: list,
-                        **kwargs) -> CalendarElement:
+                        **kwargs) -> Element:
         """
         Create a calendar element based on the provided type.
 

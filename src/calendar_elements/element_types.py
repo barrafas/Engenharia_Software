@@ -3,7 +3,7 @@
     elements that can be displayed in the calendar.
 """
 from datetime import datetime, timedelta
-from .element_interface import CalendarElement
+from .element_interface import Element
 from src.user.user_model import User
 
 class Schedule:
@@ -410,7 +410,7 @@ class TaskElement(Element):
             "schedules": self.__schedules
         }
       
-class ReminderElement(CalendarElement):
+class ReminderElement(Element):
     """
     A class that represents a reminder.
 
