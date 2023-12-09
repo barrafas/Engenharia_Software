@@ -137,7 +137,12 @@ class User:
         Set the user name
 
         Args:
-            username: user name            
+            username: user name 
+
+        >>> user = User("id", "username", "email", ["id1", "id2"])
+        >>> user.set_username("new_username")
+        >>> user.username
+        'new_username'           
         """
         if type(username) != str:
             raise TypeError("O nome de usuário deve ser uma string")
@@ -152,6 +157,11 @@ class User:
 
         Args:
             username: user name
+
+        >>> user = User("id", "username", "email", ["id1", "id2"])
+        >>> user.set_email("new_email")
+        >>> user.email
+        'new_email'
         """
         if type(email) != str:
             raise TypeError("O email deve ser uma string")
