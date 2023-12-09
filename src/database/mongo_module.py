@@ -120,12 +120,15 @@ class MongoModule(DatabaseModule):
         self.collection = None
 
 
-    def insert_data(self, collection_name, data):
+    def insert_data(self, 
+                    collection_name: str,
+                    data: dict):
         """
         Execute a database query.
         
         Args:
-            query (str): The query to execute.
+            collection_name (str): The name of the collection.
+            data (dict): The data to insert.
             
         Raises:
             Exception: If not connected to the database.
@@ -134,25 +137,32 @@ class MongoModule(DatabaseModule):
             raise Exception("Not connected to the database.")
         self._db[collection_name].insert_one(data)
 
-    def delete_data(self, collection_name, condition):
+    def delete_data(self, 
+                    collection_name: str,
+                    condition: dict):
         """
         Delete data from the database.
 
         Args:
-            data (dict): The data to delete.
+            collection_name (str): The name of the collection.
+            condition (dict): The condition to match.
 
         Raises:
             Exception: If not connected to the database.
         """
         self._db[collection_name].delete_one(condition)
 
-    def update_data(self, collection_name, condition, new_data):
+    def update_data(self, 
+                    collection_name: str,
+                    condition: dict, 
+                    new_data: dict):
         """
         Update data in the database.
 
         Args:
-            where (dict): The data to update.
-            data (dict): The data to update to.
+            collection_name (str): The name of the collection.
+            condition (dict): The condition to match.
+            new_data (dict): The new data to insert.
 
         Raises:
             Exception: If not connected to the database.
@@ -164,7 +174,8 @@ class MongoModule(DatabaseModule):
         Fetch data from the database.
 
         Args:
-            query (dict): The query to execute.
+            collection_name (str): The name of the collection.
+            condition (dict): The condition to match.
 
         Returns:
             list: The result of the query.
