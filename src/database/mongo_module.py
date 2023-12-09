@@ -1,4 +1,6 @@
 import pymongo
+import sys
+sys.path.append('/home/gustavo/ES/Engenharia_Software/')
 from src.database.database_module import DatabaseModule
 
 class MongoModule(DatabaseModule):
@@ -38,13 +40,13 @@ class MongoModule(DatabaseModule):
             user (str): The user of the database.
             password (str): The password of the database.
         """
-        self.host = host
-        self.port = port
-        self.user = user
-        self.password = password
-        self.database_name = database_name
-        self.client = None
-        self.db = None
+        self._host = host
+        self._port = port
+        self._user = user
+        self._password = password
+        self._database_name = database_name
+        self._client = None
+        self._db = None
 
     def connect(self):
         """
@@ -52,11 +54,11 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If already connected to the database.
         """
-        if self.client:
+        if self._client:
             raise Exception("Already connected to the database.")
         
-        self.client = pymongo.MongoClient(host=self.host, port=self.port, username=self.user, password=self.password)
-        self.db = self.client[self.database_name]
+        self._client = pymongo.MongoClient(host=self._host, port=self._port, username=self._user, password=self._password)
+        self._db = self._client[self._database_name]
         
     def disconnect(self):
         """
@@ -64,13 +66,13 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
-        if not self.client:
+        if not self._client:
             raise Exception("Not connected to the database.")
         # disconnect from the database
-        self.client.close()
+        self._client.close()
 
-        self.client = None
-        self.db = None
+        self._client = None
+        self._db = None
         self.collection = None
 
 
@@ -84,9 +86,9 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
-        if not self.client:
+        if not self._client:
             raise Exception("Not connected to the database.")
-        self.db[collection_name].insert_one(data)
+        self._db[collection_name].insert_one(data)
 
     def delete_data(self, collection_name, condition):
         """
@@ -98,7 +100,7 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
-        self.db[collection_name].delete_one(condition)
+        self._db[collection_name].delete_one(condition)
 
     def update_data(self, collection_name, condition, new_data):
         """
@@ -111,7 +113,7 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
-        self.db[collection_name].update_one(condition, new_data)
+        self._db[collection_name].update_one(condition, new_data)
 
     def select_data(self, collection_name, condition):
         """
@@ -123,6 +125,6 @@ class MongoModule(DatabaseModule):
         Returns:
             list: The result of the query.
         """
-        result = list(self.db[collection_name].find(condition))
+        result = list(self._db[collection_name].find(condition))
 
         return result
