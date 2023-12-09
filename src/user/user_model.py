@@ -44,7 +44,6 @@ class User:
         self.schedules = schedules if schedules else []
         self.hashed_password = hashed_password
         self.user_preferences = user_preferences if user_preferences else {}
-        self.schedule_management = ScheduleManagement.get_instance()
 
     def __str__(self) -> str:
         return f"User({self.id}, {self.username}, {self.email}," \
@@ -102,10 +101,11 @@ class User:
                 if schedule not in self.get_schedules():
                     raise UserNotInSchedule(
                         f"Usuário não está nessa agenda: {schedule}")
-
+    
+        schedule_management = ScheduleManagement.get_instance()
         elements = []
         for schedule in schedules:
-            schedule = self.schedule_management.get_schedule(schedule)
+            schedule = schedule_management.get_schedule(schedule)
             elements += schedule.get_elements()
 
         elements = list(set(elements))
@@ -164,6 +164,9 @@ class User:
             True if the user is available, False otherwise
         """
         element_ids = self.get_elements()
+
+
+
         # fazer query no banco de dados comparando o horário com os horários
         # dos elementos da seguinte forma:
         # verificar se em algum dos elementos, a condição
