@@ -171,17 +171,17 @@ class User:
             element = element_management.get_element(element_id)
             
             # Check if the start time of the element is within the given time period
-            if time[0] <= element.start_time <= time[1]:
+            if time[0] <= element.start_time < time[1]:
                 return False
             
             # Check if the end time of the element is within the given time period
-            if time[0] <= element.end_time <= time[1]:
+            if time[0] < element.end_time <= time[1]:
                 return False
             
             # Check if the given time period is within the start 
             # and end time of the element
-            if element.start_time <= time[0] <= element.end_time or \
-                element.start_time <= time[1] <= element.end_time:
+            if element.start_time <= time[0] < element.end_time or \
+                element.start_time < time[1] <= element.end_time:
                 return False
         
         return True
