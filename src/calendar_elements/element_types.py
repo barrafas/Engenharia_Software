@@ -24,7 +24,7 @@ class EventElement(CalendarElement):
                 end: datetime, 
                 schedules: [str], 
                 description: str = None, 
-                type: str = "event"):
+                element_type: str = "event"):
         """
         EventElement constructor.
 
@@ -38,7 +38,7 @@ class EventElement(CalendarElement):
             type -- The type of the event.
         """
         self.__schedules = schedules if schedules else []
-        self.__type = type
+        self.__element_type = element_type
 
         self.__id = element_id
         self.set_title(title)
@@ -47,15 +47,24 @@ class EventElement(CalendarElement):
 
     @property
     def id(self):
+        """
+        Returns the id of the event.
+        """
         return self.__id
     
     @property
     def schedules(self):
+        """
+        Returns the schedules of the event.
+        """
         return self.__schedules
     
     @property
     def type(self):
-        return self.__type
+        """
+        Returns the type of the event.
+        """
+        return self.__element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -66,33 +75,24 @@ class EventElement(CalendarElement):
         """
         return (self.start, self.end)
 
-    def get_type(self) -> str:
-        """
-        Returns the type of the event.
-
-        Returns:
-            str -- The type of the event.
-        """
-        return self.__type
-
     def get_schedules(self) -> list:
         """
         Returns the schedules of the event.
 
         Returns:
-            list -- The schedules of the event.
+            [schedule] -- The schedules of the event.
         """
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
     
-    def get_users(self, schedules = []) -> [str]:
+    def get_users(self, filter_schedules) -> list:
         """
         Returns the users that are assigned to the event.
 
         Returns:
-            [str] -- The users that are assigned to the event.
+            [user] -- The users that are assigned to the reminder.
         """
-        pass
+
     
     def set_interval(self, start: datetime, end: datetime) -> None:
         '''
@@ -161,7 +161,7 @@ class EventElement(CalendarElement):
             "title": self.title,
             "start": self.start,
             "end": self.end,
-            "type": self.__type,
+            "element_type": self.__element_type,
             "description": self.description,
             "schedules": self.__schedules
         }
@@ -182,7 +182,7 @@ class TaskElement(CalendarElement):
                 schedules: [str], 
                 description: str = None, 
                 state: str = None,
-                type: str = "task"):
+                element_type: str = "task"):
         """
         TaskElement constructor.
 
@@ -193,7 +193,7 @@ class TaskElement(CalendarElement):
             due_date -- The due date of the task.
         """
         self.__schedules = schedules if schedules else []
-        self.__type = type
+        self.__element_type = element_type
 
         self.__id = element_id
         self.set_state(state)
@@ -211,7 +211,7 @@ class TaskElement(CalendarElement):
     
     @property
     def type(self):
-        return self.__type
+        return self.__element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -228,15 +228,6 @@ class TaskElement(CalendarElement):
 
         return (starting_date, ending_date)
 
-    def get_type(self) -> str:
-        """
-        Returns the type of the task.
-
-        Returns:
-            str -- The type of the task.
-        """
-        return self.__type
-
     def get_schedules(self) -> list:
         """
         Returns the schedules of the task.
@@ -247,27 +238,13 @@ class TaskElement(CalendarElement):
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
-    def get_users(self, schedules = []) -> [str]:
+    def get_users(self, filter_schedules) -> list:
         """
         Returns the users that are assigned to the task.
 
         Returns:
             [str] -- The users that are assigned to the task.
         """
-        schedule_manager = ScheduleManagement.get_instance()
-        if schedules == []: 
-            filter_schedules = self.__schedules
-        else:
-            filter_schedules = [schedule for schedule in self.__schedules if schedule in schedules]
-        
-        users = []
-        for schedule_id in filter_schedules:
-            schedule = schedule_manager.get_schedule(schedule_id)
-            users += [user_id for user_id, _ in schedule.get_user()]
-        
-        users = list(dict.fromkeys(users))
-
-        return users
     
     def set_due_date(self, due_date: datetime) -> None:
         '''
@@ -346,7 +323,7 @@ class TaskElement(CalendarElement):
             "description": self.description,
             "state": self.state,
             "due_date": self.due_date,
-            "type": self.__type,
+            "element_type": self.__element_type,
             "schedules": self.__schedules
         }
     
@@ -371,7 +348,7 @@ class ReminderElement(CalendarElement):
                 reminder_date: datetime, 
                 schedules: [str], 
                 description: str = None, 
-                type: str = "reminder"):
+                element_type: str = "reminder"):
         """
         ReminderElement constructor.
 
@@ -382,7 +359,7 @@ class ReminderElement(CalendarElement):
             reminder_date -- The date of the reminder.
         """
         self.__schedules = schedules if schedules else []
-        self.__type = type
+        self.__element_type = element_type
 
         self.__id = element_id
         self.set_title(title)
@@ -399,7 +376,7 @@ class ReminderElement(CalendarElement):
     
     @property
     def type(self):
-        return self.__type
+        return self.__element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -416,15 +393,6 @@ class ReminderElement(CalendarElement):
 
         return (starting_date, ending_date)
 
-    def get_type(self) -> str:
-        """
-        Returns the type of the reminder.
-
-        Returns:
-            str -- The type of the reminder.
-        """
-        return self.__type
-
     def get_schedules(self) -> list:
         """
         Returns the schedules of the reminder.
@@ -436,14 +404,13 @@ class ReminderElement(CalendarElement):
         return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
         
 
-    def get_users(self, schedules = []) -> [str]:
+    def get_users(self, filter_schedules) -> list:
         """
         Returns the users that are assigned to the reminder.
 
         Returns:
-            [str] -- The users that are assigned to the reminder.
+            [user] -- The users that are assigned to the reminder.
         """
-        pass
     
     def set_reminder_date(self, reminder_date: datetime) -> None:
         '''
@@ -504,6 +471,6 @@ class ReminderElement(CalendarElement):
             "title": self.title,
             "description": self.description,
             "reminder_date": self.reminder_date,
-            "type": self.__type,
+            "element_type": self.__element_type,
             "schedules": self.__schedules
         }

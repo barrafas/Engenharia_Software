@@ -12,18 +12,18 @@ class TestTaskElement(unittest.TestCase):
         self.description = "Description"
         self.state = 'incomplete'
         self.schedules = ['schedule_1', 'schedule_2']
-        self.type = "task"
+        self.element_type = "task"
         self.task = TaskElement(self.id, 
                                 self.title, 
                                 self.due_date, 
                                 self.schedules, 
                                 self.description, 
                                 self.state,
-                                self.type)
+                                self.element_type)
         
         # Access private attributes for testing
         self.task._TaskElement__id = self.id
-        self.task._TaskElement__type = self.type
+        self.task._TaskElement__element_type = self.element_type
         self.task._TaskElement__schedules = self.schedules
 
     def test_id_property(self):
@@ -32,7 +32,7 @@ class TestTaskElement(unittest.TestCase):
 
     def test_type_property(self):
         # Test the schedules property
-        self.assertEqual(self.task.type, self.type)
+        self.assertEqual(self.task.type, self.element_type)
 
     def test_schedules_property(self):
         # Test the schedules property
@@ -44,10 +44,6 @@ class TestTaskElement(unittest.TestCase):
         expected_interval = (datetime(2022, 12, 31, 23, 50), datetime(2023, 1, 1))
         self.assertEqual(self.task.get_display_interval(), expected_interval)
 
-    def test_get_type(self):
-        # Verify if the type returned is "task"
-        self.assertEqual(self.task.get_type(), "task")
-
     def test_get_schedules(self):
         # Verify if the schedules returned match the ones that were set in
         # the constructor
@@ -58,16 +54,12 @@ class TestTaskElement(unittest.TestCase):
                             schedules=['id1', 'id2', 'id3'],
                             description=self.description)
         schedules = task.get_schedules()
-        print(schedules)
         expected_schedule = [schedule_management.schedules[id] for id in ['id1', 'id2', 'id3']]
         self.assertEqual(schedules, expected_schedule)
 
     def test_get_users(self):
         # Verify if the users returned match the ones that were set in
         # the constructor
-        # schedule_management = ScheduleManagement.get_instance()
-        # task = TaskElement(self.id, self.title, self.due_date, self.description,
-        #                         schedules=['id1', 'id2', 'id3'])
         pass
         
 
@@ -189,7 +181,7 @@ class TestTaskElement(unittest.TestCase):
             "due_date": self.due_date,
             "state": self.state,
             "schedules": self.schedules,
-            "type": self.type
+            "element_type": self.element_type
         }
         self.assertDictEqual(self.task.to_dict(), expected_dict)
 

@@ -12,13 +12,13 @@ class TestEventElement(unittest.TestCase):
         self.end = datetime(2023, 1, 2)
         self.description = "Description"
         self.schedules = ['schedule1', 'schedule2']
-        self.type = "event"
+        self.element_type = "event"
         self.event = EventElement(self.id, self.title, self.start, self.end, self.schedules,
                                     self.description)
         # Access private attributes for testing
         self.event._EventElement__id = self.id
         self.event._EventElement__schedules = self.schedules
-        self.event._EventElement__type = self.type
+        self.event._EventElement__element_type = self.element_type
         
     def test_id_property(self):
         # Test the id property
@@ -26,7 +26,7 @@ class TestEventElement(unittest.TestCase):
 
     def test_type_property(self):
         # Test the schedules property
-        self.assertEqual(self.event.type, self.type)
+        self.assertEqual(self.event.type, self.element_type)
 
     def test_schedules_property(self):
         # Test the schedules property
@@ -38,21 +38,23 @@ class TestEventElement(unittest.TestCase):
         expected_interval = (datetime(2023, 1, 1), datetime(2023, 1, 2))
         self.assertEqual(self.event.get_display_interval(), expected_interval)
 
-    def test_get_type(self):
-        # Verify if the type returned is "event"
-        self.assertEqual(self.event.get_type(), "event")
-
     def test_get_schedules(self):
         # Verify if the schedules returned match the ones that were set in 
         # the constructor
         schedule_management = ScheduleManagement.get_instance()
-        event = EventElement(self.id, self.title, self.start, self.end, ['id1', 'id2', 'id3'],
-                              self.description)
+        event = EventElement(element_id=self.id, 
+                            title=self.title, 
+                            start=self.start,
+                            end=self.end,
+                            schedules=['id1', 'id2', 'id3'],
+                            description=self.description)
         schedules = event.get_schedules()
-        expected_schedule = [schedule_management.get_schedule(id) for id in ['id1', 'id2', 'id3']]
+        expected_schedule = [schedule_management.schedules[id] for id in ['id1', 'id2', 'id3']]
         self.assertEqual(schedules, expected_schedule)
 
-    def test_get_users(self):
+    def test_get_users(self, ):
+        # Verify if the users returned match the ones that were set in 
+        # the constructor
         pass
 
     def test_get_users_empty(self):
@@ -159,7 +161,7 @@ class TestEventElement(unittest.TestCase):
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "type": self.type,
+            "element_type": self.element_type,
             "schedules": self.schedules,
             "start": self.start,
             "end": self.end
