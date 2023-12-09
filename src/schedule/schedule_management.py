@@ -71,15 +71,21 @@ class ScheduleManagement:
         Returns:
             The created schedule instance
         """
+        # Possible errors:
         if self.schedule_exists(schedule_id):
             raise DuplicatedIDError(f"A schedule with ID {schedule_id} already exists")
-
+        if not isinstance(schedule_id, str):
+            raise TypeError("Schedule ID must be a string")
+        if not permissions:
+            raise EmptyPermissionsError("Permissions cannot be empty")
+        # Create the schedule instance and insert it into the database
         schedule = Schedule(schedule_id, title, description, permissions, elements)
         self.db_module.insert_data('schedules', {'_id': schedule_id, 
                                                  'title': title, 
                                                  'description': description, 
                                                  'permissions': permissions,
                                                     'elements': elements})
+        # Add the schedule to the dictionary
         self.schedules[schedule_id] = schedule
         return schedule
 
