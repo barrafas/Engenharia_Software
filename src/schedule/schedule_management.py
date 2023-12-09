@@ -5,6 +5,10 @@ class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
     pass
 
+class DuplicatedIDError(Exception):
+    """Raised when the ID already exists"""
+    pass
+
 class ScheduleManagement:
     """
     ScheduleManagement class
@@ -69,6 +73,8 @@ class ScheduleManagement:
         Returns:
             The created schedule instance
         """
+        if self.schedule_exists(schedule_id):
+            raise DuplicatedIDError(f"A schedule with ID {schedule_id} already exists")
 
         schedule = Schedule(schedule_id, title, description, permissions, elements)
         self.db_module.insert_data('schedules', {'_id': schedule_id, 
@@ -76,6 +82,7 @@ class ScheduleManagement:
                                                  'description': description, 
                                                  'permissions': permissions,
                                                     'elements': elements})
+        self.schedules[schedule_id] = schedule
         return schedule
 
     def get_schedule(self, schedule_id: str) -> Schedule:
