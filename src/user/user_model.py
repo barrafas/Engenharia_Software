@@ -128,7 +128,7 @@ class User:
             username: user name            
         """
         if type(username) != str:
-            raise Exception("Name must be a string")
+            raise TypeError("O nome de usuário deve ser uma string")
         elif username == "":
             raise Exception("Name cannot be empty or blank")
         else:
