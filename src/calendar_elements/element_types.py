@@ -71,7 +71,7 @@ class EventElement(Element):
     assigned to one or more schedules.'
     """
 
-    def __init__(self, 
+    def __init__(self,
                 element_id: str,
                 title: str,
                 start: datetime,
