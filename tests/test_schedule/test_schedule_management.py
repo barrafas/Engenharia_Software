@@ -249,6 +249,31 @@ class TestScheduleManagement(unittest.TestCase):
             {'_id': schedule_id}
         )
 
+    def test_delete_schedule_deletes_schedule_from_dictionary(self):
+        # Check that delete_schedule deletes the schedule from the dictionary
+        # Arrange
+        schedule_id = "schedule10"
+        self.schedule_management.schedules[schedule_id] = MagicMock()
+        self.schedule_management.schedule_exists = MagicMock(return_value=True)
+        self.schedule_management.db_module.delete_data = MagicMock()
+        # Act
+        self.schedule_management.delete_schedule(schedule_id)
+        # Assert
+        self.schedule_management.db_module.delete_data.assert_called_once_with(
+            'schedules', 
+            {'_id': schedule_id}
+        )
+        self.assertNotIn(schedule_id, self.schedule_management.schedules)
+
+    def test_delete_schedule_id_doesnt_exist(self):
+        # Check that delete_schedule raises an error when the schedule does not exist
+        # Arrange
+        schedule_id = "schedule10"
+        self.schedule_management.schedule_exists = MagicMock(return_value=False)
+        # Act & Assert
+        with self.assertRaises(NonExistentIDError):
+            self.schedule_management.delete_schedule(schedule_id)
+
 
 if __name__ == '__main__':
     unittest.main()
