@@ -2,8 +2,11 @@
 
 import unittest
 from datetime import datetime
-from src.calendar_elements.element_types import ReminderElement
-from tests.test_events.mocks import ScheduleManagement
+from src.calendar_elements.element_types import ReminderElement, ScheduleManagement, Schedule, UserManagement
+from unittest.mock import MagicMock, PropertyMock
+from src.user.user_model import User
+from typing import Optional
+
 
 class TestReminderElement(unittest.TestCase):
     """Test the ReminderElement class"""
@@ -50,33 +53,78 @@ class TestReminderElement(unittest.TestCase):
  
     def test_get_schedules(self):
         """
-        Verify if the schedules returned match the ones that were set in the 
+        Test if the schedules returned match the ones that were set in the
         constructor
         """
-        schedule_management = ScheduleManagement.get_instance()
-        reminder = ReminderElement(element_id=self.id, 
-                            title=self.title,
-                            reminder_date=self.reminder_date, 
-                            schedules=['id1', 'id2', 'id3'],
-                            description=self.description)
-        schedules = reminder.get_schedules()
-        expected_schedule = [schedule_management.schedules[id] for id in ['id1', 'id2', 'id3']]
-        self.assertEqual(schedules, expected_schedule)
+        # Set up the mock objects and functions
+        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
+            schedules = self.reminder.get_schedules()
+            self.assertEqual(schedules, [schedule_1, schedule_2])
 
     def test_get_users(self):
         """
         Test if the users returned match the ones that were set in the 
         constructor
         """
+        # Set up the mock objects and functions
+        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+        get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
+        
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                users = self.reminder.get_users(['schedule_1', 'schedule_2'])
+                self.assertEqual(len(users), 4)
+                for user in users:
+                    self.assertIn(user, [user_1, user_2, user_3, user_4])
 
-    def test_get_users_empty(self):
-        """Test if an empty list is returned when there are no users"""
+    def test_get_users_nonfilter(self):
+        """Test get_users when no filter of schedules are not specified.
+        Default to all schedules.
+        # """
+        # Set up the mock objects and functions
+        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+        get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
+
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
+                                            side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                users = self.reminder.get_users()
+                self.assertEqual(len(users), 4)
+                for user in users:
+                    self.assertIn(user, [user_1, user_2, user_3, user_4])
 
     def test_get_users_with_filter_by_schedules(self):
         """
         Test if the users returned match the ones that were set in the 
         constructor and if they belong to the specified schedules
         """
+        # Set up the mock objects
+        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+        get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
+        
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
+                                            side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                users = self.reminder.get_users(['schedule_1'])
+                self.assertEqual(len(users), 2)
+                for user in users:
+                    self.assertIn(user, [user_1, user_2, user_3, user_4])
+
+    def test_get_users_nonrepeat_users(self):
+        """Test if the users returned are unique"""
+        # Set up the mock objects
+        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule(repeat_user=True)
+        get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
+        
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
+                                            side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                users = self.reminder.get_users(['schedule_1', 'schedule_2'])
+                self.assertEqual(len(users), 2)
+                for user in users:
+                    self.assertIn(user, [user_1, user_2])
 
     def test_set_reminder_date_valid(self):
         """Test setting a valid reminder date"""
@@ -169,6 +217,62 @@ class TestReminderElement(unittest.TestCase):
             "element_type": self.element_type
         }
         self.assertDictEqual(self.reminder.to_dict(), expected_dict)
+
+    def get_mock_schedule(self, repeat_user = False) -> tuple[callable, MagicMock, MagicMock]:
+        """Mock function to return a schedule object"""
+
+        # Set up the mock objects
+        schedule_1 = MagicMock(spec=Schedule)
+        type(schedule_1).id = PropertyMock(return_value='schedule_1')
+        type(schedule_1).permissions = PropertyMock(return_value={"user_1": "owner",
+                                                        "user_2": "editor"})
+
+        schedule_2 = MagicMock(spec=Schedule)
+        type(schedule_2).id = PropertyMock(return_value='schedule_2')
+        if repeat_user:
+            type(schedule_2).permissions = PropertyMock(return_value={"user_1": "owner",
+                                                        "user_2": "editor"})
+        else:
+            type(schedule_2).permissions = PropertyMock(return_value={"user_3": "owner",
+                                                        "user_4": "editor"})
+
+        def get_schedule_mock(id: str) -> Optional[MagicMock]:
+            return {
+                'schedule_1': schedule_1,
+                'schedule_2': schedule_2
+            }.get(id, None)
+
+        return get_schedule_mock, schedule_1, schedule_2
+
+    def get_mock_user(self) -> tuple[callable, MagicMock, MagicMock, MagicMock, MagicMock]:
+        """Mock function to return a user object"""
+
+        # Set up the mock objects
+        user_1 = MagicMock(spec=User)
+        type(user_1).id = PropertyMock(return_value='user_1')
+        type(user_1).username = PropertyMock(return_value='user_1')
+
+        user_2 = MagicMock(spec=User)
+        type(user_2).id = PropertyMock(return_value='user_2')
+        type(user_2).username = PropertyMock(return_value='user_2')
+
+        user_3 = MagicMock(spec=User)
+        type(user_3).id = PropertyMock(return_value='user_3')
+        type(user_3).username = PropertyMock(return_value='user_3')
+
+        user_4 = MagicMock(spec=User)
+        type(user_4).id = PropertyMock(return_value='user_4')
+        type(user_4).username = PropertyMock(return_value='user_4')
+
+        def get_user_mock(id: str) -> Optional[MagicMock]:
+            return {
+                'user_1': user_1,
+                'user_2': user_2,
+                'user_3': user_3,
+                'user_4': user_4
+            }.get(id, None)
+
+        return get_user_mock, user_1, user_2, user_3, user_4
 
 if __name__ == '__main__':
     unittest.main()
