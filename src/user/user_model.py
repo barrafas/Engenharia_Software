@@ -174,6 +174,9 @@ class User:
         """
         if type(time) != tuple:
             raise TypeError("O horário deve ser uma tupla")
+        if len(time) < 2:
+            raise TupleWithLessThanTwoDatetimeObjects(
+                "A tupla de horário deve conter pelo menos dois objetos datetime")
         if type(time[0]) != datetime or type(time[1]) != datetime:
             raise TypeError("A tupla de horário deve conter objetos datetime")
 
