@@ -53,16 +53,17 @@ class ScheduleManagement:
         return bool(schedule)
         
 
-    def create_schedule(self, title: str, description: str, 
-            permissions: [tuple], schedule_id: str = None) -> Schedule:
+    def create_schedule(self, schedule_id: str, title: str, description: str, 
+            permissions: dict, elements: list) -> Schedule:
         """
         Create a new schedule
 
         Args:
+            schedule_id: Schedule ID
             title: Title of the schedule
             description: Description of the schedule
-            permissions: List of tuples (user_id, permission_type)
-            schedule_id: Schedule ID
+            permissions: Dictionary of permissions, where the key is the user 
+            elements: List of elements IDs that are displayed in the schedule
 
         Returns:
             The created schedule instance
