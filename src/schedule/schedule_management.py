@@ -149,7 +149,6 @@ class ScheduleManagement:
         if schedule_id in self.schedules:
             del self.schedules[schedule_id]
 
-
     def add_element_to_schedule(self, schedule_id: str, element_id: str) -> None:
         """
         Add an element to a schedule

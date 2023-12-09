@@ -278,6 +278,7 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.delete_schedule(schedule_id)
 
     def test_add_element_to_schedule_updates_elements(self):
+        # Check that add_element_to_schedule updates the elements list of the schedule
         # Arrange
         schedule_id = "schedule10"
         element_id = "element1"
@@ -288,13 +289,24 @@ class TestScheduleManagement(unittest.TestCase):
         self.assertIn(element_id, self.schedule_management.schedules[schedule_id].elements)
 
     @patch.object(ElementManagement, 'get_instance')
-    def test_add_element_to_schedule_raises_error_for_nonexistent_element(self, mock_get_instance):
+    def test_add_element_to_schedule_invalid_element(self, mock_get_instance):
+        # Check that add_element_to_schedule raises an error when the element does not exist
         # Arrange
         mock_element_manager = Mock()
         mock_element_manager.element_exists.return_value = False
         mock_get_instance.return_value = mock_element_manager
         schedule_id = "schedule1"
         element_id = "nonexistent_element"
+        # Act & Assert
+        with self.assertRaises(NonExistentIDError):
+            self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+
+    def test_add_element_to_schedule_invalid_schedule(self):
+        # Check that add_element_to_schedule raises an error when the schedule does not exist
+        # Arrange
+        schedule_id = "nonexistent_schedule"
+        element_id = "element1"
+        self.schedule_management.schedule_exists = MagicMock(return_value=False)
         # Act & Assert
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.add_element_to_schedule(schedule_id, element_id)
