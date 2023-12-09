@@ -76,7 +76,7 @@ class TestTaskElement(unittest.TestCase):
         Test if the users returned match the ones that were set in the 
         constructor
         """
-         # Set up the mock objects
+        # Set up the mock objects
         schedule_1 = MagicMock(spec=Schedule)
         type(schedule_1).id = PropertyMock(return_value='schedule_1')
         type(schedule_1).permissions = PropertyMock(return_value={"user_1": "owner", "user_2": "editor"})
@@ -119,14 +119,52 @@ class TestTaskElement(unittest.TestCase):
                 for user in users:
                     self.assertIn(user, [user_1, user_2, user_3, user_4])
 
-    def test_get_users_with_filter_by_schedules(self):
+    def test_get_users_nonfilter(self):
+        """Test get_users when no filter of schedules are not specified.
+        Default to all schedules.
         """
-        Test if the users returned match the ones that were set in the 
-        constructor and if they belong to the specified schedules
-        """
+        # Set up the mock objects
+        schedule_1 = MagicMock(spec=Schedule)
+        type(schedule_1).id = PropertyMock(return_value='schedule_1')
+        type(schedule_1).permissions = PropertyMock(return_value={"user_1": "owner", "user_2": "editor"})
 
-    def test_get_users_empty(self):
-        """Test if an empty list is returned when there are no users"""
+        schedule_2 = MagicMock(spec=Schedule)
+        type(schedule_2).id = PropertyMock(return_value='schedule_2')
+        type(schedule_2).permissions = PropertyMock(return_value={"user_3": "owner", "user_4": "editor"})
+
+        user_1 = MagicMock(spec=User)
+        type(user_1).id = PropertyMock(return_value='user_1')
+        type(user_1).username = PropertyMock(return_value='user_1')
+        user_2 = MagicMock(spec=User)
+        type(user_2).id = PropertyMock(return_value='user_2')
+        type(user_2).username = PropertyMock(return_value='user_2')
+        user_3 = MagicMock(spec=User)
+        type(user_3).id = PropertyMock(return_value='user_3')
+        type(user_3).username = PropertyMock(return_value='user_3')
+        user_4 = MagicMock(spec=User)
+        type(user_4).id = PropertyMock(return_value='user_4')
+        type(user_4).username = PropertyMock(return_value='user_4')
+
+        def get_user_mock(id: str) -> User:
+            return {
+                'user_1': user_1,
+                'user_2': user_2,
+                'user_3': user_3,
+                'user_4': user_4
+            }.get(id, None)
+
+        def get_schedule_mock(id: str) -> Schedule:
+            return {
+                'schedule_1': schedule_1,
+                'schedule_2': schedule_2
+            }.get(id, None)
+        
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                users = self.task.get_users()
+                self.assertEqual(len(users), 4)
+                for user in users:
+                    self.assertIn(user, [user_1, user_2, user_3, user_4])
 
     def test_get_users_with_filter_by_schedules(self):
         """
