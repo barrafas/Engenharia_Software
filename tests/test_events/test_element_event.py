@@ -71,7 +71,8 @@ class TestEventElement(unittest.TestCase):
         get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
         get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
         
-        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
+        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
+                                            side_effect=get_schedule_mock):
             with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
                 users = self.event.get_users(['schedule_1', 'schedule_2'])
                 self.assertEqual(len(users), 4)
@@ -220,7 +221,7 @@ class TestEventElement(unittest.TestCase):
     def test_to_dict(self):
         """Verify if the dictionary returned has the expected keys and values"""
         expected_dict = {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": self.description,
             "element_type": self.element_type,

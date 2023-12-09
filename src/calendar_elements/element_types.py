@@ -219,7 +219,7 @@ class EventElement(Element):
             dict -- The dictionary representation of the event.
         """
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "start": self.start,
             "end": self.end,
@@ -401,7 +401,7 @@ class TaskElement(Element):
             dict -- The dictionary representation of the task.
         """
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "description": self.description,
             "state": self.state,
@@ -558,7 +558,7 @@ class ReminderElement(Element):
             dict -- The dictionary representation of the reminder.
         """
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "description": self.description,
             "reminder_date": self.reminder_date,

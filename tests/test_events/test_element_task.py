@@ -232,7 +232,7 @@ class TestTaskElement(unittest.TestCase):
     def test_to_dict(self):
         """Verify if the dictionary returned has the expected keys and values"""
         expected_dict = {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": self.description,
             "due_date": self.due_date,
