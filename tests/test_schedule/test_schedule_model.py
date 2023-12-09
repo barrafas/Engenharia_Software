@@ -189,6 +189,23 @@ class TestScheduleModel(unittest.TestCase):
         users = schedule.get_users(['permissiontype3'])
         self.assertEqual(users, [])
 
+    def test_elements_setter_accepts_valid_input(self):
+        # Arrange
+        schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
+        new_elements = ["element2", "element3"]
+        # Act
+        schedule.elements = new_elements
+        # Assert
+        self.assertEqual(schedule.elements, new_elements)
+
+    def test_elements_setter_raises_error_on_invalid_input(self):
+        # Arrange
+        schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
+        invalid_elements = "element2"
+        # Act & Assert
+        with self.assertRaises(ValueError):
+            schedule.elements = invalid_elements
+
 
 if __name__ == '__main__':
     unittest.main()

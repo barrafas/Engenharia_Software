@@ -43,6 +43,12 @@ class Schedule:
     def elements(self):
         return self.__elements
 
+    @elements.setter
+    def elements(self, value):
+        if isinstance(value, list) and all(isinstance(i, str) for i in value):
+            self.__elements = value
+        else:
+            raise ValueError("Elements must be a list of strings")
 
     def get_elements(self, types =  []) -> list:
         '''
