@@ -46,6 +46,7 @@ class TestScheduleManagement(unittest.TestCase):
         self.db_module.select_data.assert_called_with('schedules', {'_id': 'schedule1'})
     
     def test_create_schedule(self):
+        # General test for create_schedule
         # Arrange
         self.db_module.insert_data = MagicMock()
         self.db_module.select_data = MagicMock(return_value=[])
@@ -101,6 +102,7 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
     def test_create_schedule_raises_error_with_invalid_title(self):
+        # Check that create_schedule raises an error when the title is invalid
         # Arrange
         self.schedule_management.db_module.insert_data = MagicMock()
         self.schedule_management.db_module.select_data = MagicMock(return_value=[])
@@ -115,6 +117,7 @@ class TestScheduleManagement(unittest.TestCase):
                 self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
     def test_create_schedule_raises_error_with_invalid_description(self):
+        # Check that create_schedule raises an error when the description is invalid
         # Arrange
         self.schedule_management.db_module.insert_data = MagicMock()
         self.schedule_management.db_module.select_data = MagicMock(return_value=[])
@@ -129,6 +132,7 @@ class TestScheduleManagement(unittest.TestCase):
                 self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
     def test_create_schedule_raises_error_with_non_string_id(self):
+        # Check that create_schedule raises an error when the ID is not a string
         # Arrange
         self.schedule_management.db_module.insert_data = MagicMock()
         self.schedule_management.db_module.select_data = MagicMock(return_value=[])
@@ -142,6 +146,7 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
     def test_create_schedule_raises_error_with_empty_permissions(self):
+        # Check that create_schedule raises an error when the permissions are empty
         # Arrange
         self.schedule_management.db_module.insert_data = MagicMock()
         self.schedule_management.db_module.select_data = MagicMock(return_value=[])
@@ -155,6 +160,7 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
     def test_get_schedule_id_exists_on_dict(self):
+        # Check that get_schedule returns the correct schedule when the schedule exists in the dictionary
         # Arrange
         schedule_id = "schedule10"
         title = "Schedule 2"
@@ -169,6 +175,7 @@ class TestScheduleManagement(unittest.TestCase):
         self.assertEqual(result, schedule)
 
     def test_get_schedule_id_exists_in_database(self):
+        # Check that get_schedule returns the correct schedule when the schedule exists in the database
         # Arrange
         schedule_id = "schedule10"
         title = "Schedule 2"
@@ -192,6 +199,7 @@ class TestScheduleManagement(unittest.TestCase):
         self.assertEqual(result.elements, elements)
 
     def test_get_schedule_id_doesnt_exist(self):
+        # Check that get_schedule raises an error when the schedule does not exist
         # Arrange
         schedule_id = "schedule10"
         self.schedule_management.schedule_exists = MagicMock(return_value=False)
@@ -200,6 +208,7 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.get_schedule(schedule_id)
 
     def test_update_schedule_id_exists(self):
+        # Check that update_schedule updates the schedule when the schedule exists
         # Arrange
         schedule_id = "schedule10"
         title = "Schedule 2"
@@ -219,12 +228,26 @@ class TestScheduleManagement(unittest.TestCase):
         )
 
     def test_update_schedule_id_doesnt_exist(self):
+        # Check that update_schedule raises an error when the schedule does not exist
         # Arrange
         schedule_id = "schedule10"
         self.schedule_management.schedule_exists = MagicMock(return_value=False)
         # Act & Assert
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.update_schedule(schedule_id)
+
+    def test_delete_schedule_deletes_from_database(self):
+        # Check that delete_schedule deletes the schedule from the database
+        # Arrange
+        schedule_id = "schedule10"
+        self.schedule_management.db_module.delete_data = MagicMock()
+        # Act
+        self.schedule_management.delete_schedule(schedule_id)
+        # Assert
+        self.schedule_management.db_module.delete_data.assert_called_once_with(
+            'schedules', 
+            {'_id': schedule_id}
+        )
 
 
 if __name__ == '__main__':
