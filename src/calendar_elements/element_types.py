@@ -61,8 +61,6 @@ class UserManagement:
         if cls.__instance is None:
             cls.__instance = UserManagement()
         return cls.__instance
-  
-
 
 
 class EventElement(CalendarElement):
@@ -135,8 +133,9 @@ class EventElement(CalendarElement):
             [schedule] -- The schedules of the event.
         """
         schedule_manager = ScheduleManagement.get_instance()
-        return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
-
+        # Return a list of Schedules objects
+        return [schedule_manager.get_schedule(id) for id in self.__schedules]
+        
     def get_users(self, filter_schedules = []) -> list:
         """
         Returns the users that are assigned to the event.
@@ -145,20 +144,18 @@ class EventElement(CalendarElement):
             filter_schedules -- A list of schedules to filter the users.
 
         Returns:
-            [user] -- The users that are assigned to the reminder.
+            [user] -- The users that are assigned to the event.
         """
         schedule_manager = ScheduleManagement.get_instance()
-        filter_schedules = [schedule for schedule in self.__schedules
-                                if schedule in filter_schedules]
-        users = []
-        for schedule_id in filter_schedules:
+        schedules_to_use = filter_schedules or self.__schedules
+  
+        users = set()
+        for schedule_id in schedules_to_use:
             schedule = schedule_manager.get_schedule(schedule_id)
-            users += list(schedule.permissions.keys())
+            users.update(schedule.permissions.keys())
         
         user_manager = UserManagement.get_instance()
-
-        users = [user_manager.get_user(id) for id in users]
-        return users
+        return [user_manager.get_user(id) for id in users]
 
     def set_interval(self, start: datetime, end: datetime) -> None:
         """
@@ -324,7 +321,7 @@ class TaskElement(CalendarElement):
         """
         schedule_manager = ScheduleManagement.get_instance()
         schedules_to_use = filter_schedules or self.__schedules
-        
+  
         users = set()
         for schedule_id in schedules_to_use:
             schedule = schedule_manager.get_schedule(schedule_id)
@@ -483,19 +480,29 @@ class ReminderElement(CalendarElement):
         Returns the schedules of the reminder.
 
         Returns:
-            list -- The schedules of the reminder.
+            [schedule] -- The schedules of the reminder.
         """
         schedule_manager = ScheduleManagement.get_instance()
         # Return a list of Schedules objects
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
-    def get_users(self, filter_schedules) -> list:
+    def get_users(self, filter_schedules = []) -> list:
         """
         Returns the users that are assigned to the reminder.
 
         Returns:
             [user] -- The users that are assigned to the reminder.
         """
+        schedule_manager = ScheduleManagement.get_instance()
+        schedules_to_use = filter_schedules or self.__schedules
+  
+        users = set()
+        for schedule_id in schedules_to_use:
+            schedule = schedule_manager.get_schedule(schedule_id)
+            users.update(schedule.permissions.keys())
+        
+        user_manager = UserManagement.get_instance()
+        return [user_manager.get_user(id) for id in users]
     
     def set_reminder_date(self, reminder_date: datetime) -> None:
         """
