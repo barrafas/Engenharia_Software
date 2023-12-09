@@ -18,6 +18,15 @@ class TestUserModel(unittest.TestCase):
         result = user.get_elements()        
         self.assertEqual(sorted(result), ['elementid1', 'elementid2', 
                                   'elementid3', 'elementid4', 'elementid5'])
+        
+    def test_get_filtered_elements(self):
+        # Test getting all element ids from user schedules, with filter
+        user = User("id", "username", "email", ["id1", "id2", "id3"])
+        result = user.get_elements(["id1", "id3"])        
+        self.assertEqual(sorted(result), ['elementid1', 'elementid2', 
+                                    'elementid5', 'elementid6', 'elementid7'])
+        
+    
 
 
 if __name__ == '__main__':
