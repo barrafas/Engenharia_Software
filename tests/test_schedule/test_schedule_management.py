@@ -218,6 +218,14 @@ class TestScheduleManagement(unittest.TestCase):
             schedule.to_dict()
         )
 
+    def test_update_schedule_id_doesnt_exist(self):
+        # Arrange
+        schedule_id = "schedule10"
+        self.schedule_management.schedule_exists = MagicMock(return_value=False)
+        # Act & Assert
+        with self.assertRaises(NonExistentIDError):
+            self.schedule_management.update_schedule(schedule_id)
+
 
 if __name__ == '__main__':
     unittest.main()
