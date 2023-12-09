@@ -3,27 +3,26 @@
     elements that can be displayed in the calendar.
 """
 from datetime import datetime, timedelta
+from tests.test_events.mocks import ScheduleManagement
 from .element_interface import CalendarElement
-from tests.test_events.mocks import Schedule, ScheduleManagement, User, UserManagement
-
 
 
 class EventElement(CalendarElement):
     """
-        A class that represents an event.
+    A class that represents an event.
 
-        'Event with determined beginning and end dates, which can be
-        scheduled for a specific time, and which can be
-        assigned to one or more schedules.'
+    'Event with determined beginning and end dates, which can be
+    scheduled for a specific time, and which can be
+    assigned to one or more schedules.'
     """
 
     def __init__(self, 
-                element_id: str, 
-                title: str, 
-                start: datetime, 
-                end: datetime, 
-                schedules: [str], 
-                description: str = None, 
+                element_id: str,
+                title: str,
+                start: datetime,
+                end: datetime,
+                schedules: [str],
+                description: str = None,
                 element_type: str = "event"):
         """
         EventElement constructor.
@@ -47,23 +46,17 @@ class EventElement(CalendarElement):
 
     @property
     def id(self):
-        """
-        Returns the id of the event.
-        """
+        """Returns the id of the event. """
         return self.__id
-    
+
     @property
     def schedules(self):
-        """
-        Returns the schedules of the event.
-        """
+        """Returns the schedules of the event."""
         return self.__schedules
-    
+
     @property
     def type(self):
-        """
-        Returns the type of the event.
-        """
+        """Returns the type of the event."""
         return self.__element_type
 
     def get_display_interval(self) -> (datetime, datetime):
@@ -71,7 +64,8 @@ class EventElement(CalendarElement):
         Returns the interval that the event should ocupate in the calendar.
 
         Returns:
-            (datetime, datetime) -- The interval that the event should ocupate in the calendar.
+            (datetime, datetime) -- The interval that the event should ocupate 
+            in the calendar.
         """
         return (self.start, self.end)
 
@@ -84,24 +78,26 @@ class EventElement(CalendarElement):
         """
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
-    
+
     def get_users(self, filter_schedules) -> list:
         """
         Returns the users that are assigned to the event.
+
+        Arguments:
+            filter_schedules -- A list of schedules to filter the users.
 
         Returns:
             [user] -- The users that are assigned to the reminder.
         """
 
-    
     def set_interval(self, start: datetime, end: datetime) -> None:
-        '''
-            Sets the interval of the event.
+        """
+        Sets the interval of the event.
 
-            Arguments:
-                start -- start date of the event.
-                end -- end date of the event.
-        '''
+        Arguments:
+            start -- start date of the event.
+            end -- end date of the event.
+        """
         if start is None:
             raise ValueError("Start cannot be None")
         elif type(start) != datetime:
@@ -117,12 +113,12 @@ class EventElement(CalendarElement):
             self.end = end
 
     def set_title(self, title: str) -> None:
-        '''
-            Sets the title of the event.
+        """
+        Sets the title of the event.
 
-            Arguments:
-                title -- title of the event.
-        '''
+        Arguments:
+            title -- title of the event.
+        """
 
         if title is None:
             raise ValueError("Title cannot be None")
@@ -136,12 +132,12 @@ class EventElement(CalendarElement):
             self.title = title
 
     def set_description(self, description: str) -> None:
-        '''
-            Sets the description of the event.
+        """
+        Sets the description of the event.
 
-            Arguments:
-                description -- description of the event.
-        '''
+        Arguments:
+            description -- description of the event.
+        """
         if description is not None:
             if type(description) != str:
                 raise TypeError("Description must be a string")
@@ -169,18 +165,18 @@ class EventElement(CalendarElement):
 
 class TaskElement(CalendarElement):
     """
-        A class that represents a task.
+    A class that represents a task.
 
-        'Task with a deadline, which can be scheduled for a specific
-        time, and which can be assigned to one or more schedules.'
+    'Task with a deadline, which can be scheduled for a specific
+    time, and which can be assigned to one or more schedules.'
     """
 
-    def __init__(self, 
-                element_id: str, 
-                title: str, 
-                due_date: datetime, 
-                schedules: [str], 
-                description: str = None, 
+    def __init__(self,
+                element_id: str,
+                title: str,
+                due_date: datetime,
+                schedules: [str],
+                description: str = None,
                 state: str = None,
                 element_type: str = "task"):
         """
@@ -189,8 +185,11 @@ class TaskElement(CalendarElement):
         Arguments:
             element_id -- The id of the task.
             title -- The title of the task.
-            description -- The description of the task.
             due_date -- The due date of the task.
+            schedules -- The schedules that the task is assigned to.
+            description -- The description of the task.
+            state -- The state of the task.
+            element_type -- The type of the task.
         """
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
@@ -203,14 +202,17 @@ class TaskElement(CalendarElement):
 
     @property
     def id(self):
+        """Returns the id of the task."""
         return self.__id
-    
+
     @property
     def schedules(self):
+        """Returns the schedules of the task."""
         return self.__schedules
-    
+
     @property
     def type(self):
+        """Returns the type of the task."""
         return self.__element_type
 
     def get_display_interval(self) -> (datetime, datetime):
@@ -218,8 +220,10 @@ class TaskElement(CalendarElement):
         Returns the interval that the task should ocupate in the calendar.
         In the case of the task, it will be 10 minutes before
         the due date untill the due date.
+
         Returns:
-            (datetime, datetime) -- The interval that the task should ocupate in the calendar.
+            (datetime, datetime) -- The interval that the task should ocupate 
+            in the calendar.
         """
         ending_date = self.due_date
         # The task will be displayed 10 minutes before the due date.
@@ -242,17 +246,20 @@ class TaskElement(CalendarElement):
         """
         Returns the users that are assigned to the task.
 
+        Arguments:
+            filter_schedules -- A list of schedules to filter the users.
+
         Returns:
             [str] -- The users that are assigned to the task.
         """
-    
-    def set_due_date(self, due_date: datetime) -> None:
-        '''
-            Sets the due date of the task.
 
-            Arguments:
-                due_date -- due date of the task.
-        '''
+    def set_due_date(self, due_date: datetime) -> None:
+        """
+        Sets the due date of the task.
+
+        Arguments:
+            due_date -- due date of the task.
+        """
         if due_date is None:
             raise ValueError("Due date cannot be None")
         elif type(due_date) != datetime:
@@ -262,10 +269,10 @@ class TaskElement(CalendarElement):
 
     def set_state(self, state: str):
         """
-            Sets the state of the task.
+        Sets the state of the task.
 
-            Arguments:
-                state -- The new state of the task.
+        Arguments:
+            state -- The new state of the task.
         """
         if state is None:
             self.state = 'incomplete'
@@ -278,12 +285,12 @@ class TaskElement(CalendarElement):
                 self.state = state
 
     def set_title(self, title: str) -> None:
-        '''
-            Sets the title of the task.
+        """
+        Sets the title of the task.
 
-            Arguments:
-                title -- title of the task.
-        '''
+        Arguments:
+            title -- title of the task.
+        """
 
         if title is None:
             raise ValueError("Title cannot be None")
@@ -297,12 +304,12 @@ class TaskElement(CalendarElement):
             self.title = title
 
     def set_description(self, description: str) -> None:
-        '''
-            Sets the description of the task.
+        """
+        Sets the description of the task.
 
-            Arguments:
-                description -- description of the task.
-        '''
+        Arguments:
+            description -- description of the task.
+        """
         if description is not None:
             if type(description) != str:
                 raise TypeError("Description must be a string")
@@ -329,25 +336,18 @@ class TaskElement(CalendarElement):
     
 class ReminderElement(CalendarElement):
     """
-        A class that represents a reminder.
+    A class that represents a reminder.
 
-        'Reminder with a date and time, which can be scheduled for a specific
-        time, and which can be assigned to one or more schedules.'
-
-        Attributes:
-            _id -- The id of the reminder.
-            title -- The title of the reminder.
-            description -- The description of the reminder.
-            reminder_date -- The date of the reminder.
-            _type -- The type of the reminder.
+    'Reminder with a date and time, which can be scheduled for a specific
+    time, and which can be assigned to one or more schedules.'
     """
 
-    def __init__(self, 
-                element_id: str, 
-                title: str, 
-                reminder_date: datetime, 
-                schedules: [str], 
-                description: str = None, 
+    def __init__(self,
+                element_id: str,
+                title: str,
+                reminder_date: datetime,
+                schedules: [str],
+                description: str = None,
                 element_type: str = "reminder"):
         """
         ReminderElement constructor.
@@ -355,8 +355,10 @@ class ReminderElement(CalendarElement):
         Arguments:
             element_id -- The id of the reminder.
             title -- The title of the reminder.
-            description -- The description of the reminder.
             reminder_date -- The date of the reminder.
+            schedules -- The schedules that the reminder is assigned to.
+            description -- The description of the reminder.
+            element_type -- The type of the reminder.
         """
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
@@ -368,14 +370,17 @@ class ReminderElement(CalendarElement):
 
     @property
     def id(self):
+        """Returns the id of the reminder."""
         return self.__id
-    
+
     @property
     def schedules(self):
+        """Returns the schedules of the reminder."""
         return self.__schedules
-    
+
     @property
     def type(self):
+        """Returns the type of the reminder."""
         return self.__element_type
 
     def get_display_interval(self) -> (datetime, datetime):
@@ -401,8 +406,8 @@ class ReminderElement(CalendarElement):
             list -- The schedules of the reminder.
         """
         schedule_manager = ScheduleManagement.get_instance()
-        return [schedule_manager.get_schedule(id) for id in self.__schedules]  # Return a list of Schedules objects
-        
+        # Return a list of Schedules objects
+        return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
     def get_users(self, filter_schedules) -> list:
         """
@@ -413,12 +418,12 @@ class ReminderElement(CalendarElement):
         """
     
     def set_reminder_date(self, reminder_date: datetime) -> None:
-        '''
-            Sets the reminder date of the reminder.
+        """
+        Sets the reminder date of the reminder.
 
-            Arguments:
-                reminder_date -- reminder date of the reminder.
-        '''
+        Arguments:
+            reminder_date -- reminder date of the reminder.
+        """
         if reminder_date is None:
             raise ValueError("Reminder date cannot be None")
         elif type(reminder_date) != datetime:
@@ -427,12 +432,12 @@ class ReminderElement(CalendarElement):
             self.reminder_date = reminder_date
 
     def set_title(self, title: str) -> None:
-        '''
-            Sets the title of the reminder.
+        """
+        Sets the title of the reminder.
 
-            Arguments:
-                title -- title of the reminder.
-        '''
+        Arguments:
+            title -- title of the reminder.
+        """
 
         if title is None:
             raise ValueError("Title cannot be None")
@@ -446,12 +451,12 @@ class ReminderElement(CalendarElement):
             self.title = title
 
     def set_description(self, description: str) -> None:
-        '''
-            Sets the description of the reminder.
+        """
+        Sets the description of the reminder.
 
-            Arguments:
-                description -- description of the reminder.
-        '''
+        Arguments:
+            description -- description of the reminder.
+        """
         if description is not None:
             if type(description) != str:
                 raise TypeError("Description must be a string")

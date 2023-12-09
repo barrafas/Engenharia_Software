@@ -1,3 +1,5 @@
+"""Module to test the CalendarElementFactory class."""
+
 import unittest
 from datetime import datetime
 from unittest.mock import MagicMock
