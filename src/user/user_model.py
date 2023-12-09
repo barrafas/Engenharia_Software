@@ -169,6 +169,8 @@ class User:
 
         for element_id in element_ids:
             element = element_management.get_element(element_id)
+            if element.type != 'evento':
+                continue
             
             # Check if the start time of the element is within the given time period
             if time[0] <= element.start_time < time[1]:
