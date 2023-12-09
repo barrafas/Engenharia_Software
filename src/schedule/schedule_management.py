@@ -32,7 +32,7 @@ class ScheduleManagement:
             database_module: Database module
 
         """
-        self.db = database_module
+        self.db_module = database_module
         self.schedules = schedules if schedules else {}
 
     def schedule_exists(self, schedule_id: str) -> bool:
