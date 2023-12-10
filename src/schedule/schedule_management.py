@@ -172,3 +172,4 @@ class ScheduleManagement:
             element.schedules = element.schedules + [schedule_id]
         else: 
             raise DuplicatedIDError(f"Element with ID {element_id} already exists in schedule {schedule_id}")
+        

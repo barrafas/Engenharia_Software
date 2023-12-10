@@ -102,6 +102,9 @@ class ElementManagement:
     
     def element_exists(self, element_id: str) -> bool:
         return "teste"
+    
+    def update_element(self, element_id: str) -> None:
+        pass
 
 class User:
     def __init__(self, user_id: str):
