@@ -2,9 +2,7 @@ import unittest
 from src.schedule.schedule_management import ScheduleManagement
 from src.schedule.schedule_management import EmptyPermissionsError, DuplicatedIDError, NonExistentIDError
 from src.schedule.schedule_model import Schedule
-from tests.test_schedule.mocks import Element, ElementManagement
-from src.user.user_model import User
-from src.user.user_management import UserManagement
+from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
 from unittest.mock import Mock, MagicMock, patch, PropertyMock
 
 
@@ -297,13 +295,28 @@ class TestScheduleManagement(unittest.TestCase):
         self.schedule_management.schedules[schedule_id] = mock_schedule
         with patch.object(self.schedule_management, 'get_schedule', return_value=mock_schedule), \
             patch.object(ElementManagement, 'update_element', return_value=None) as mock_update_element:
-            mock_element_manager = MagicMock()
             # Act
             self.schedule_management.delete_schedule(schedule_id)
             # Assert
             assert mock_update_element.call_count == len(element_ids)
             for element_id in element_ids:
                 mock_update_element.assert_any_call(element_id)
+
+    def test_delete_schedule_updates_users(self):
+        # Arrange
+        schedule_id = "schedule1"
+        user_ids = ["user1", "user2", "user3"]
+        mock_schedule = MagicMock()
+        mock_schedule.permissions = {user_id: {} for user_id in user_ids}
+        self.schedule_management.schedules[schedule_id] = mock_schedule
+        with patch.object(self.schedule_management, 'get_schedule', return_value=mock_schedule), \
+            patch.object(UserManagement,'update_user', return_value=None) as mock_update_user:
+            # Act
+            self.schedule_management.delete_schedule(schedule_id)
+            # Assert
+            assert mock_update_user.call_count == len(user_ids)
+            for user_id in user_ids:
+                mock_update_user.assert_any_call(user_id)
 
     def test_add_element_to_schedule_updates_schedule_elements(self):
         # Check that add_element_to_schedule updates the elements list of the schedule

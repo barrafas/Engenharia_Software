@@ -1,8 +1,8 @@
 from src.schedule.schedule_model import Schedule
 from src.database.mongo_module import MongoModule
-from src.user.user_model import User
-from src.user.user_management import UserManagement
-from tests.test_schedule.mocks import Element, ElementManagement
+#from src.user.user_model import User
+#from src.user.user_management import UserManagement
+from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
 
 
 class EmptyPermissionsError(Exception):

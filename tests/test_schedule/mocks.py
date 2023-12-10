@@ -142,3 +142,6 @@ class UserManagement:
     
     def user_exists(self, user_id: str) -> bool:
         return "teste"
+    
+    def update_user(self, user_id: str) -> None:
+        pass
