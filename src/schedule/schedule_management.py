@@ -3,7 +3,7 @@ from src.database.mongo_module import MongoModule
 #from src.user.user_model import User
 #from src.user.user_management import UserManagement
 from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
-
+from .schedule_observer import Observer, Subject
 
 class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
@@ -17,7 +17,7 @@ class NonExistentIDError(Exception):
     """Raised when the ID does not exist"""
     pass
 
-class ScheduleManagement:
+class ScheduleManagement(Observer):
     """
     ScheduleManagement class
     Responsible for managing the schedules in the database
@@ -113,13 +113,13 @@ class ScheduleManagement:
         for element_id in elements:
             element = element_manager.get_element(element_id)
             element.schedules.append(schedule)
-            element_manager.update_element(element_id)
+            element_manager.update_element(element_id) # TODO: Observer for elements
 
         # Update each user and add the schedule to its schedules attribute
         for user_id in permissions.keys():
             user = user_manager.get_user(user_id)
             user.schedules.append(schedule)
-            user_manager.update_user(user_id)
+            user_manager.update_user(user_id) # TODO: Observer for users
 
         return schedule
 
@@ -211,4 +211,12 @@ class ScheduleManagement:
             element_manager.update_element(element_id)
         else: 
             raise DuplicatedIDError(f"Element with ID {element_id} already exists in schedule {schedule_id}")
-        
+
+    def update(self, schedule: Schedule) -> None:
+        """
+        Called when the schedule is updated.
+
+        Args:
+            schedule: The schedule that was updated.
+        """
+        self.update_schedule(schedule.id)
