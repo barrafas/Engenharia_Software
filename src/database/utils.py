@@ -36,7 +36,7 @@ def timeout(seconds, error_message="Timeout"):
                 return result
 
             else:
-                from signal import signal
+                import signal
 
                 def handler(signum, frame):
                     raise TimeExceedError(error_message)
