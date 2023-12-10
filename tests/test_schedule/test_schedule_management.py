@@ -311,5 +311,15 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.add_element_to_schedule(schedule_id, element_id)
 
+    def test_add_element_to_schedule_duplicated_element(self):
+        # Arrange
+        schedule_id = "schedule1"
+        element_id = "element1"
+        self.schedule_management.schedules[schedule_id] = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, [element_id])
+        self.schedule_management.schedule_exists = MagicMock(return_value=True)
+        # Act & Assert
+        with self.assertRaises(DuplicatedIDError):
+            self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+
 if __name__ == '__main__':
     unittest.main()
