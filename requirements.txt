@@ -1,3 +1,4 @@
 pymongo
+customtkinter
 pytest
 bcrypt
