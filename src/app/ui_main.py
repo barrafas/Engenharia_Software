@@ -109,18 +109,22 @@ class MainUI:
         month = self.selected_date.month
 
         month_calendar = calendar.month(year, month)
-        
-        self.calendar_title = customtkinter.CTkLabel(self.calendar, text=month_calendar)
+        title = f"{calendar.month_name[month]} {year}"
+
+        self.calendar_title = customtkinter.CTkLabel(self.calendar, text=title)
         self.calendar_title.grid(row=0, column=0, padx=10, pady=10, sticky="ew", columnspan=7)
                 
         cal = calendar.TextCalendar(calendar.SUNDAY)
-
+        calendar_day_size = {
+            "width": 50,
+            "height": 40
+        }
         for w, week in enumerate(cal.monthdayscalendar(year, month), 2):
             for d, day in enumerate(week):
                 if day != 0:
-                    day_button = customtkinter.CTkButton(self.calendar, text=dayp)
+                    day_button = customtkinter.CTkButton(self.calendar, text=day, width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
                 else:
-                    day_button = customtkinter.CTkButton(self.calendar, text="")
+                    day_button = customtkinter.CTkButton(self.calendar, text=" ", width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
         
