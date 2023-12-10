@@ -17,6 +17,7 @@ class Application:
             self.transition_to(state)
         self._ui = ui
         self._db = db
+        self._user = None
 
 
     def transition_to(self, state) -> None:
@@ -44,15 +45,16 @@ class Application:
         object.
         """
 
-    def login(self, username, password):
+    def login(self, user_id, password):
         """
         The Application delegates part of its behavior to the current State
         object.
         """
         auth = AuthenticationModule(self._db)
 
-        if auth.authenticate_user(username, password):
-            print(f"\033[92mUser {username} authenticated.\033[0m")
+        if auth.authenticate_user(user_id, password):
+            print(f"\033[92mUser {user_id} authenticated.\033[0m")
+            self._user = UserManagement(self._db).get_user(user_id)
             return True
         else:
             print("Login failed.")
@@ -69,3 +71,19 @@ class Application:
             return True
         else:
             print("Sign up failed.")
+
+    def get_user_events(self):
+        """
+        The Application delegates part of its behavior to the current State
+        object.
+        """
+        elements = self._user.events
+
+        print(f"\033[92mUser events: {elements}, with len ={len(elements)}\033[0m")
+
+        event_titles = []
+        for event in elements:
+            event_titles.append(event.title)
+
+        return event_titles
+        
