@@ -250,13 +250,18 @@ class TestScheduleManagement(unittest.TestCase):
         # Arrange
         schedule_id = "schedule10"
         self.schedule_management.db_module.delete_data = MagicMock()
+        # Mock the return value of select_data
+        self.schedule_management.db_module.select_data.return_value = {
+            '_id': schedule_id,
+            'title': 'Test Title',
+            'description': 'Test Description',
+            'permissions': {},
+            'elements': []
+        }
         # Act
         self.schedule_management.delete_schedule(schedule_id)
         # Assert
-        self.schedule_management.db_module.delete_data.assert_called_once_with(
-            'schedules', 
-            {'_id': schedule_id}
-        )
+        self.schedule_management.db_module.delete_data.assert_called_once_with('schedules', {'_id': schedule_id})
 
     def test_delete_schedule_deletes_schedule_from_dictionary(self):
         # Check that delete_schedule deletes the schedule from the dictionary
@@ -282,6 +287,23 @@ class TestScheduleManagement(unittest.TestCase):
         # Act & Assert
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.delete_schedule(schedule_id)
+
+    def test_delete_schedule_updates_elements(self):
+        # Arrange
+        schedule_id = "schedule1"
+        element_ids = ["element1", "element2", "element3"]
+        mock_schedule = MagicMock()
+        mock_schedule.elements = element_ids
+        self.schedule_management.schedules[schedule_id] = mock_schedule
+        with patch.object(self.schedule_management, 'get_schedule', return_value=mock_schedule), \
+            patch.object(ElementManagement, 'update_element', return_value=None) as mock_update_element:
+            mock_element_manager = MagicMock()
+            # Act
+            self.schedule_management.delete_schedule(schedule_id)
+            # Assert
+            assert mock_update_element.call_count == len(element_ids)
+            for element_id in element_ids:
+                mock_update_element.assert_any_call(element_id)
 
     def test_add_element_to_schedule_updates_schedule_elements(self):
         # Check that add_element_to_schedule updates the elements list of the schedule

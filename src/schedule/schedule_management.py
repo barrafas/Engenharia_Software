@@ -144,6 +144,13 @@ class ScheduleManagement:
         """
         if not self.schedule_exists(schedule_id):
             raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
+        
+        # Update each element
+        schedule = self.get_schedule(schedule_id)
+        element_manager = ElementManagement.get_instance()
+        for element_id in schedule.elements:
+            element_manager.update_element(element_id)
+
         self.db_module.delete_data('schedules', {'_id': schedule_id})
         if schedule_id in self.schedules:
             del self.schedules[schedule_id]
