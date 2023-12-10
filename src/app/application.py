@@ -79,6 +79,32 @@ class Application:
         """
         elements = self._user.events
 
+        """
+        Gets the events from the user and stores them in a dictionary
+        """
+        # get user events
+        events = elements
+        elements = {}
+
+        for event in events:
+            date = event.get_display_interval()[0]
+
+            yearly_events = elements.get(date.year, {})
+            monthly_events = yearly_events.get(date.month, {})
+            daily_events = monthly_events.get(date.day, {})
+            hourly_events = daily_events.get(date.hour, {})
+            minutely_events = hourly_events.get(date.minute, [])
+
+            minutely_events.append(event)
+
+            hourly_events[date.minute] = minutely_events
+            daily_events[date.hour] = hourly_events
+            monthly_events[date.day] = daily_events
+            yearly_events[date.month] = monthly_events
+
+            elements[date.year] = yearly_events
+
+
         print(f"\033[92mUser events: {elements}, with len ={len(elements)}\033[0m")
 
         event_titles = []

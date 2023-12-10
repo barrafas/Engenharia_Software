@@ -60,9 +60,9 @@ class TkinterUI:
         self.login_button = login_button
         self.sign_up_button = sign_up_button
 
-    def show_main_elements(self):
-        
-        main_ui = MainUI(self.root)
+    def show_main_elements(self, elements):
+
+        main_ui = MainUI(self.root, elements)
 
         self.logout_button = main_ui.logout_button
         self.go_back_button = main_ui.go_back_button

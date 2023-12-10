@@ -3,11 +3,13 @@ import datetime
 import calendar
 
 class MainUI:
-    def __init__(self, root):
+    def __init__(self, root, elements):
         self.root = root
         self.logout_button = None
         self.go_back_button = None
         self.user_events = None
+
+        self.elements = elements
 
         self.sidebar = None
         self.navbar = None
@@ -77,6 +79,8 @@ class MainUI:
 
         # self.user_events = customtkinter.CTkLabel(self.main_frame, text=">> User events: loading... ")
         # self.user_events.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        
+        print(f">> User events: {self.elements['user_events']}")
 
         self.show_calendar()
 
