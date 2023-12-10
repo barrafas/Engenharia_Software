@@ -111,6 +111,7 @@ class Schedule(Subject):
         if len(title) > 50:
             raise ValueError("Title must have at most 50 characters")
         self.title = title
+        self.notify()
 
     def set_description(self, description: str) -> None:
         '''
