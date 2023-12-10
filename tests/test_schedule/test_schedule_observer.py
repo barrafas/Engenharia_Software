@@ -21,7 +21,7 @@ class TestScheduleObserver(unittest.TestCase):
         }
         schedule = Schedule('schedule_id', 'title', 'description', permissions)
         
-        initial_observers_len = len(schedule.__observers)
+        initial_observers_len = len(schedule.observers)
         self.assertEqual(initial_observers_len, 0)
 
     def test_subject_add_observer(self):
@@ -31,7 +31,7 @@ class TestScheduleObserver(unittest.TestCase):
         schedule = Schedule('schedule_id', 'title', 'description', permissions)
         
         schedule.attach(self.observer)
-        observers_len = len(schedule.__observers)
+        observers_len = len(schedule.observers)
         self.assertEqual(observers_len, 1)
 
         

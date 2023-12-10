@@ -1,8 +1,8 @@
 #from src.calendar_elements.element_interface import Element
 from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
- 
+from .schedule_observer import Observer, Subject
 
-class Schedule:
+class Schedule(Subject):
     """
         Class that represents a schedule:
 
@@ -25,6 +25,7 @@ class Schedule:
                         that represent the permissions of the users in the schedule.
                 elements -- list of elements ids that are displayed in the schedule.
         """
+        self.__observers = []
         self.__id = schedule_id
         self.set_title(title)
         self.set_description(description)
@@ -43,10 +44,15 @@ class Schedule:
     def elements(self):
         return self.__elements
 
+    @property
+    def observers(self):
+        return self.__observers
+
     @elements.setter
     def elements(self, value):
         if isinstance(value, list) and all(isinstance(i, str) for i in value):
             self.__elements = value
+            self.notify()
         else:
             raise ValueError("Elements must be a list of strings")
 
@@ -135,3 +141,30 @@ class Schedule:
             "permissions": self.__permissions,
             "elements": self.__elements
         }
+    
+    def attach(self, observer: Observer) -> None:
+        '''
+            Attach an observer to the subject.
+
+            Arguments:
+                observer -- the observer to attach.
+        '''
+        self.__observers.append(observer)
+
+    def detach(self, observer: Observer) -> None:
+        '''
+            Detach an observer from the subject.
+
+            Arguments:
+                observer -- the observer to detach.
+        '''
+        self.__observers.remove(observer)
+
+    def notify(self) -> None:
+        '''
+            Notify all the observers that the subject has changed.
+        '''
+        for observer in self.__observers:
+            observer.update(self)
+
+    
