@@ -31,7 +31,7 @@ class ScheduleManagement(Observer):
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule, schedules: dict = None):
+    def get_instance(cls, database_module: MongoModule = None, schedules: dict = None):
         if cls._instance is None:
             cls._instance = cls(database_module, schedules)
         return cls._instance

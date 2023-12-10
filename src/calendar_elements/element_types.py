@@ -4,65 +4,6 @@
 """
 from datetime import datetime, timedelta
 from .element_interface import Element
-# from src.schedule.schedule_management import ScheduleManagement
-# from src.user.user_management import UserManagement
-
-
-class Schedule:
-    """Mock class for Schedule"""
-    def __init__(self, id, title, description, permissions, elements):
-        self.__id = id
-        self.tilte = "title"
-        self.description = "description"
-        self.__permissions = permissions
-        self.__elements = elements
-
-    @property
-    def id(self):
-        return self.__id
-
-    @property
-    def permissions(self):
-        return self.__permissions
-
-    @property
-    def elements(self):
-        return self.__elements
-
-
-class ScheduleManagement:
-    """Mock class for ScheduleManagement"""
-
-    __instance = None
-
-    def __init__(self):
-        self.__schedules = {}
-
-    def get_schedule(self, id: str) -> Schedule:
-        ... 
-    
-    @classmethod
-    def get_instance(cls):
-        if cls.__instance is None:
-            cls.__instance = ScheduleManagement()
-        return cls.__instance
-
-class UserManagement:
-    """Mock class for UserManagement"""
-
-    __instance = None
-
-    def __init__(self):
-        self.__users = {}
-
-    def get_user(self, id: str) -> Schedule:
-        ... 
-    
-    @classmethod
-    def get_instance(cls):
-        if cls.__instance is None:
-            cls.__instance = UserManagement()
-        return cls.__instance
 
 class EventElement(Element):
     """
@@ -599,3 +540,7 @@ class ReminderElement(Element):
             "element_type": self.__element_type,
             "schedules": self.__schedules
         }
+
+# Importing here to avoid circular imports
+from ..schedule.schedule_management import ScheduleManagement
+from ..user.user_management import UserManagement
