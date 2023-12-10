@@ -151,6 +151,12 @@ class ScheduleManagement:
         for element_id in schedule.elements:
             element_manager.update_element(element_id)
 
+        # Update each user
+        user_ids = schedule.permissions.keys()
+        user_manager = UserManagement.get_instance()
+        for user_id in user_ids:
+            user_manager.update_user(user_id)
+
         self.db_module.delete_data('schedules', {'_id': schedule_id})
         if schedule_id in self.schedules:
             del self.schedules[schedule_id]
