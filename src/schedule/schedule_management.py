@@ -167,3 +167,5 @@ class ScheduleManagement:
         schedule = self.schedules[schedule_id]
         if element_id not in schedule.elements:
             schedule.elements = schedule.elements + [element_id]
+        else: 
+            raise DuplicatedIDError(f"Element with ID {element_id} already exists in schedule {schedule_id}")
