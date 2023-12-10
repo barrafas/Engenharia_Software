@@ -32,25 +32,14 @@ class MainUI:
         # |         |                 |
         # +---------+-----------------+
 
-        # sidebar
-        self.root.grid_columnconfigure((0), weight=2)
+        self.root.grid_columnconfigure((0), weight=2) # sidebar
+        self.root.grid_columnconfigure((1), weight=5) # navbar and main
 
-        # navbar and main
-        self.root.grid_columnconfigure((1), weight=5)
+        self.root.grid_rowconfigure((0), weight=1) # navbar
+        self.root.grid_rowconfigure((1), weight=9) # main
 
-        # navbar
-        self.root.grid_rowconfigure((0), weight=1)
-
-        # main
-        self.root.grid_rowconfigure((1), weight=9)
-
-        # sidebar
         self.show_sidebar()
-
-        # navbar
         self.show_navbar()
-
-        # main
         self.show_main()
 
     def show_sidebar(self):
