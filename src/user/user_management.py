@@ -7,7 +7,7 @@ Attributes:
     users: Dict of users, where the key is the id
 """
 import bcrypt
-from ..database.database_module import DatabaseModule
+from src.database.mongo_module import MongoModule
 from .user_model import User
 
 class UserAlreadyExistsError(Exception):
@@ -31,8 +31,15 @@ class UserManagement:
         db: Database module
         users: Dict of users, where the key is the id
     """
+    _instance = None
 
-    def __init__(self, database_module: DatabaseModule):
+    @classmethod
+    def get_instance(cls, database_module: MongoModule):
+        if not cls._instance:
+            cls._instance = cls(database_module)
+        return cls._instance
+
+    def __init__(self, database_module: MongoModule):
         """
         Constructor for the UserManagement class
 
@@ -59,7 +66,6 @@ class UserManagement:
 
         if self.user_exists(username):
             raise UserAlreadyExistsError(f'Usuário {username} já existe')
-
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
