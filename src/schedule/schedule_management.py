@@ -144,7 +144,6 @@ class ScheduleManagement:
         """
         if not self.schedule_exists(schedule_id):
             raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
-
         self.db_module.delete_data('schedules', {'_id': schedule_id})
         if schedule_id in self.schedules:
             del self.schedules[schedule_id]
@@ -170,6 +169,7 @@ class ScheduleManagement:
             self.update_schedule(schedule_id)
             element = element_manager.get_element(element_id)
             element.schedules = element.schedules + [schedule_id]
+            element_manager.update_element(element_id)
         else: 
             raise DuplicatedIDError(f"Element with ID {element_id} already exists in schedule {schedule_id}")
         
