@@ -64,7 +64,7 @@ class Application:
         """
         user_management = UserManagement(self._db)
 
-        if user_management.create_user(username, email, password):
+        if user_management.create_user(username, email, password, id=username):
             print(f"\033[92mSign up successful! User {username} created.\033[0m")
             return True
         else:

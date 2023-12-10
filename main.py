@@ -9,6 +9,7 @@ if __name__ == '__main__':
     db = MongoModule(host="localhost", 
                     port=27017,
                     database_name="test_app")
+    db.connect()
     app = Application(db=db)
 
     initial_state = SignInUp(app)

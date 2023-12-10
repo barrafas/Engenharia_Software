@@ -33,7 +33,7 @@ class User:
         hashed_password: user hashed password
         user_preferences: user preferences
     """
-    def __init__(self, id: str, username: str, email: str, schedules: list=None, 
+    def __init__(self, _id: str, username: str, email: str, schedules: list=None, 
                  hashed_password: str=None, user_preferences: dict=None):
         """
         Constructor for the User class
@@ -46,7 +46,7 @@ class User:
             hashed_password: user hashed password
             user_preferences: user preferences
         """
-        self.id = id
+        self._id = _id
         self.username = username
         self.email = email
         self.schedules = schedules if schedules else []
@@ -54,7 +54,7 @@ class User:
         self.user_preferences = user_preferences if user_preferences else {}
 
     def __str__(self) -> str:
-        return f"User({self.id}, {self.username}, {self.email}," \
+        return f"User({self._id}, {self.username}, {self.email}," \
         f"{self.schedules}, {self.user_preferences})"
 
     def to_dict(self) -> dict:
@@ -70,7 +70,7 @@ class User:
         'schedules': ['id1', 'id2'], 'password': None, 'user_preferences': {}}
         """
         return {
-            "id": self.id,
+            "id": self._id,
             "username": self.username,
             "email": self.email,
             "schedules": self.schedules,

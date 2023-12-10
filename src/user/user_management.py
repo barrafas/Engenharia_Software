@@ -76,17 +76,18 @@ class UserManagement:
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
 
-        if not id:
-            id = self.db.get_next_id("users")
+        # if not id:
+        #     id = self.db.get_next_id("users")
 
-        user_info = {"username": username,
+        user_info = {"_id": id,
+                    "username": username,
                      "email": email, "schedules": [], 
                      "hashed_password": hashed_password, 
                      "user_preferences": user_preferences}
         
-        self.db.insert_data('users', {"_id": id, **user_info})
+        self.db.insert_data('users', {**user_info})
 
-        user = User(id=id, **user_info)
+        user = User(**user_info)
         self.users[id] = user
         return user
 
@@ -144,9 +145,11 @@ class UserManagement:
             The user if it exists, None otherwise
         """
         data = self.db.select_data('users', {"_id": id})
-        user = User(id, **data[0])
-        self.users[user.id] = user
-        return 
+        print(data[0])
+        user = User(**data[0])
+        print(user)
+        self.users[user._id] = user
+        return user
 
     def update_user(self, id: str) -> None:
         """
