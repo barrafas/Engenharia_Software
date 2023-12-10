@@ -8,10 +8,11 @@ class Subject(ABC): ...
 class Observer(ABC):
     """
     Observer interface, used to implement the observer pattern in the schedule.
-    solve the problem of circular dependencies between the schedule and the schedule management.
+    solve the problem of circular dependencies between the schedule and the 
+    schedule management.
     provide a update method that is called when the schedule is updated.
     """
-    
+
     @abstractmethod
     def update(self, subject: Subject) -> None:
         """
@@ -25,10 +26,11 @@ class Observer(ABC):
 class Subject(ABC):
     """
     Subject interface, used to implement the observer pattern in the schedule.
-    solve the problem of circular dependencies between the schedule and the schedule management.
+    solve the problem of circular dependencies between the schedule and the 
+    schedule management.
     provide a attach method that is called when the schedule is updated.
     """
-    
+
     @abstractmethod
     def attach(self, observer: Observer) -> None:
         """
