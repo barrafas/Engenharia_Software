@@ -77,7 +77,7 @@ class Application:
         The Application delegates part of its behavior to the current State
         object.
         """
-        elements = self._user.get_elements()
+        elements = self._user.events
 
         print(f"\033[92mUser events: {elements}, with len ={len(elements)}\033[0m")
 

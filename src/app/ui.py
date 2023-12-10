@@ -2,6 +2,7 @@
 Módulo responsável por gerenciar a interface gráfica do programa.
 """
 import customtkinter
+from .ui_main import MainUI
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -60,22 +61,27 @@ class TkinterUI:
         self.sign_up_button = sign_up_button
 
     def show_main_elements(self):
-        # Lógica para exibir elementos relacionados ao login
-        logout_button = customtkinter.CTkButton(self.root, text="Logout")
-        logout_button.pack()
 
-        go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
-        go_back_button.pack()
+        # logout_button = customtkinter.CTkButton(self.root, text="Logout")
+        # logout_button.pack()
 
-        user_events_label = customtkinter.CTkLabel(self.root, text="Eventos do usuário")
-        user_events_label.pack()
-        user_events = customtkinter.CTkLabel(self.root, text=">> User events: loading... ")
-        user_events.pack()
+        # go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
+        # go_back_button.pack()
 
+        # user_events_label = customtkinter.CTkLabel(self.root, text="Eventos do usuário")
+        # user_events_label.pack()
+        # user_events = customtkinter.CTkLabel(self.root, text=">> User events: loading... ")
+        # user_events.pack()
 
-        self.logout_button = logout_button
-        self.go_back_button = go_back_button
-        self.user_events = user_events
+        # self.logout_button = logout_button
+        # self.go_back_button = go_back_button
+        # self.user_events = user_events
+
+        main_ui = MainUI(self.root)
+
+        self.logout_button = main_ui.logout_button
+        self.go_back_button = main_ui.go_back_button
+        self.user_events = main_ui.user_events
 
     def show_sign_up_elements(self):
         # Lógica para exibir elementos relacionados ao login

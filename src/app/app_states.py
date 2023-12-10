@@ -88,7 +88,7 @@ class MainState(State):
 
         # get user events
         events = self.context.get_user_events()
-        event_string = ">> User events: "+"\n".join(events)
+        event_string = ">> User events: \n - "+"\n - ".join(events)
         self.context._ui.user_events.configure(text=event_string)
 
         # bind events
