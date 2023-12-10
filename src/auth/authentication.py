@@ -1,5 +1,6 @@
 from ..database.database_module import DatabaseModule
 from ..user.user_management import UserManagement
+import bcrypt
 
 class AuthenticationModule:
 
@@ -12,4 +13,4 @@ class AuthenticationModule:
         return self.verify_password(password, user.get_hashed_password())
 
     def verify_password(self, input_password: str, hashed_password: str) -> bool:
-        ...
+        return bcrypt.checkpw(input_password.encode(), hashed_password.encode())
