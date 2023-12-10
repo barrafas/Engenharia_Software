@@ -8,7 +8,7 @@ TODO:
 """
 import unittest
 from unittest.mock import MagicMock
-from src.auth.authentication import AuthenticationModule
+from src.auth.authentication import AuthenticationModule, UserNotFound
 import bcrypt
 
 class TestAuthenticationModule(unittest.TestCase):
@@ -56,6 +56,15 @@ class TestAuthenticationModule(unittest.TestCase):
         # Test
         result = self.auth_module.verify_password("test_password", "test_hashed_password")
         self.assertFalse(result)
+
+    
+    def test_authenticate_user_user_not_found(self):
+        # Mocking user_exists method
+        self.auth_module.user_management_module.user_exists = MagicMock(return_value=False)
+
+        # Test
+        with self.assertRaises(UserNotFound):
+            self.auth_module.authenticate_user("nonexistent_user", "password")
 
     def create_mock_user(self):
         # You may want to create a mock user for testing purposes
