@@ -103,8 +103,10 @@ class ScheduleManagement:
         # Add the schedule to the dictionary
         self.schedules[schedule_id] = schedule
 
-        # Update each element
+        # Update each element and add the schedule to its schedules attribute
         for element_id in elements:
+            element = element_manager.get_element(element_id)
+            element.schedules.append(schedule)
             element_manager.update_element(element_id)
 
         return schedule
