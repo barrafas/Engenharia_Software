@@ -36,7 +36,7 @@ class TestReminderElement(unittest.TestCase):
 
     def test_type_property(self):
         """Test the schedules property"""
-        self.assertEqual(self.reminder.type, self.element_type)
+        self.assertEqual(self.reminder.element_type, self.element_type)
 
     def test_schedules_property(self):
         """Test the schedules property"""
@@ -209,7 +209,7 @@ class TestReminderElement(unittest.TestCase):
     def test_to_dict(self):
         """Verify if the dictionary returned has the expected keys and values"""
         expected_dict = {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": self.description,
             "reminder_date": self.reminder_date,
