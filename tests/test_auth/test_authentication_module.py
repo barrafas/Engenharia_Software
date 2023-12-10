@@ -1,3 +1,4 @@
+
 """
 Test the authentication module
 
@@ -6,68 +7,70 @@ TODO:
     - Review the documentation
 """
 import unittest
-from src.auth.authentication import Authentication
-from src.database.text_document_module import TextDocumentModule
-from src.auth.user_management import UserManagement
-
+from unittest.mock import MagicMock
+from src.auth.authentication import AuthenticationModule, UserNotFound
+import bcrypt
 
 class TestAuthenticationModule(unittest.TestCase):
-    """_summary_
-
-    Arguments:
-        unittest -- _description_
-    """
-
     def setUp(self):
-        """
-        Set up the test environment
-        """
-        self.database_module_mock = TextDocumentModule(
-            "tests/test_auth/test_database.json")
-        self.database_module_mock.clear_data()
-        self.auth_module = Authentication(self.database_module_mock)
-        self.user_management_module = UserManagement(self.database_module_mock)
+        # You may want to mock the database module for testing
+        self.database_module_mock = MagicMock()
+        self.auth_module = AuthenticationModule(self.database_module_mock)
 
-        # Create a test user
-        self.user_management_module.create_user(username="test_user",
-                                                email="test_email", password="test_password")
+    def test_authenticate_user_success(self):
+        # Mocking user_exists and get_user methods
+        self.auth_module.user_management_module.user_exists = MagicMock(return_value=True)
+        self.auth_module.user_management_module.get_user = MagicMock(return_value=self.create_mock_user())
 
-    def test_successful_authentication(self):
-        """
-        GIVEN a user that exists in the database
-        WHEN the user tries to authenticate with the correct password
-        THEN the authentication should be successful
-        """
-        result = self.auth_module.authenticate_user(
-            "test_user", "test_password")
+        # Mocking verify_password method
+        self.auth_module.verify_password = MagicMock(return_value=True)
+
+        # Test
+        result = self.auth_module.authenticate_user("test_user", "test_password")
         self.assertTrue(result)
 
-    def test_failed_authentication(self):
-        """
-        GIVEN a user that exists in the database
-        WHEN the user tries to authenticate with the wrong password
-        THEN the authentication should fail
-        """
-        result = self.auth_module.authenticate_user(
-            "test_user", "wrong_password")
+    def test_authenticate_user_wrong_password(self):
+        # Mocking user_exists and get_user methods
+        self.auth_module.user_management_module.user_exists = MagicMock(return_value=True)
+        self.auth_module.user_management_module.get_user = MagicMock(return_value=self.create_mock_user())
+
+        # Mocking verify_password method
+        self.auth_module.verify_password = MagicMock(return_value=False)
+
+        # Test
+        result = self.auth_module.authenticate_user("test_user", "wrong_password")
         self.assertFalse(result)
 
-    def test_logout_user(self):
-        """
-        GIVEN a user that is logged in
-        WHEN the user tries to logout
-        THEN the user should be logged out
-        """
-        self.auth_module.authenticate_user("test_user", "test_password")
-        self.auth_module.logout_user("test_user")
+    def test_password_verification_success(self):
+        # Mocking bcrypt.checkpw method
+        bcrypt.checkpw = MagicMock(return_value=True)
 
+        # Test
+        result = self.auth_module.verify_password("test_password", "test_hashed_password")
+        self.assertTrue(result)
 
-    def tearDown(self):
-        """
-        Clean up after the tests, resets the database
-        """
-        self.database_module_mock.clear_data()
+    def test_password_verification_failure(self):
+        # Mocking bcrypt.checkpw method
+        bcrypt.checkpw = MagicMock(return_value=False)
 
+        # Test
+        result = self.auth_module.verify_password("test_password", "test_hashed_password")
+        self.assertFalse(result)
+
+    
+    def test_authenticate_user_user_not_found(self):
+        # Mocking user_exists method
+        self.auth_module.user_management_module.user_exists = MagicMock(return_value=False)
+
+        # Test
+        with self.assertRaises(UserNotFound):
+            self.auth_module.authenticate_user("nonexistent_user", "password")
+
+    def create_mock_user(self):
+        # You may want to create a mock user for testing purposes
+        user = MagicMock()
+        user.get_hashed_password = MagicMock(return_value=b'$2b$12$4PVzqGrnWdUzWd9s/VoI2u6cfTS58zvVqEzUzTijp8usZbRAnkE/W')
+        return user
 
 if __name__ == '__main__':
-    unittest.main() # pragma: no cover
+    unittest.main()

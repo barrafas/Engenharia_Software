@@ -5,17 +5,17 @@ Classes:
     EventFactory: classe responsável por criar os elementos do calendário
 """
 from ..calendar_elements.element_types import EventElement, TaskElement, ReminderElement
-from ..calendar_elements.element_interface import CalendarElement
+from ..calendar_elements.element_interface import Element
 
 
-class CalendarElementFactory:
+class ElementFactory:
     """
     A Factory class for creating different types of calendar elements.
     """
 
     @staticmethod
     def create_element(element_type: str, element_id: str, title: str, schedules: list,
-                        **kwargs) -> CalendarElement:
+                        **kwargs) -> Element:
         """
         Create a calendar element based on the provided type.
 
@@ -27,7 +27,7 @@ class CalendarElementFactory:
             **kwargs -- Additional arguments specific to each element type.
 
         Returns:
-            CalendarElement -- An instance of the specified calendar element type.
+            Element -- An instance of the specified calendar element type.
         """
         if element_type == "event":
             return EventElement(element_id, title, kwargs['start'], kwargs['end'], schedules)
