@@ -25,10 +25,11 @@ class TkinterUI:
 
     def show_login_elements(self):
         # Lógica para exibir elementos relacionados ao login
-        username_label = customtkinter.CTkLabel(self.root, text="Usuário")
-        username_label.pack()
-        username_entry = customtkinter.CTkEntry(self.root)
-        username_entry.pack()
+        
+        user_id_label = customtkinter.CTkLabel(self.root, text="Username")
+        user_id_label.pack()
+        user_id_entry = customtkinter.CTkEntry(self.root)
+        user_id_entry.pack()
 
         password_label = customtkinter.CTkLabel(self.root, text="Senha")
         password_label.pack()
@@ -41,7 +42,9 @@ class TkinterUI:
         go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
         go_back_button.pack()
 
-        self.username_entry = username_entry
+        user_id_entry.focus()
+
+        self.user_id_entry = user_id_entry
         self.password_entry = password_entry
         self.login_button = login_button
         self.go_back_button = go_back_button
@@ -63,6 +66,7 @@ class TkinterUI:
     def show_main_elements(self, elements):
 
         main_ui = MainUI(self.root, elements)
+        
 
         self.logout_button = main_ui.logout_button
         self.go_back_button = main_ui.go_back_button
@@ -70,7 +74,12 @@ class TkinterUI:
 
     def show_sign_up_elements(self):
         # Lógica para exibir elementos relacionados ao login
-        username_label = customtkinter.CTkLabel(self.root, text="Usuário")
+        user_id_label = customtkinter.CTkLabel(self.root, text="Username (seu usuário para login)")
+        user_id_label.pack()
+        user_id_entry = customtkinter.CTkEntry(self.root)
+        user_id_entry.pack()
+
+        username_label = customtkinter.CTkLabel(self.root, text="Nome de exibição")
         username_label.pack()
         username_entry = customtkinter.CTkEntry(self.root)
         username_entry.pack()
@@ -91,6 +100,7 @@ class TkinterUI:
         go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
         go_back_button.pack()
 
+        self.user_id_entry = user_id_entry
         self.username_entry = username_entry
         self.email_entry = email_entry
         self.password_entry = password_entry

@@ -37,7 +37,7 @@ class LoggedOut(State):
 
     def login(self, event):
 
-        username = self.context._ui.username_entry.get()
+        username = self.context._ui.user_id_entry.get()
         password = self.context._ui.password_entry.get()
 
         print("Logging in...")
@@ -137,7 +137,7 @@ class SignUpState(State):
         self.context.transition_to(SignInUp(self.context))
     
     def sign_up(self, event):
-        username = self.context._ui.username_entry.get()
+        username = self.context._ui.user_id_entry.get()
         email = self.context._ui.email_entry.get()
         password = self.context._ui.password_entry.get()
 
