@@ -4,7 +4,7 @@ The Application defines the interface of interest to clients.
 
 from __future__ import annotations
 from src.user.user_management import UserManagement
-from src.auth.authentication import Authentication
+from src.auth.authentication import AuthenticationModule
 
 class Application:
     """
@@ -49,7 +49,7 @@ class Application:
         The Application delegates part of its behavior to the current State
         object.
         """
-        auth = Authentication(self._db)
+        auth = AuthenticationModule(self._db)
 
         if auth.authenticate_user(username, password):
             print(f"\033[92mUser {username} authenticated.\033[0m")
