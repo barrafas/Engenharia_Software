@@ -1,5 +1,6 @@
-from tests.test_users.mocks import Schedule, ScheduleManagement, \
-                                   Element, ElementManagement
+from src.schedule.schedule_management import ScheduleManagement
+from src.calendar_elements.element_management import ElementManagement
+
 from datetime import datetime
 
 class UserNotInSchedule(Exception):
