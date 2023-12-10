@@ -4,7 +4,9 @@
 """
 from datetime import datetime, timedelta
 from .element_interface import Element
-from src.user.user_model import User
+# from src.schedule.schedule_management import ScheduleManagement
+# from src.user.user_management import UserManagement
+
 
 class Schedule:
     """Mock class for Schedule"""
@@ -89,7 +91,7 @@ class EventElement(Element):
             start -- The start date of the event.
             end -- The end date of the event.
             schedules -- The schedules that the event is assigned to.
-            type -- The type of the event.
+            element_type -- The type of the event.
         """
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
@@ -110,9 +112,19 @@ class EventElement(Element):
         return self.__schedules
 
     @property
-    def type(self):
+    def element_type(self):
         """Returns the type of the event."""
         return self.__element_type
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the event."""
+        self.__schedules = schedules
+
+    @element_type.setter
+    def element_type(self, element_type: str):
+        """Sets the type of the event."""
+        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -277,9 +289,19 @@ class TaskElement(Element):
         return self.__schedules
 
     @property
-    def type(self):
+    def element_type(self):
         """Returns the type of the task."""
         return self.__element_type
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the task."""
+        self.__schedules = schedules
+
+    @element_type.setter
+    def element_type(self, element_type: str):
+        """Sets the type of the task."""
+        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -457,9 +479,19 @@ class ReminderElement(Element):
         return self.__schedules
 
     @property
-    def type(self):
+    def element_type(self):
         """Returns the type of the reminder."""
         return self.__element_type
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the reminder."""
+        self.__schedules = schedules
+
+    @element_type.setter
+    def element_type(self, element_type: str):
+        """Sets the type of the reminder."""
+        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """

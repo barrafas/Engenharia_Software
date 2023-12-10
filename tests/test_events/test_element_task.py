@@ -38,7 +38,7 @@ class TestTaskElement(unittest.TestCase):
 
     def test_type_property(self):
         """Test the schedules property"""
-        self.assertEqual(self.task.type, self.element_type)
+        self.assertEqual(self.task.element_type, self.element_type)
 
     def test_schedules_property(self):
         """Test the schedules property"""
