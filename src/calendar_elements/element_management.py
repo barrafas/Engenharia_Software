@@ -1,11 +1,5 @@
-from ..calendar_elements.element_interface import Element
-from ..calendar_elements.element_factory import ElementFactory
-from src.database.mongo_module import MongoModule
-# from src.database.database_module import DatabaseModule
-from src.schedule.schedule_management import ScheduleManagement
-# from src.schedule.schedule_model import Schedule
-# from src.user.user_model import User
-from src.user.user_management import UserManagement
+from src.database.database_module import DatabaseModule
+
 
 class ElementDoesNotExistError(Exception):
     """
@@ -30,12 +24,12 @@ class ElementManagement:
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule, elements: dict = None):
+    def get_instance(cls, database_module: DatabaseModule = None, elements: dict = None):
         if cls._instance is None:
             cls._instance = cls(database_module, elements)
         return cls._instance
 
-    def __init__(self, database_module: MongoModule, elements: dict = None):
+    def __init__(self, database_module: DatabaseModule, elements: dict = None):
         self.db_module = database_module
         self.elements = elements if elements is not None else {}
 

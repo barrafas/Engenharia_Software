@@ -2,10 +2,14 @@
 
 import unittest
 from datetime import datetime
-from src.calendar_elements.element_types import EventElement, ScheduleManagement, Schedule, UserManagement
+from src.calendar_elements.element_types import EventElement
 from unittest.mock import MagicMock, PropertyMock
 from src.user.user_model import User
 from typing import Optional
+
+from src.schedule.schedule_model import Schedule
+from src.schedule.schedule_management import ScheduleManagement
+from src.user.user_management import UserManagement
 
 
 class TestEventElement(unittest.TestCase):

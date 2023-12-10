@@ -1,10 +1,12 @@
 """
 mongo_module.py
 
-This module defines a MongoDB implementation of the DatabaseModule interface and demonstrates the Singleton pattern.
+This module defines a MongoDB implementation of the DatabaseModule interface 
+and demonstrates the Singleton pattern.
 
 Classes:
-    - MongoModule(DatabaseModule): Implements the DatabaseModule interface for MongoDB.
+    - MongoModule(DatabaseModule): Implements the DatabaseModule interface for 
+    MongoDB.
         Attributes:
             - host (str): The host address of the database.
             - port (int): The port of the database.
@@ -17,19 +19,27 @@ Classes:
         Methods:
             - connect(): Connects to the database.
             - disconnect(): Disconnects from the database.
-            - insert_data(collection_name, data): Inserts data into the database.
-            - delete_data(collection_name, condition): Deletes data from the database.
-            - update_data(collection_name, condition, new_data): Updates data in the database.
-            - select_data(collection_name, condition): Selects data from the database.
+            - insert_data(collection_name, data): Inserts data into the 
+            database.
+            - delete_data(collection_name, condition): Deletes data from the 
+            database.
+            - update_data(collection_name, condition, new_data): Updates data 
+            in the database.
+            - select_data(collection_name, condition): Selects data from the 
+            database.
 
-    Note: The MongoModule class follows the Singleton pattern to ensure a single instance throughout the program.
+    Note: The MongoModule class follows the Singleton pattern to ensure a 
+    single instance throughout the program.
 
 Usage:
-    The module can be used to interact with a MongoDB database by creating an instance of the MongoModule class. The Singleton pattern ensures that multiple instances of the class refer to the same database connection.
+    The module can be used to interact with a MongoDB database by creating an 
+    instance of the MongoModule class. The Singleton pattern ensures that 
+    multiple instances of the class refer to the same database connection.
 """
 
 import pymongo
 from src.database.database_module import DatabaseModule
+
 
 class MongoModule(DatabaseModule):
     """
@@ -52,14 +62,17 @@ class MongoModule(DatabaseModule):
         update_data: Updates data in the database.
         select_data: Selects data from the database.
     """
+
     _instance = None
 
-    def __init__(self, 
-                 host: str, 
-                 port: int, 
-                 database_name: str,
-                 user: str = None,
-                 password: str = None,):
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        database_name: str,
+        user: str = None,
+        password: str = None,
+    ):
         """
         Constructor method.
 
@@ -77,6 +90,7 @@ class MongoModule(DatabaseModule):
         self._database_name = database_name
         self._client = None
         self._db = None
+        self.collection = None
 
     def __new__(cls, *args, **kwargs):
         """
@@ -97,13 +111,15 @@ class MongoModule(DatabaseModule):
         """
         if self._client:
             raise Exception("Already connected to the database.")
-        
-        self._client = pymongo.MongoClient(host=self._host, 
-                                            port=self._port, 
-                                            username=self._user, 
-                                            password=self._password)
+
+        self._client = pymongo.MongoClient(
+            host=self._host,
+            port=self._port,
+            username=self._user,
+            password=self._password,
+        )
         self._db = self._client[self._database_name]
-        
+
     def disconnect(self):
         """
         Disconnect from the database.
@@ -117,19 +133,17 @@ class MongoModule(DatabaseModule):
 
         self._client = None
         self._db = None
-        self.collection = None
 
-
-    def insert_data(self, 
+    def insert_data(self,
                     collection_name: str,
                     data: dict):
         """
         Execute a database query.
-        
+
         Args:
             collection_name (str): The name of the collection.
             data (dict): The data to insert.
-            
+
         Raises:
             Exception: If not connected to the database.
         """
@@ -137,7 +151,7 @@ class MongoModule(DatabaseModule):
             raise Exception("Not connected to the database.")
         self._db[collection_name].insert_one(data)
 
-    def delete_data(self, 
+    def delete_data(self,
                     collection_name: str,
                     condition: dict):
         """
@@ -152,9 +166,9 @@ class MongoModule(DatabaseModule):
         """
         self._db[collection_name].delete_one(condition)
 
-    def update_data(self, 
+    def update_data(self,
                     collection_name: str,
-                    condition: dict, 
+                    condition: dict,
                     new_data: dict):
         """
         Update data in the database.
@@ -169,7 +183,9 @@ class MongoModule(DatabaseModule):
         """
         self._db[collection_name].update_one(condition, new_data)
 
-    def select_data(self, collection_name, condition):
+    def select_data(self,
+                    collection_name,
+                    condition):
         """
         Fetch data from the database.
 
@@ -184,14 +200,13 @@ class MongoModule(DatabaseModule):
 
         return result
 
+
 if __name__ == "__main__":
-    mongo_module = MongoModule(host="localhost", 
-                                port=27017, 
-                                database_name="test")
-    
-    mongo_module2 = MongoModule(host="localhost", 
-                                port=27017, 
-                                database_name="test")
+    mongo_module = MongoModule(
+        host="localhost", port=27017, database_name="test")
+
+    mongo_module2 = MongoModule(
+        host="localhost", port=27017, database_name="test")
 
     if mongo_module == mongo_module2:
         print("Singleton works, both variables contain the same instance.")

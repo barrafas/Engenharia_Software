@@ -2,7 +2,10 @@
 
 import unittest
 from datetime import datetime
-from src.calendar_elements.element_types import TaskElement, ScheduleManagement, Schedule, UserManagement
+from src.calendar_elements.element_types import TaskElement
+from src.schedule.schedule_model import Schedule
+from src.schedule.schedule_management import ScheduleManagement
+from src.user.user_management import UserManagement
 from unittest.mock import MagicMock, PropertyMock
 from src.user.user_model import User
 from typing import Optional
