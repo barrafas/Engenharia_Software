@@ -91,6 +91,19 @@ class TestUserModel(unittest.TestCase):
         self.assertEqual(str(context.exception), 
                          "O email não pode ser vazio")
         
+    def test_set_preference(self):
+        # Test setting a preference
+        user = User("id", "username", "email", ["id1", "id2"])
+        user.set_preferences({"preference_type": "preference"})
+        self.assertEqual(user.user_preferences["preference_type"], "preference")
+            
+    def test_set_preference_with_int(self):
+        user = User("id", "username", "email", ["id1", "id2"])
+        with self.assertRaises(TypeError) as context:
+            user.set_preferences({"preference_type": 123})
+        self.assertEqual(str(context.exception),
+                            "A preferência deve ser uma string")
+
     def test_check_disponibility(self):
         user = User("id", "username", "email", ["id1", "id2"])
         time = (datetime.now() + timedelta(hours=2), 

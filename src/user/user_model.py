@@ -170,6 +170,20 @@ class User:
         else:
             self.email = email.strip()
 
+    def set_preferences(self, preferences: dict):
+        """
+        Set the user preferences
+
+        Args:
+            preference_type: preference type
+            preference: preference to be set
+        """
+        for preference_type, preference in preferences.items():
+            if type(preference) != str:
+                raise TypeError("A preferência deve ser uma string")
+            else:
+                self.user_preferences[preference_type] = preference
+
 
     def check_disponibility(self, time: tuple) -> bool:
         """
