@@ -1,13 +1,41 @@
+"""
+Interface for database modules.
+
+Classes:
+    DatabaseModule
+
+Abstract Methods:
+    connect
+    disconnect
+    insert_data
+    delete_data
+    update_data
+    select_data
+"""
+
 from abc import ABC, abstractmethod
 
 class DatabaseModule(ABC):
+    """
+    Interface for database modules.
+
+    Methods:
+        connect
+        disconnect
+        insert_data
+        delete_data
+        update_data
+        select_data
+
+    Attributes:
+        host (str): database host
+        port (int): database port
+        database_name (str): database name
+        user (str): database user
+        password (str): database password
+    """
     @abstractmethod
-    def connect(self, 
-                 host: str, 
-                 port: int, 
-                 database_name: str,
-                 user: str = None,
-                 password: str = None,):
+    def connect(self):
         """Connect to the database."""
 
     @abstractmethod

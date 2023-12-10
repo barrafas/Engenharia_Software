@@ -1,6 +1,8 @@
 import unittest
-from unittest import mock
 from src.schedule.schedule_model import Schedule
+from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
+from unittest.mock import MagicMock
+from src.schedule.schedule_management import ScheduleManagement
 
 class TestScheduleModel(unittest.TestCase):
 
@@ -9,9 +11,9 @@ class TestScheduleModel(unittest.TestCase):
         self.id = "schedule_id"
         self.title = "schedule_title"
         self.description = "schedule_description"
-        self.permissions = [("user_id1", "permission_type1"), 
-                            ("user_id2", "permission_type2"),
-                            ("user_id3", "permission_type1")]
+        self.permissions = {"user_id1": "permission_type1", 
+                            "user_id2": "permission_type2",
+                            "user_id3": "permission_type1"}
         self.elements = ["element1", "element2"]
 
         self.schedule = Schedule(self.id, self.title, self.description, self.permissions, self.elements)
@@ -103,7 +105,7 @@ class TestScheduleModel(unittest.TestCase):
 
         # Check that the dictionary has the correct keys and values
         self.assertEqual(schedule_dict, {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": self.description,
             "permissions": self.permissions,
@@ -122,15 +124,100 @@ class TestScheduleModel(unittest.TestCase):
 
     def test_to_dict_none_empty(self):
         # Test to_dict when attributes are None or empty
-        empty_schedule = Schedule(self.id, self.title, None, [], [])
+        empty_schedule = Schedule(self.id, self.title, None, {'userid1': 'permissiontype1'}, [])
         schedule_dict = empty_schedule.to_dict()
         self.assertEqual(schedule_dict, {
-            "id": self.id,
+            "_id": self.id,
             "title": self.title,
             "description": None,
-            "permissions": [],
+            "permissions": {'userid1': 'permissiontype1'},
             "elements": []
         })
+
+    def test_get_elements(self):
+        # Test that get_elements returns the correct elements
+        element_management = ElementManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2'])
+        elements = schedule.get_elements()
+        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid2']]
+        self.assertEqual(elements, expected_elements)
+
+    def test_get_elements_with_types(self):
+        # Test that get_elements returns the correct elements with the specified types
+        element_management = ElementManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
+        elements = schedule.get_elements(['evento'])
+        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid4']]
+        self.assertEqual(elements, expected_elements)
+
+    def test_get_elements_empty(self):
+        # Test that get_elements returns an empty list when there are no elements
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, [])
+        elements = schedule.get_elements()
+        self.assertEqual(elements, [])
+    
+    def test_get_elements_nonexistent_type(self):
+        # Test that get_elements returns an empty list when there are no elements with the specified type
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
+        elements = schedule.get_elements(['citrico'])
+        self.assertEqual(elements, [])
+
+    def test_get_users(self):
+        # Test that get_users returns the correct users
+        user_management = UserManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2'}, [])
+        users = schedule.get_users()
+        expected_users = [user_management.users['userid1'], user_management.users['userid2']]
+        self.assertEqual(users, expected_users)
+
+    def test_get_users_with_permission_types(self):
+        # Test that get_users returns the correct users with the specified permission types
+        user_management = UserManagement.get_instance()
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2', 'userid3': 'permissiontype1'}, [])
+        users = schedule.get_users(['permissiontype1'])
+        expected_users = [user_management.users['userid1'], user_management.users['userid3']]
+        self.assertEqual(users, expected_users)
+
+    # Cancelled test because it is not possible to have empty users
+    #def test_get_users_empty(self):
+    #    # Test that get_users returns an empty list when there are no users
+    #    schedule = Schedule('id', 'title', 'description', [], [])
+    #    users = schedule.get_users()
+    #    self.assertEqual(users, [])
+
+    def test_get_users_nonexistent_permission_type(self):
+        # Test that get_users returns an empty list when there are no users with the specified permission type
+        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2', 'userid3': 'permissiontype1'}, [])
+        users = schedule.get_users(['permissiontype3'])
+        self.assertEqual(users, [])
+
+    def test_elements_setter_accepts_valid_input(self):
+        # Arrange
+        schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
+        new_elements = ["element2", "element3"]
+        # Act
+        schedule.elements = new_elements
+        # Assert
+        self.assertEqual(schedule.elements, new_elements)
+
+    def test_elements_setter_raises_error_on_invalid_input(self):
+        # Arrange
+        schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
+        invalid_elements = "element2"
+        # Act & Assert
+        with self.assertRaises(ValueError):
+            schedule.elements = invalid_elements
+
+    def test_changes_on_elements_calls_schedule_management_update_schedule(self):
+        # Arrange
+        schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
+        schedule_management = ScheduleManagement.get_instance(database_module=MagicMock())
+        schedule_management.update_schedule = MagicMock()
+        schedule.attach(schedule_management)
+        # Act
+        schedule.elements = ["changed_element1"]
+        # Assert
+        schedule_management.update_schedule.assert_called_once_with("schedule1")
 
 if __name__ == '__main__':
     unittest.main()
