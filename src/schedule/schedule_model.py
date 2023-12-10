@@ -47,6 +47,14 @@ class Schedule(Subject):
     @property
     def observers(self):
         return self.__observers
+    
+    @permissions.setter
+    def permissions(self, value):
+        if isinstance(value, dict) and all(isinstance(i, str) for i in value.keys()) and all(isinstance(i, str) for i in value.values()):
+            self.__permissions = value
+            self.notify()
+        else:
+            raise ValueError("Permissions must be a dictionary of strings")
 
     @elements.setter
     def elements(self, value):

@@ -121,6 +121,7 @@ class ScheduleManagement(Observer):
             user.schedules.append(schedule)
             user_manager.update_user(user_id) # TODO: Observer for users
 
+        schedule.attach(self)
         return schedule
 
     def get_schedule(self, schedule_id: str) -> Schedule:
@@ -205,7 +206,6 @@ class ScheduleManagement(Observer):
         schedule = self.schedules[schedule_id]
         if element_id not in schedule.elements:
             schedule.elements = schedule.elements + [element_id]
-            self.update_schedule(schedule_id)
             element = element_manager.get_element(element_id)
             element.schedules = element.schedules + [schedule_id]
             element_manager.update_element(element_id)
