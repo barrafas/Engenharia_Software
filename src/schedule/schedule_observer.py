@@ -2,7 +2,8 @@
 Module that contains the observer interface for the schedule.
 """
 from abc import ABC, abstractmethod
-from src.schedule.schedule_model import Schedule
+
+class Subject(ABC): ...
 
 class Observer(ABC):
     """
@@ -12,7 +13,7 @@ class Observer(ABC):
     """
     
     @abstractmethod
-    def update(self, schedule: Schedule) -> None:
+    def update(self, subject: Subject) -> None:
         """
         Called when the schedule is updated.
 
