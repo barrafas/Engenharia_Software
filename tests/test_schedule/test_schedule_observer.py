@@ -20,6 +20,7 @@ class TestScheduleObserver(unittest.TestCase):
 
         self.db_module = MagicMock()
         self.schedule_management = ScheduleManagement.get_instance(self.db_module)
+        self.schedule_management.update_schedule = MagicMock()
 
     def test_subject_start_with_no_observers(self):
         permissions = {
@@ -83,3 +84,14 @@ class TestScheduleObserver(unittest.TestCase):
         schedule.set_description('new description')
         # verificando se o observer chamou o método update
         self.assertEqual(len(self.observer.notifications), 1)
+
+    def test_update_schedule_gets_called_when_schedule_is_updated(self):
+        permissions = {
+            'user1': "read"
+        }
+        schedule = Schedule('schedule_id', 'title', 'description', permissions)
+
+        schedule.attach(self.schedule_management)
+        schedule.set_description('Sample change')
+
+        self.schedule_management.update_schedule.assert_called_once_with(schedule.id)
