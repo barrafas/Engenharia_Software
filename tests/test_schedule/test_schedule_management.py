@@ -312,6 +312,7 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.add_element_to_schedule(schedule_id, element_id)
 
     def test_add_element_to_schedule_duplicated_element(self):
+        # Check that add_element_to_schedule raises an error when the element is already in the schedule
         # Arrange
         schedule_id = "schedule1"
         element_id = "element1"
@@ -320,6 +321,18 @@ class TestScheduleManagement(unittest.TestCase):
         # Act & Assert
         with self.assertRaises(DuplicatedIDError):
             self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+
+    def test_add_element_to_schedule_calls_update_schedule(self):
+        # Check that add_element_to_schedule calls update_schedule
+        # Arrange
+        schedule_id = "schedule1"
+        element_id = "element1"
+        self.schedule_management.schedules[schedule_id] = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, ["element2"])
+        self.schedule_management.update_schedule = MagicMock()
+        # Act
+        self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+        # Assert
+        self.schedule_management.update_schedule.assert_called_once_with(schedule_id)
 
 if __name__ == '__main__':
     unittest.main()
