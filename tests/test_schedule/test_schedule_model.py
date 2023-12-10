@@ -1,6 +1,8 @@
 import unittest
 from src.schedule.schedule_model import Schedule
 from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
+from unittest.mock import MagicMock
+from src.schedule.schedule_management import ScheduleManagement
 
 class TestScheduleModel(unittest.TestCase):
 
@@ -206,6 +208,16 @@ class TestScheduleModel(unittest.TestCase):
         with self.assertRaises(ValueError):
             schedule.elements = invalid_elements
 
+    def test_changes_on_elements_calls_schedule_management_update_schedule(self):
+        # Arrange
+        schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
+        schedule_management = ScheduleManagement.get_instance(database_module=MagicMock())
+        schedule_management.update_schedule = MagicMock()
+        schedule.attach(schedule_management)
+        # Act
+        schedule.elements = ["changed_element1"]
+        # Assert
+        schedule_management.update_schedule.assert_called_once_with("schedule1")
 
 if __name__ == '__main__':
     unittest.main()

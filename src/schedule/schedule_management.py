@@ -113,13 +113,13 @@ class ScheduleManagement(Observer):
         for element_id in elements:
             element = element_manager.get_element(element_id)
             element.schedules.append(schedule)
-            element_manager.update_element(element_id)
+            element_manager.update_element(element_id) # TODO: Observer for elements
 
         # Update each user and add the schedule to its schedules attribute
         for user_id in permissions.keys():
             user = user_manager.get_user(user_id)
             user.schedules.append(schedule)
-            user_manager.update_user(user_id)
+            user_manager.update_user(user_id) # TODO: Observer for users
 
         return schedule
 
