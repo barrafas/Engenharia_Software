@@ -73,4 +73,13 @@ class TestScheduleObserver(unittest.TestCase):
         # verificando se o observer chamou o método update
         self.assertEqual(len(self.observer.notifications), 1)
 
-        
+    def test_observer_gets_notified_on_description_set(self):
+        permissions = {
+            'user1': "read"
+        }
+        schedule = Schedule('schedule_id', 'title', 'description', permissions)
+
+        schedule.attach(self.observer)
+        schedule.set_description('new description')
+        # verificando se o observer chamou o método update
+        self.assertEqual(len(self.observer.notifications), 1)
