@@ -86,6 +86,13 @@ class ScheduleManagement:
             raise TypeError("Schedule ID must be a string")
         if not permissions:
             raise EmptyPermissionsError("Permissions cannot be empty")
+
+        # Check if each element exists
+        element_manager = ElementManagement.get_instance()
+        for element_id in elements:
+            if not element_manager.element_exists(element_id):
+                raise NonExistentIDError(f"No element found with ID {element_id}")
+
         # Create the schedule instance and insert it into the database
         schedule = Schedule(schedule_id, title, description, permissions, elements)
         self.db_module.insert_data('schedules', {'_id': schedule_id, 
@@ -95,6 +102,11 @@ class ScheduleManagement:
                                                 'elements': elements})
         # Add the schedule to the dictionary
         self.schedules[schedule_id] = schedule
+
+        # Update each element
+        for element_id in elements:
+            element_manager.update_element(element_id)
+
         return schedule
 
     def get_schedule(self, schedule_id: str) -> Schedule:
