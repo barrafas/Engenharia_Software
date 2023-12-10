@@ -1,6 +1,5 @@
 from tests.test_users.mocks import Schedule, ScheduleManagement, \
                                    Element, ElementManagement
-from src.user.user_management import UserManagement
 from datetime import datetime
 
 class UserNotInSchedule(Exception):
@@ -151,9 +150,6 @@ class User:
             raise UsernameCantBeBlank("O nome de usuário não pode ser vazio")
         else:
             self.username = username.strip()
-            user_management = UserManagement.get_instance()
-            user_management[self.id].username = username.strip()
-            user_management.update_user(self.id)  # Update the user in the db
     
     def set_email(self, email: str):
         """
@@ -173,9 +169,6 @@ class User:
             raise EmailCantBeBlank("O email não pode ser vazio")
         else:
             self.email = email.strip()
-            user_management = UserManagement.get_instance()
-            user_management[self.id].email = email.strip()
-            user_management.update_user(self.id)  # Update the user in the db
 
 
     def check_disponibility(self, time: tuple) -> bool:

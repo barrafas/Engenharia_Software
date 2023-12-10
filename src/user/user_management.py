@@ -50,7 +50,7 @@ class UserManagement:
         self.users = {}
 
     def create_user(self, username: str, email: str, password: str,
-                    user_preferences: dict, id: str = None) -> User:
+                    user_preferences: dict = None, id: str = None) -> User:
         """
         Create a new user
 
@@ -58,6 +58,7 @@ class UserManagement:
             username: Username
             email: Email
             password: Password
+            user_preferences: User preferences
             id: User ID
 
         Returns:
@@ -73,17 +74,18 @@ class UserManagement:
         if not id:
             id = self.db.get_next_id("users")
 
-        user_info = {"id": id, "username": username,
+        user_info = {"username": username,
                      "email": email, "schedules": [], 
-                     "hashed_password": hashed_password, "user_preferences": user_preferences}
-        self.db.execute_query(
-            {"entity": "users", "action": "insert", "data": user_info})
+                     "hashed_password": hashed_password, 
+                     "user_preferences": user_preferences}
+        
+        self.db.insert_data('users', {"_id": id, **user_info})
 
-        user = User(**user_info)
+        user = User(id=id, **user_info)
         self.users[id] = user
         return user
 
-    def delete_user(self, username: str) -> None:
+    def delete_user(self, id: str) -> None:
         """
         Delete a user
 
@@ -94,13 +96,12 @@ class UserManagement:
             Void
         """
 
-        if not self.user_exists(username):
-            raise UserDoesNotExistError(f'Usuário {username} não existe')
+        if not self.user_exists(id):
+            raise UserDoesNotExistError(f'Usuário {id} não existe')
 
-        self.db.execute_query(
-            {"entity": "users", "action": "delete", "criteria": {"username": username}})
+        self.db.delete_data('users', {"_id": id})
 
-    def user_exists(self, username: str) -> bool:
+    def user_exists(self, id: str) -> bool:
         """
         Check if a user exists
 
@@ -110,8 +111,7 @@ class UserManagement:
         Returns:
             True if the user exists, False otherwise
         """
-        query = {"entity": "users", "criteria": {"username": username}}
-        data = self.db.fetch_data(query)
+        data = self.db.select_data('users', {"_id": id})
         return len(data) > 0
 
     def hash_password(self, password: str) -> str:
@@ -128,7 +128,7 @@ class UserManagement:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_password
 
-    def get_user(self, username: str) -> User:
+    def get_user(self, id: str) -> User:
         """
         Get a user
 
@@ -138,9 +138,8 @@ class UserManagement:
         Returns:
             The user if it exists, None otherwise
         """
-        query = {"entity": "users", "criteria": {"username": username}}
-        data = self.db.fetch_data(query)
-        user = User(**data[0])
+        data = self.db.select_data('users', {"_id": id})
+        user = User(id, **data[0])
         self.users[user.id] = user
         return 
 
@@ -159,8 +158,7 @@ class UserManagement:
         
         user = self.users[id]
         user_info = user.to_dict()
-        self.db.execute_query(
-            {"entity": "users", "action": "update", "data": user_info})
+        self.db.update_data('users', {"_id": id}, user_info)
         return
 
 

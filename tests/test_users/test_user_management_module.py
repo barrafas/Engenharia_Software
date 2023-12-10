@@ -6,14 +6,19 @@ import bcrypt
 class TestUserManagementModule(unittest.TestCase):
     def setUp(self):
         # Set up for the tests
-
+        UserManagement._instance = None
         # Cria um mock para a interface DatabaseModule
-        self.db = 
+        self.db = Mock()
+        self.user_management = UserManagement.get_instance(self.db)
 
     # def test_create_user_success(self):
     #     # Test creating a new user successfully
-    #     result = self.user_management_module.create_user(username="test_user", email="test_email", password="test_password")
-    #     self.assertTrue(result)
+    #     result = self.user_management.create_user(
+    #         username="test_user", email="test_email", password="test_password")
+    #     self.assertEqual(result.username, "test_user")
+    #     self.assertEqual(result.email, "test_email")
+    #     self.assertTrue(bcrypt.checkpw("test_password".encode('utf-8'), 
+    #                                    result.hashed_password))
 
     # def test_create_existing_user(self):
         # Test creating a user that already exists
