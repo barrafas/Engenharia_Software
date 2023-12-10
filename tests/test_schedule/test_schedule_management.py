@@ -166,6 +166,35 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(EmptyPermissionsError):
             self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
 
+    def test_create_schedule_updates_elements(self):
+        # Arrange
+        schedule_id = "schedule1"
+        title = "Test Title"
+        description = "Test Description"
+        permissions = {"user1": {}}
+        elements = ["element1", "element2", "element3"]
+        with patch.object(self.schedule_management, 'schedule_exists', return_value=False), \
+            patch.object(ElementManagement, 'update_element', return_value=None) as mock_update_element:
+            # Act
+            self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
+            # Assert
+            assert mock_update_element.call_count == len(elements)
+            for element_id in elements:
+                mock_update_element.assert_any_call(element_id)
+
+    def test_create_schedule_raises_error_for_nonexistent_element(self):
+        # Arrange
+        schedule_id = "schedule1"
+        title = "Test Title"
+        description = "Test Description"
+        permissions = {"user1": {}}
+        elements = ["element1", "nonexistent_element"]
+        with patch.object(self.schedule_management, 'schedule_exists', return_value=False), \
+            patch.object(ElementManagement, 'element_exists', side_effect=[True, False]):
+            # Act & Assert
+            with self.assertRaises(NonExistentIDError):
+                self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
+
     def test_get_schedule_id_exists_on_dict(self):
         # Check that get_schedule returns the correct schedule when the schedule exists in the dictionary
         # Arrange

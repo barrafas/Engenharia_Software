@@ -64,8 +64,8 @@ class ScheduleManagement:
         return bool(schedule)
         
 
-    def create_schedule(self, schedule_id: str, title: str, description: str, 
-            permissions: dict, elements: list) -> Schedule:
+    def create_schedule(self, schedule_id: str, title: str, description: str,
+                        permissions: dict, elements: list) -> Schedule:
         """
         Create a new schedule
 
@@ -89,10 +89,10 @@ class ScheduleManagement:
         # Create the schedule instance and insert it into the database
         schedule = Schedule(schedule_id, title, description, permissions, elements)
         self.db_module.insert_data('schedules', {'_id': schedule_id, 
-                                                 'title': title, 
-                                                 'description': description, 
-                                                 'permissions': permissions,
-                                                    'elements': elements})
+                                                'title': title, 
+                                                'description': description, 
+                                                'permissions': permissions,
+                                                'elements': elements})
         # Add the schedule to the dictionary
         self.schedules[schedule_id] = schedule
         return schedule
