@@ -343,6 +343,7 @@ class TaskElement(Element):
         else:
             self.due_date = due_date
 
+
     def set_state(self, state: str):
         """
         Sets the state of the task.
@@ -350,15 +351,16 @@ class TaskElement(Element):
         Arguments:
             state -- The new state of the task.
         """
+        valid_states = ['incomplete', 'complete', 'cancelled']
+
         if state is None:
             self.state = 'incomplete'
+        elif not isinstance(state, str):
+            raise TypeError("State must be a string")
+        elif state not in valid_states:
+            raise ValueError("State must be either 'incomplete', 'complete', or 'cancelled'")
         else:
-            if not isinstance(state, str):
-                raise TypeError("State must be a string")
-            elif state not in ["incomplete", "complete", "cancelled"]:
-                raise ValueError("State must be either 'incomplete' or 'complete' or 'cancelled'")
-            else:
-                self.state = state
+            self.state = state
 
     def set_title(self, title: str) -> None:
         """
