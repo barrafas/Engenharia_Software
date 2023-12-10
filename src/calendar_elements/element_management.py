@@ -1,5 +1,5 @@
 from src.database.database_module import DatabaseModule
-
+from src.calendar_elements.element_interface import Element
 
 class ElementDoesNotExistError(Exception):
     """
