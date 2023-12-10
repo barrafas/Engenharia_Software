@@ -4,63 +4,6 @@
 """
 from datetime import datetime, timedelta
 from .element_interface import Element
-from src.user.user_model import User
-
-class Schedule:
-    """Mock class for Schedule"""
-    def __init__(self, id, title, description, permissions, elements):
-        self.__id = id
-        self.tilte = "title"
-        self.description = "description"
-        self.__permissions = permissions
-        self.__elements = elements
-
-    @property
-    def id(self):
-        return self.__id
-
-    @property
-    def permissions(self):
-        return self.__permissions
-
-    @property
-    def elements(self):
-        return self.__elements
-
-
-class ScheduleManagement:
-    """Mock class for ScheduleManagement"""
-
-    __instance = None
-
-    def __init__(self):
-        self.__schedules = {}
-
-    def get_schedule(self, id: str) -> Schedule:
-        ... 
-    
-    @classmethod
-    def get_instance(cls):
-        if cls.__instance is None:
-            cls.__instance = ScheduleManagement()
-        return cls.__instance
-
-class UserManagement:
-    """Mock class for UserManagement"""
-
-    __instance = None
-
-    def __init__(self):
-        self.__users = {}
-
-    def get_user(self, id: str) -> Schedule:
-        ... 
-    
-    @classmethod
-    def get_instance(cls):
-        if cls.__instance is None:
-            cls.__instance = UserManagement()
-        return cls.__instance
 
 class EventElement(Element):
     """
@@ -71,7 +14,7 @@ class EventElement(Element):
     assigned to one or more schedules.'
     """
 
-    def __init__(self, 
+    def __init__(self,
                 element_id: str,
                 title: str,
                 start: datetime,
@@ -89,7 +32,7 @@ class EventElement(Element):
             start -- The start date of the event.
             end -- The end date of the event.
             schedules -- The schedules that the event is assigned to.
-            type -- The type of the event.
+            element_type -- The type of the event.
         """
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
@@ -110,9 +53,19 @@ class EventElement(Element):
         return self.__schedules
 
     @property
-    def type(self):
+    def element_type(self):
         """Returns the type of the event."""
         return self.__element_type
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the event."""
+        self.__schedules = schedules
+
+    @element_type.setter
+    def element_type(self, element_type: str):
+        """Sets the type of the event."""
+        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -219,7 +172,7 @@ class EventElement(Element):
             dict -- The dictionary representation of the event.
         """
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "start": self.start,
             "end": self.end,
@@ -277,9 +230,19 @@ class TaskElement(Element):
         return self.__schedules
 
     @property
-    def type(self):
+    def element_type(self):
         """Returns the type of the task."""
         return self.__element_type
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the task."""
+        self.__schedules = schedules
+
+    @element_type.setter
+    def element_type(self, element_type: str):
+        """Sets the type of the task."""
+        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -343,6 +306,7 @@ class TaskElement(Element):
         else:
             self.due_date = due_date
 
+
     def set_state(self, state: str):
         """
         Sets the state of the task.
@@ -350,15 +314,16 @@ class TaskElement(Element):
         Arguments:
             state -- The new state of the task.
         """
+        valid_states = ['incomplete', 'complete', 'cancelled']
+
         if state is None:
             self.state = 'incomplete'
+        elif not isinstance(state, str):
+            raise TypeError("State must be a string")
+        elif state not in valid_states:
+            raise ValueError("State must be either 'incomplete', 'complete', or 'cancelled'")
         else:
-            if not isinstance(state, str):
-                raise TypeError("State must be a string")
-            elif state not in ["incomplete", "complete", "cancelled"]:
-                raise ValueError("State must be either 'incomplete' or 'complete' or 'cancelled'")
-            else:
-                self.state = state
+            self.state = state
 
     def set_title(self, title: str) -> None:
         """
@@ -401,7 +366,7 @@ class TaskElement(Element):
             dict -- The dictionary representation of the task.
         """
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "description": self.description,
             "state": self.state,
@@ -455,9 +420,19 @@ class ReminderElement(Element):
         return self.__schedules
 
     @property
-    def type(self):
+    def element_type(self):
         """Returns the type of the reminder."""
         return self.__element_type
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the reminder."""
+        self.__schedules = schedules
+
+    @element_type.setter
+    def element_type(self, element_type: str):
+        """Sets the type of the reminder."""
+        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -558,10 +533,14 @@ class ReminderElement(Element):
             dict -- The dictionary representation of the reminder.
         """
         return {
-            "id": self.__id,
+            "_id": self.__id,
             "title": self.title,
             "description": self.description,
             "reminder_date": self.reminder_date,
             "element_type": self.__element_type,
             "schedules": self.__schedules
         }
+
+# Importing here to avoid circular imports
+from ..schedule.schedule_management import ScheduleManagement
+from ..user.user_management import UserManagement

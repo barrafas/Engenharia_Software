@@ -34,7 +34,7 @@ class UserManagement:
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule):
+    def get_instance(cls, database_module: MongoModule = None):
         if not cls._instance:
             cls._instance = cls(database_module)
         return cls._instance
