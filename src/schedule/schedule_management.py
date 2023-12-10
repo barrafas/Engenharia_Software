@@ -93,6 +93,12 @@ class ScheduleManagement:
             if not element_manager.element_exists(element_id):
                 raise NonExistentIDError(f"No element found with ID {element_id}")
 
+        # Check if each user exists
+        user_manager = UserManagement.get_instance()
+        for user_id in permissions.keys():
+            if not user_manager.user_exists(user_id):
+                raise NonExistentIDError(f"No user found with ID {user_id}")
+
         # Create the schedule instance and insert it into the database
         schedule = Schedule(schedule_id, title, description, permissions, elements)
         self.db_module.insert_data('schedules', {'_id': schedule_id, 
@@ -108,6 +114,12 @@ class ScheduleManagement:
             element = element_manager.get_element(element_id)
             element.schedules.append(schedule)
             element_manager.update_element(element_id)
+
+        # Update each user and add the schedule to its schedules attribute
+        for user_id in permissions.keys():
+            user = user_manager.get_user(user_id)
+            user.schedules.append(schedule)
+            user_manager.update_user(user_id)
 
         return schedule
 
