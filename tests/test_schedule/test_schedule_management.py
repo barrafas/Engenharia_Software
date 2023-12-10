@@ -5,13 +5,19 @@ from src.schedule.schedule_model import Schedule
 from tests.test_schedule.mocks import Element, ElementManagement
 from src.user.user_model import User
 from src.user.user_management import UserManagement
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, MagicMock, patch, PropertyMock
+
+
+
 
 class TestScheduleManagement(unittest.TestCase):
     def setUp(self):
         # Reset the singleton instance before each test
         ScheduleManagement._instance = None
         self.db_module = Mock()
+        self.schedules = {
+                'schedule10': MagicMock(spec=Schedule),
+            }
         self.schedule_management = ScheduleManagement.get_instance(self.db_module)
 
     def test_get_instance_creates_instance(self):
@@ -277,17 +283,19 @@ class TestScheduleManagement(unittest.TestCase):
         with self.assertRaises(NonExistentIDError):
             self.schedule_management.delete_schedule(schedule_id)
 
-    def test_add_element_to_schedule_updates_elements(self):
+    def test_add_element_to_schedule_updates_schedule_elements(self):
         # Check that add_element_to_schedule updates the elements list of the schedule
         # Arrange
         schedule_id = "schedule10"
         element_id = "element1"
+        mock_element = MagicMock()
         self.schedule_management.schedules[schedule_id] = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, [])
-        # Act
-        self.schedule_management.add_element_to_schedule(schedule_id, element_id)
-        # Assert
-        self.assertIn(element_id, self.schedule_management.schedules[schedule_id].elements)
-
+        with patch.object(ElementManagement, 'get_element', return_value=mock_element):
+            # Act
+            self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+            # Assert
+            self.assertIn(element_id, self.schedule_management.schedules[schedule_id].elements)
+    
     @patch.object(ElementManagement, 'get_instance')
     def test_add_element_to_schedule_invalid_element(self, mock_get_instance):
         # Check that add_element_to_schedule raises an error when the element does not exist
@@ -327,12 +335,33 @@ class TestScheduleManagement(unittest.TestCase):
         # Arrange
         schedule_id = "schedule1"
         element_id = "element1"
+        mock_element = MagicMock()
         self.schedule_management.schedules[schedule_id] = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, ["element2"])
         self.schedule_management.update_schedule = MagicMock()
-        # Act
-        self.schedule_management.add_element_to_schedule(schedule_id, element_id)
-        # Assert
-        self.schedule_management.update_schedule.assert_called_once_with(schedule_id)
+        with patch.object(ElementManagement, 'get_element', return_value=mock_element):
+            # Act
+            self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+            # Assert
+            self.schedule_management.update_schedule.assert_called_once_with(schedule_id)
+
+    def test_add_element_to_schedule_updates_element_schedules(self):
+        # Arrange
+        schedule_id = "schedule10"
+        element_id = "element1"
+        # Create a mock schedule with 'element2' as an element
+        mock_schedule = MagicMock(spec=Schedule)
+        mock_schedule.elements = ["element2"]
+        # Create a mock element with no schedules
+        mock_element = MagicMock()
+        mock_element.schedules = []
+        # Mock the get_element method to return our mock element when called with 'element1'
+        with patch.object(ElementManagement, 'get_element', return_value=mock_element):
+            # Add the mock schedule to the schedules dictionary
+            self.schedule_management.schedules[schedule_id] = mock_schedule
+            # Act
+            self.schedule_management.add_element_to_schedule(schedule_id, element_id)
+            # Assert
+            self.assertIn(schedule_id, mock_element.schedules)
 
 if __name__ == '__main__':
     unittest.main()
