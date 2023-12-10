@@ -126,6 +126,7 @@ class Schedule(Subject):
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
         self.description = description
+        self.notify()
 
     def to_dict(self) -> dict:
         '''
