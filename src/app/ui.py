@@ -3,6 +3,9 @@ Módulo responsável por gerenciar a interface gráfica do programa.
 """
 import customtkinter
 
+customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
 class TkinterUI:
     """
     Classe responsável por gerenciar a interface gráfica do programa.
@@ -12,7 +15,7 @@ class TkinterUI:
         self.root = customtkinter.CTk()
         # Configuração de elementos da interface
         self.root.title("Sistema de Calendário")
-        self.root.geometry("200x300")
+        self.root.geometry(f"{450}x{300}")
 
         # Vincula o fechamento da janela e a tecla ESC a uma função
         self.root.protocol("WM_DELETE_WINDOW", self.close)
@@ -64,8 +67,15 @@ class TkinterUI:
         go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
         go_back_button.pack()
 
+        user_events_label = customtkinter.CTkLabel(self.root, text="Eventos do usuário")
+        user_events_label.pack()
+        user_events = customtkinter.CTkLabel(self.root, text=">> User events: loading... ")
+        user_events.pack()
+
+
         self.logout_button = logout_button
         self.go_back_button = go_back_button
+        self.user_events = user_events
 
     def show_sign_up_elements(self):
         # Lógica para exibir elementos relacionados ao login
@@ -103,7 +113,6 @@ class TkinterUI:
         
     def run(self):
         self.root.mainloop()
-
 
     def close(self, event=None):
         # Função para executar quando a janela é fechada

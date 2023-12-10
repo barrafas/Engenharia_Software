@@ -79,11 +79,17 @@ class MainState(State):
 
     def logout(self, event):
         print("Logging out...")
+        self.context.user = None
         self.context.transition_to(SignInUp(self.context))
 
     def render(self):
         print("Rendering main page...")
         self.context._ui.show_main_elements()
+
+        # get user events
+        events = self.context.get_user_events()
+        event_string = ">> User events: "+"\n".join(events)
+        self.context._ui.user_events.configure(text=event_string)
 
         # bind events
         self.context._ui.logout_button.bind("<Button-1>", self.logout)
@@ -94,6 +100,7 @@ class MainState(State):
 
     def go_back(self, event):
         # transition to sign-in/up state
+        self.context.user = None
         self.context.transition_to(LoggedOut(self.context))
 
     def __str__(self):
