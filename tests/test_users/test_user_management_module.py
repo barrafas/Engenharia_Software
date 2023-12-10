@@ -1,5 +1,6 @@
 import unittest
-from src.user.user_management import UserManagement
+from src.user.user_management import UserManagement, \
+UserAlreadyExistsError, UsernameCantBeBlank, UserDoesNotExistError, User
 from unittest.mock import Mock, MagicMock, patch
 import bcrypt
 
@@ -11,57 +12,119 @@ class TestUserManagementModule(unittest.TestCase):
         self.db = Mock()
         self.user_management = UserManagement.get_instance(self.db)
 
-    # def test_create_user_success(self):
-    #     # Test creating a new user successfully
-    #     result = self.user_management.create_user(
-    #         username="test_user", email="test_email", password="test_password")
-    #     self.assertEqual(result.username, "test_user")
-    #     self.assertEqual(result.email, "test_email")
-    #     self.assertTrue(bcrypt.checkpw("test_password".encode('utf-8'), 
-    #                                    result.hashed_password))
+    def test_create_user_success(self):
+        # Test creating a new user successfully
+        self.db.insert_data = MagicMock(return_value = 
+                                    [{"username": "test_user", 
+                                      "email": "test_email", 
+                                      "hashed_password": "test_hashed_password"}])
+        
+        self.db.select_data = MagicMock(return_value = [])
+        
+        result = self.user_management.create_user(username="test_user", 
+                        email="test_email", password="test_password", id="1")
+        self.assertEqual(result.username, "test_user")
+        self.assertEqual(result.email, "test_email")
+        self.assertTrue(bcrypt.checkpw("test_password".encode('utf-8'), 
+                                       result.hashed_password.encode('utf-8')), 
+                        result.hashed_password)
 
-    # def test_create_existing_user(self):
+    def test_create_existing_user(self):
         # Test creating a user that already exists
-        # self.user_management_module.create_user("existing_user", "existing_email", "existing_password")
-        # with self.assertRaises(Exception) as context:
-        #     self.user_management_module.create_user("existing_user", "existing_email", "existing_password")
-        # self.assertEqual(str(context.exception), 'Usuário já existe')
+        self.db.select_data = MagicMock(return_value = 
+                                    [{"username": "test_user", 
+                                      "email": "test_email", 
+                                      "hashed_password": "test_hashed_password"}])
+        
+        with self.assertRaises(UserAlreadyExistsError) as context:
+            self.user_management.create_user(username="test_user", 
+                            email="test_email", password="test_password", id="1")
+        self.assertEqual(str(context.exception),
+                            "Usuário test_user já existe")
+        
+    def test_create_blank_username(self):
+        # Test creating a user with a blank username
+        with self.assertRaises(UsernameCantBeBlank) as context:
+            self.user_management.create_user(username="", 
+                            email="test_email", password="test_password", id="1")
+        self.assertEqual(str(context.exception),
+                            "Nome de usuário não pode ser vazio")
 
-    # def test_hash_password(self):
+    def test_hash_password(self):
         # Test hashing a password
-        # password = "test_password"
-        # hashed_password = self.user_management_module.hash_password(password)
-        # self.assertTrue(bcrypt.checkpw(password.encode('utf-8'), hashed_password))
+        password = "test_password"
+        hashed_password = self.user_management.hash_password(password)
+        self.assertTrue(bcrypt.checkpw(password.encode('utf-8'), hashed_password))
 
-    # def test_user_exists(self):
+    def test_delete_user(self):
+        # Test deleting a user
+        self.db.select_data = MagicMock(return_value = ['a'])
+
+
+        self.db.delete_data = MagicMock()
+        self.user_management.delete_user("test_user")
+        self.db.delete_data.assert_called_once_with("users", {"_id": "test_user"})
+
+    def test_delete_nonexistent_user(self):
+        # Test deleting a nonexistent user
+        self.db.select_data = MagicMock(return_value = [])
+        with self.assertRaises(UserDoesNotExistError) as context:
+            self.user_management.delete_user("id2")
+        self.assertEqual(str(context.exception),
+                            "Usuário id2 não existe")
+
+    def test_user_exists(self):
         # Test checking if a user exists
-        # self.user_management_module.create_user("check_user", "check_email", "check_password")
-        # result = self.user_management_module.user_exists("check_user")
-        # self.assertTrue(result)
+        self.db.select_data = MagicMock(return_value = ['a'])
+        result = self.user_management.user_exists("test_user")
+        self.assertTrue(result)
 
-    # def test_user_not_exists(self):
-    #     # Test checking if a user does not exist
-    #     result = self.user_management_module.user_exists("nonexistent_user")
-    #     self.assertFalse(result)
+    def test_user_doesnt_exist(self):
+        # Test checking if a user doesnt exists
+        self.db.select_data = MagicMock(return_value = [])
+        result = self.user_management.user_exists("test_user")
+        self.assertFalse(result)
 
-    # def test_delete_user(self):
-    #     # Testa a exclusão de um usuário
-    #     username = "user_to_delete"
-    #     password = "password123"
-    #     self.user_management_module.create_user(username, "delete_email@mail.com", password)
-
-    #     # Verifica se o usuário existe antes da exclusão
-    #     self.assertTrue(self.user_management_module.user_exists(username))
-
-    #     # Exclui o usuário
-    #     self.user_management_module.delete_user(username)
-
-    #     # Verifica se o usuário não existe mais após a exclusão
-    #     self.assertFalse(self.user_management_module.user_exists(username))
-
-    # def tearDown(self):
-    #     # Clean up after the tests
-    #     self.database_module_mock.clear_data()
+    def test_update_user(self):
+        # Test updating a user
+        self.db.select_data = MagicMock(return_value = ['a'])
+        self.db.update_data = MagicMock()
+        self.user_management.users = {"test_user": User("test_user", "test_email",
+                                                        "test_password", "test_id")}
+        self.user_management.update_user("test_user")
+        self.db.update_data.assert_called_once_with("users", {"_id": "test_user"},
+                                {'id': 'test_user', 'username': 'test_email', 
+                                'email': 'test_password', 'schedules': 'test_id', 
+                                'password': None, 'user_preferences': {}})
+        
+    def test_update_nonexistent_user(self):
+        # Test updating a nonexistent user
+        self.db.select_data = MagicMock(return_value = [])
+        with self.assertRaises(UserDoesNotExistError) as context:
+            self.user_management.update_user("id2")
+        self.assertEqual(str(context.exception),
+                            "Usuário id2 não existe")
+        
+    def test_add_schedule_to_user(self):
+        # Test adding a schedule to a user
+        self.db.select_data = MagicMock(return_value = ['a'])
+        self.db.update_data = MagicMock()
+        self.user_management.users = {"test_id": User("test_id", "test_user",
+                                                        "test_email", [],
+                                                        "test_password")}
+        self.user_management.add_schedule_to_user("test_id", "test_schedule")
+        self.db.update_data.assert_called_once_with("users", {"_id": "test_id"},
+                                {'id': 'test_id', 'username': 'test_user', 
+                                'email': 'test_email', 'schedules': ["test_schedule"], 
+                                'password': "test_password", 'user_preferences': {}})
+        
+    def test_add_schedule_to_nonexistant_user(self):
+        # Test adding a schedule to a nonexistent user
+        self.db.select_data = MagicMock(return_value = [])
+        with self.assertRaises(UserDoesNotExistError) as context:
+            self.user_management.add_schedule_to_user("id2", "test_schedule")
+        self.assertEqual(str(context.exception),
+                            "Usuário id2 não existe")
 
         
 if __name__ == '__main__':

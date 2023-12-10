@@ -8,7 +8,7 @@ Attributes:
 """
 import bcrypt
 from src.database.mongo_module import MongoModule
-from .user_model import User
+from .user_model import User, UsernameCantBeBlank
 
 class UserAlreadyExistsError(Exception):
     """
@@ -64,6 +64,11 @@ class UserManagement:
         Returns:
             The created user
         """
+        username = username.strip()
+        email = email.strip()
+
+        if username == "":
+            raise UsernameCantBeBlank("Nome de usuário não pode ser vazio")
 
         if self.user_exists(username):
             raise UserAlreadyExistsError(f'Usuário {username} já existe')
