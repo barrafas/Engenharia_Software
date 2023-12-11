@@ -119,10 +119,9 @@ class ElementManagement(Observer):
             schedule_instance.elements = [element for element in \
                 schedule_instance.elements if element != element_id]
 
-        # Update each user
-        users = element.get_users()
+
         from src.user.user_management import UserManagement
-        UserManagement.get_instance()
+        user_manager = UserManagement.get_instance()
         for user in users:
             user.elements = [element for element in user.elements \
                  if element != element_id]
@@ -187,6 +186,7 @@ class ElementManagement(Observer):
             schedule_instance.elements = (
                         schedule_instance.elements + [element_id])
 
+        element.attach(self)
         return element
 
 
@@ -197,4 +197,5 @@ class ElementManagement(Observer):
         Args:
             element: The element that was updated.
         """
+        print(f"Element {element.id} was updated.")
         self.update_element(element.id)

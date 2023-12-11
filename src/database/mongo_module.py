@@ -193,6 +193,7 @@ class MongoModule(DatabaseModule):
         Raises:
             Exception: If not connected to the database.
         """
+        new_data = {"$set": new_data}
         self._db[collection_name].update_one(condition, new_data)
 
     def select_data(self,

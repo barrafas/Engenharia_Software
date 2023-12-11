@@ -96,6 +96,7 @@ class User(Subject):
         """Sets the schedules of the event."""
         self.__schedules = schedules
         self.notify()
+        print(f"User schedules: {self.schedules}")
 
     def to_dict(self) -> dict:
         """
@@ -106,15 +107,14 @@ class User(Subject):
 
         >>> user = User("id", "username", "email", ["id1", "id2"])
         >>> user.to_dict()
-        {'_id': 'id', 'username': 'username', 'email': 'email',
-        'schedules': ['id1', 'id2'], 'password': None, 'user_preferences': {}}
+        {'_id': 'id', 'username': 'username', 'email': 'email', 'schedules': ['id1', 'id2'], 'password': None, 'user_preferences': {}}
         """
         return {
             "_id": self.__id,
             "username": self.username,
             "email": self.email,
             "schedules": self.schedules,
-            "password": self.__hashed_password,
+            "hashed_password": self.hashed_password,
             "user_preferences": self.user_preferences
         }
 
@@ -182,9 +182,9 @@ class User(Subject):
             username: user name 
 
         >>> user = User("id", "username", "email", ["id1", "id2"])
-        >>> user.set_username("new_username")
+        >>> user.set_username("newusername")
         >>> user.username
-        'new_username'           
+        'newusername'           
         """
         if isinstance(username, str) is False:
             raise TypeError("Username must be a string")
@@ -302,3 +302,7 @@ class User(Subject):
         """
         for observer in self.__observers:
             observer.update(self)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

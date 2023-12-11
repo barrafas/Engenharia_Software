@@ -27,12 +27,6 @@ Functions:
 
 from src.schedule.schedule_model import Schedule
 from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
-#from src.user.user_model import User
-#from src.user.user_management import UserManagement
-from tests.test_schedule.mocks import Element,\
-                                        ElementManagement,\
-                                        User,\
-                                        UserManagement
 
 from src.observer.observer import Observer, Subject
 
@@ -73,6 +67,7 @@ class ScheduleManagement(Observer):
         self.db_module = database_module
         self.schedules = schedules if schedules else {}
 
+
     def schedule_exists(self, schedule_id: str) -> bool:
         """
         Check if a schedule exists
@@ -112,6 +107,9 @@ class ScheduleManagement(Observer):
             raise TypeError("Schedule ID must be a string")
         if not permissions:
             raise EmptyPermissionsError("Permissions cannot be empty")
+
+        from src.user.user_management import UserManagement
+        from src.calendar_elements.element_management import ElementManagement
 
         # Check if each element exists
         element_manager = ElementManagement.get_instance()
@@ -202,6 +200,9 @@ class ScheduleManagement(Observer):
         if not self.schedule_exists(schedule_id):
             raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
 
+        from src.user.user_management import UserManagement
+        from src.calendar_elements.element_management import ElementManagement
+        
         # Update each element
         schedule = self.get_schedule(schedule_id)
         element_manager = ElementManagement.get_instance()
@@ -233,6 +234,8 @@ class ScheduleManagement(Observer):
             schedule_id: Schedule ID
             element_id: Element ID
         """
+        from src.calendar_elements.element_management import ElementManagement
+
         element_manager = ElementManagement.get_instance()
         if not element_manager.element_exists(element_id):
             raise NonExistentIDError(f"No element found with ID {element_id}")
@@ -256,4 +259,5 @@ class ScheduleManagement(Observer):
         Args:
             schedule: The schedule that was updated.
         """
+        print(f"Schedule {schedule.id} was updated.")
         self.update_schedule(schedule.id)

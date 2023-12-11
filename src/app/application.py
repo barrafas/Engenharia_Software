@@ -56,7 +56,7 @@ class Application:
         The Application delegates part of its behavior to the current State
         object.
         """
-        auth = AuthenticationModule(self._db)
+        auth = AuthenticationModule()
 
         if auth.authenticate_user(user_id, password):
             print(f"\033[92mUser {user_id} authenticated.\033[0m")
@@ -65,15 +65,33 @@ class Application:
         else:
             print("Login failed.")
 
-    def sign_up(self, username, email, password):
+    def sign_up(self, user_id, username, email, password):
         """
         The Application delegates part of its behavior to the current State
         object.
         """
         user_management = UserManagement.get_instance()
 
-        if user_management.create_user(username, email, password, id=username):
+        user = user_management.create_user(username, email, password, user_id=user_id)
+        user.attach(user_management)
+
+        if user:
             print(f"\033[92mSign up successful! User {username} created.\033[0m")
+
+            schedule_management = ScheduleManagement.get_instance()
+            schedule_id = f"{user_id}_schedule"
+            schedule_title = "Private schedule"
+            schedule_description = f"Private schedule of {username}"
+            schedule_permissions = {user_id: "owner"}
+            schedule = schedule_management.create_schedule(schedule_id, schedule_title,
+                                        schedule_description, schedule_permissions, [])
+
+            print(f"\033[92mSchedule created: {schedule}\033[0m")
+
+            user_management.add_schedule_to_user(user_id, schedule_id, "owner")
+            print(f"\033[92mSchedule {schedule_id} added to user {user_id}\033[0m")
+            print(f"\033[92mUser schedules: {user.schedules}\033[0m")
+
             return True
         else:
             print("Sign up failed.")

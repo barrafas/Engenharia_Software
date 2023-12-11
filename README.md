@@ -12,6 +12,15 @@ Membros:
 
 <hr>
 
+**Processo de instalação:**
+Para certificar-se que todas as dependências foram instaladas em suas versões corretas, rode o comando `pip install -r requirements.txt`. Para instalar o banco, é necessário baixar Docker, instalar a imagem do banco MongoDB, e rodar o seguinte comando `sudo docker run -d -p 27017:27017 --name=mongo-example mongo:latest` para que a aplicação consiga interagir com ele.
+
+**Entrega A1:**
+Decidimos atualizar a entrega inicial referente aos casos de uso para melhor refletir as modificações que ocorreram no sistema ao longo do desenvolvimento. O arquivo Entrega_A1_Atualizado.pdf dentro da pasta de documentação é referente à essa entrega atualizada.
+
+**Testes realizados durante TDD:**
+Os testes realizados durante o processo de TDD foram registrados em notebooks Jupyter, que estão disponíveis dentro da pasta de testes de cada classe específica, contendo o histórico de iterações das funções testadas.
+
 **Requisitos do sistema:**
 -   Gerenciamento de eventos pessoais:
     -   Um usuário deve ser capaz de organizar sua agenda pessoal, criando e gerenciando eventos pessoais.

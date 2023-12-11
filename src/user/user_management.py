@@ -111,6 +111,7 @@ class UserManagement(Observer):
 
         user = self.get_user(user_id)
         # Update each schedule
+        from src.schedule.schedule_management import ScheduleManagement
         schedule_manager = ScheduleManagement.get_instance()
         for schedule in user.schedules:
             schedule_instance = schedule_manager.get_schedule(schedule)
@@ -163,6 +164,7 @@ class UserManagement(Observer):
         data = self.db_module.select_data('users', {"_id": user_id})
         print(data[0])
         user = User(**data[0])
+        user.attach(self)
         print(user)
         self.users[user_id] = user
         return user
@@ -198,6 +200,7 @@ class UserManagement(Observer):
         Returns:
             None
         """
+        from src.schedule.schedule_management import ScheduleManagement
         schedule_manager = ScheduleManagement.get_instance()
         if not self.user_exists(user_id):
             raise NonExistentIDError(f'User {user_id} does not exist')
@@ -219,4 +222,5 @@ class UserManagement(Observer):
         Args:
             user: The user that was updated.
         """
+        print(f"User {user.id} was updated.")
         self.update_user(user.id)
