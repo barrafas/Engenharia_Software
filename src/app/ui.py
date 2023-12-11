@@ -16,7 +16,7 @@ class TkinterUI:
         self.root = customtkinter.CTk()
         # Configuração de elementos da interface
         self.root.title("Sistema de Calendário")
-        self.root.geometry(f"{900}x{700}")
+        self.root.geometry(f"{800}x{600}")
 
         # Vincula o fechamento da janela e a tecla ESC a uma função
         self.root.protocol("WM_DELETE_WINDOW", self.close)
@@ -50,7 +50,6 @@ class TkinterUI:
 
         day_events_label = customtkinter.CTkLabel(self.root, text=f"Eventos do dia {day}")
         day_events_label.pack()
-
 
     def clear_elements(self):
         # Lógica para limpar elementos da interface

@@ -1,3 +1,6 @@
+"""
+Main view is the view that shows the user's calendar.
+"""
 import customtkinter
 from src.app.views.view import View
 import datetime
@@ -20,7 +23,7 @@ class MainView(View):
         self.main_frame = None
 
         self.calendar_frame = None
-        self.calendar_buttons_tree = {}
+        self.calendar_buttons = {}
 
         self.selected_date = datetime.date.today()
 
@@ -118,7 +121,7 @@ class MainView(View):
                 if day != 0:
                     day_button = customtkinter.CTkButton(self.calendar_frame, text=day, width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
-                    self.calendar_buttons_tree[(year, month, day)] = day_button
+                    self.calendar_buttons[(year, month, day)] = day_button
                 else:
                     day_button = customtkinter.CTkButton(self.calendar_frame, text=" ", width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
