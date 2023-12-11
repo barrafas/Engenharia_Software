@@ -10,6 +10,10 @@ Exceptions:
 import bcrypt
 from ..user.user_management import UserManagement
 
+class UserManagementNotInitializedError(Exception):
+    """Exception raised when user management module is not initialized"""
+    pass
+
 # create a custom exception
 class UserNotFound(Exception):
     """Exception raised when user doesn't exist"""
@@ -36,7 +40,11 @@ class AuthenticationModule:
             user_management_module (UserManagement): user management module
         """
         # get the instance of the user management module
-        self.user_management_module = UserManagement.get_instance()
+        try:
+            self.user_management_module = UserManagement.get_instance()
+        except UserManagementNotInitializedError:
+            raise UserManagementNotInitializedError(
+                "User management module is not initialized!")
 
     def authenticate_user(self,
                             username: str,
