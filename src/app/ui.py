@@ -2,7 +2,7 @@
 Módulo responsável por gerenciar a interface gráfica do programa.
 """
 import customtkinter
-from .ui_main import MainUI
+from src.app.views.splash_view import SplashView
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -22,46 +22,8 @@ class TkinterUI:
         self.root.protocol("WM_DELETE_WINDOW", self.close)
         self.root.bind('<Escape>', self.close)
 
-
-    def show_login_elements(self):
-        # Lógica para exibir elementos relacionados ao login
-        
-        user_id_label = customtkinter.CTkLabel(self.root, text="Username")
-        user_id_label.pack()
-        user_id_entry = customtkinter.CTkEntry(self.root)
-        user_id_entry.pack()
-
-        password_label = customtkinter.CTkLabel(self.root, text="Senha")
-        password_label.pack()
-        password_entry = customtkinter.CTkEntry(self.root, show="*")
-        password_entry.pack()
-
-        login_button = customtkinter.CTkButton(self.root, text="Login")
-        login_button.pack()
-
-        go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
-        go_back_button.pack()
-
-        user_id_entry.focus()
-
-        self.user_id_entry = user_id_entry
-        self.password_entry = password_entry
-        self.login_button = login_button
-        self.go_back_button = go_back_button
-
-    def show_sign_in_up_elements(self):
-        login_label = customtkinter.CTkLabel(self.root, text="Já possui uma conta?")
-        login_label.pack()
-        login_button = customtkinter.CTkButton(self.root, text="Faça login")
-        login_button.pack()
-
-        sign_up_label = customtkinter.CTkLabel(self.root, text="Não possui uma conta?")
-        sign_up_label.pack()
-        sign_up_button = customtkinter.CTkButton(self.root, text="Cadastre-se")
-        sign_up_button.pack()
-
-        self.login_button = login_button
-        self.sign_up_button = sign_up_button
+        # inicializa a view padrão
+        self.view = SplashView(self.root)
 
     def show_main_elements(self, elements):
 

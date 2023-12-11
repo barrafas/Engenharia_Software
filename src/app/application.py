@@ -3,11 +3,12 @@ The Application defines the interface of interest to clients.
 """
 
 from __future__ import annotations
+
+import datetime
 from src.user.user_management import UserManagement
 from src.calendar_elements.element_management import ElementManagement
 from src.schedule.schedule_management import ScheduleManagement
 from src.auth.authentication import AuthenticationModule
-import datetime
 
 class Application:
     """
@@ -16,12 +17,12 @@ class Application:
     _state = None
 
     def __init__(self, state = None, ui = None, db = None) -> None:
-        if state is not None:
-            self.transition_to(state)
+        self._state = state
         self._ui = ui
         self._db = db
         self._user = None
 
+        # initialize modules
         ScheduleManagement.get_instance(database_module=self._db)
         ElementManagement.get_instance(database_module=self._db)
         UserManagement.get_instance(database_module=self._db)
@@ -34,9 +35,23 @@ class Application:
             self._state.clear()
         print(f"Application: Transition to {type(state).__name__}")
         self._state = state
-        self._state.context = self
         state.render()
 
+    @property
+    def state(self):
+        return self._state
+    
+    @property
+    def user(self):
+        return self._user
+    
+    @property
+    def ui(self):
+        return self._ui
+
+    @ui.setter
+    def ui(self, ui):
+        self._ui = ui
 
     def run(self) -> None:
         """
