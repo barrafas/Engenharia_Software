@@ -28,7 +28,6 @@ class AuthenticationModule:
         verify_password
 
     Attributes:
-        database_module
         user_management_module
     """
 

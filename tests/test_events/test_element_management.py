@@ -5,7 +5,7 @@ from src.calendar_elements.element_management import ElementManagement, ElementA
 from src.calendar_elements.element_factory import ElementFactory
 from src.database.mongo_module import MongoModule
 from src.calendar_elements.element_interface import Element
-from src.schedule.schedule_management import ScheduleManagement
+# from src.schedule.schedule_management import ScheduleManagement
 
 class TestElementManagement(unittest.TestCase):
     """ Tests for ElementManagement class """
@@ -15,9 +15,11 @@ class TestElementManagement(unittest.TestCase):
         self.db_module = MagicMock()
         self.elements = {'id': MagicMock(spec=Element)}
         self.element_management = ElementManagement.get_instance(self.db_module)
+
         from src.schedule.schedule_management import ScheduleManagement
         ScheduleManagement._instance = None
         self.schedule_management = ScheduleManagement.get_instance(self.db_module)
+
         from src.user.user_management import UserManagement
         UserManagement._instance = None
         self.user_management = UserManagement.get_instance(self.db_module)
@@ -164,108 +166,149 @@ class TestElementManagement(unittest.TestCase):
                         "description": "description",
                         "permissions": {"user1": 'owner', "user2": "editor"},
                         "elements": ["id"]}]
-            if collection == "users" and query == {"_id": "user1"}:
-                return [{"_id": "user1",
-                        "username": "username1",
-                        "email": "email1",
-                        "schedules": ["schedule1", "schedule2"],
-                        "hashed_password": "hashed_password1",
-                        "user_preferences": {},}]
-            if collection == "users" and query == {"_id": "user2"}:
-                return [{"_id": "user2",
-                        "username": "username2",
-                        "email": "email2",
-                        "schedules": ["schedule1"],
-                        "hashed_password": "hashed_password2",
-                        "user_preferences": {},}]
-            
+                        
         self.element_management.db_module.select_data = MagicMock(side_effect=mock_select_data)
         self.element_management.delete_element(element_id)
         self.element_management.db_module.delete_data.assert_called_once_with("elements", {"_id": "id"})
 
 
-    # def test_delete_element_id_does_not_exist(self):
-    #     """ Check that delete_element raises ElementDoesNotExistError if the 
-    #     element does not exist in the database """
-    #     element = 'element'
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(ElementDoesNotExistError):
-    #         self.element_management.delete_element(element)
+    def test_delete_element_id_does_not_exist(self):
+        """ Check that delete_element raises ElementDoesNotExistError if the 
+        element does not exist in the database """
+        element = 'element'
+        self.element_management.element_exists = MagicMock(return_value=False)
+        with self.assertRaises(ElementDoesNotExistError):
+            self.element_management.delete_element(element)
 
-    # def test_create_element(self):
-    #     """ Check that create_element creates the element if it does not exist 
-    #     in the database """
-    #     self.db_module.insert_data = MagicMock()
-    #     self.db_module.select_data = MagicMock(return_value=[])
-    #     mock_schedule = Mock()
-    #     with patch('Schedule', 'get_schedule' return_value=mock_schedule), \
-    #         patch('src.calendar_elements.element_management.ElementFactory.create_element', return_value=Mock()):
-    #         self.element_management.create_element("id", "title", ["schedule1", "schedule2"], "event", datetime(2021, 1, 1), datetime(2021, 1, 2), "description")
+    def test_create_element(self):
+        """ Check that create_element creates the element if it does not exist 
+        in the database """
+        self.element_management.db_module.delete_data = MagicMock()
+        def mock_select_data(collection, query):
+            if collection == "elements" and query == {"_id": "id"}:
+                return [{"_id": "id",
+                        "title": "title",
+                        "schedules": ["schedule1", "schedule2"],
+                        "element_type": "event",
+                        "start": datetime(2021, 1, 1),
+                        "end": datetime(2021, 1, 2),
+                        "description": "description"}]
+            if collection == "schedules" and query == {"_id": "schedule1"}:
+                return [{"_id": "schedule1",
+                        "title": "title1",
+                        "description": "description",
+                        "permissions": {"user1": 'owner', "user2": "editor"},
+                        "elements": ["id", "element2"]}]
+            if collection == "schedules" and query == {"_id": "schedule2"}:
+                return [{"_id": "schedule2",
+                        "title": "title2",
+                        "description": "description",
+                        "permissions": {"user1": 'owner', "user2": "editor"},
+                        "elements": ["id"]}]
+        self.element_management.db_module.select_data = MagicMock(side_effect=mock_select_data)
+        self.element_management.db_module.insert_data = MagicMock()
+        element_id = "id"
+        title = "title"
+        schedules = ["schedule1", "schedule2"]
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        element = ElementFactory.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
+        self.element_management.element_exists = MagicMock(return_value=False)
+        self.element_management.create_element(element_type = element_type, element_id = element_id, title = title, schedules = schedules, start=start, end=end, description=description)
+        self.db_module.insert_data.assert_called_once_with("elements", element.to_dict())
 
-    # def test_create_element_id_exists(self):
-    #     """ Check that create_element raises ElementAlreadyExistsError if the 
-    #     element already exists in the database """
-    #     element = Mock(spec=Element)
-    #     self.element_management.element_exists = MagicMock(return_value=True)
-    #     with self.assertRaises(ElementAlreadyExistsError):
-    #         self.element_management.create_element(element)
+    def test_create_element_id_exists(self):
+        """ Check that create_element raises ElementAlreadyExistsError if the 
+        element already exists in the database """
+        element_id = "id"
+        title = "title"
+        schedules = ["schedule1", "schedule2"]
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        self.element_management.element_exists = MagicMock(return_value=True)
+        with self.assertRaises(ElementAlreadyExistsError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
 
-    # def test_create_element_id_does_not_exist(self):
-    #     """ Check that create_element creates the element if it does not exist 
-    #     in the database """
-        # element = Mock(spec=Element)
-        # self.element_management.element_exists = MagicMock(return_value=False)
-        # self.element_management.create_element(element)
-        # element.to_dict.assert_called()
+    def test_create_element_invalid_element_type(self):
+        """ Check that create_element raises ValueError if the element type is 
+        invalid """
+        element_id = "id"
+        title = "title"
+        schedules = ["schedule1", "schedule2"]
+        element_type = "invalid_element_type"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        with self.assertRaises(ValueError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
 
-    # def test_create_element_if_title_is_none(self):
-    #     """ Check that create_element raises ValueError if title is None """
-    #     element = Mock(spec=Element)
-    #     element.title = None
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(ValueError):
-    #         self.element_management.create_element(element)
-
-    # def test_create_element_title_nonstring(self):
-    #     """ Check that create_element raises TypeError if title is not a string """
-    #     element = Mock(spec=Element)
-    #     element.title = 1
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(TypeError):
-    #         self.element_management.create_element(element)
-
-    # def test_create_element_if_schedules_is_none(self):
-    #     """ Check that create_element raises ValueError if schedules is None """
-    #     element = Mock(spec=Element)
-    #     element.schedules = None
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(ValueError):
-    #         self.element_management.create_element(element)
+    def test_create_element_invalid_element_id(self):
+        """ Check that create_element raises TypeError if the element id is 
+        invalid """
+        element_id = 1
+        title = "title"
+        schedules = ["schedule1", "schedule2"]
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        with self.assertRaises(TypeError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
     
-    # def test_create_element_schedules_nonlist(self):
-    #     """ Check that create_element raises TypeError if schedules is not a list """
-    #     element = Mock(spec=Element)
-    #     element.schedules = 1
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(TypeError):
-    #         self.element_management.create_element(element)
+    def test_create_element_invalid_title(self):
+        """ Check that create_element raises TypeError if the title is invalid """
+        element_id = "id"
+        title = 1
+        schedules = ["schedule1", "schedule2"]
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        with self.assertRaises(TypeError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
 
-    # def test_create_element_if_element_type_is_none(self):
-    #     """ Check that create_element raises ValueError if element_type is None """
-    #     element = Mock(spec=Element)
-    #     element.element_type = None
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(ValueError):
-    #         self.element_management.create_element(element)
+    def test_create_element_invalid_schedules(self):
+        """ Check that create_element raises ValueError if the schedules are 
+        invalid """
+        element_id = "id"
+        title = "title"
+        schedules = "invalid_schedules"
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        with self.assertRaises(TypeError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
 
-    # def test_create_element_element_type_nonstring(self):
-    #     """ Check that create_element raises TypeError if element_type is not a string """
-    #     element = Mock(spec=Element)
-    #     element.element_type = 1
-    #     self.element_management.element_exists = MagicMock(return_value=False)
-    #     with self.assertRaises(TypeError):
-    #         self.element_management.create_element(element)
-        
+    def test_create_element_invalid_schedules2(self):
+        """ Check that create_element raises ValueError if the schedules are 
+        invalid """
+        element_id = "id"
+        title = "title"
+        schedules = [1, 2]
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        with self.assertRaises(TypeError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
+
+    def test_create_element_invalid_schedules3(self):
+        """ Check that create_element raises TypeError if the schedules are 
+        invalid """
+        element_id = "id"
+        title = "title"
+        schedules = []
+        element_type = "event"
+        start = datetime(2021, 1, 1)
+        end = datetime(2021, 1, 2)
+        description = "description"
+        with self.assertRaises(ValueError):
+            self.element_management.create_element(element_type, element_id, title, schedules, start=start, end=end, description=description)
 
 if __name__ == '__main__':
     unittest.main()

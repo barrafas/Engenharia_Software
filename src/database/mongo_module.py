@@ -85,11 +85,15 @@ class MongoModule(DatabaseModule):
         Constructor method.
 
         Args:
-            host (str): The host address of the database.
-            port (int): The port of the database.
-            database_name (str): The name of the database.
-            user (str): The user of the database.
-            password (str): The password of the database.
+            _host (str): The host address of the database.
+            _port (int): The port of the database.
+            _database_name (str): The name of the database.
+            _user (str): The user of the database.
+            _password (str): The password of the database.
+            _client (MongoClient): The MongoClient object.
+            _db (Database): The Database object.
+            _collection (Collection): The Collection object.
+
         """
         self._host = host
         self._port = port
