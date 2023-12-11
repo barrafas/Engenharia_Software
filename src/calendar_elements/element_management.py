@@ -130,13 +130,6 @@ class ElementManagement(Observer):
             schedule_instance.elements = [element for element in \
                 schedule_instance.elements if element != element_id]
 
-
-        from src.user.user_management import UserManagement
-        user_manager = UserManagement.get_instance()
-        for user in users:
-            user.elements = [element for element in user.elements \
-                 if element != element_id]
-
         self.db_module.delete_data('elements', {'_id': element_id})
         if element_id in self.elements:
             remove = self.elements.pop(element_id)
@@ -158,18 +151,19 @@ class ElementManagement(Observer):
         """
         if element_type not in ['event', 'task', 'reminder']:
             raise ValueError(f"Element is not a valid type ({element_type})")
+        
         if not isinstance(element_id, str):
-            raise TypeError("Schedule ID must be a string")
+            raise TypeError("Element ID must be a string")
 
         if not isinstance(title, str):
             raise TypeError("Title must be a string")
 
         if not schedules:
             raise ValueError("Element must have at least one schedule")
+        
         if not isinstance(schedules, list):
             raise TypeError("Schedules must be a list")
 
-        # schedules só podem ser strin
         for schedule in schedules:
             if not isinstance(schedule, str):
                 raise TypeError("Schedule must be a string")
@@ -177,7 +171,7 @@ class ElementManagement(Observer):
         if self.element_exists(element_id):
             raise ElementAlreadyExistsError(
                     f"Element with id {element_id} already exists")
-
+        
         # Check if each schedule exists
         from src.schedule.schedule_management import ScheduleManagement
         schedule_manager = ScheduleManagement.get_instance()
@@ -185,13 +179,12 @@ class ElementManagement(Observer):
             if not schedule_manager.schedule_exists(schedule_id):
                 raise NonExistentIDError(
                         f"No schedule found with ID {schedule_id}")
-
-        element = ElementFactory.create_element(element_type, element_id, title,
-            schedules, **kwargs)
+        element = ElementFactory.create_element(element_type = element_type,
+                element_id = element_id, title = title, schedules = schedules,
+                **kwargs)
         element.attach(self)
         self.db_module.insert_data("elements", element.to_dict())
         self.elements[element_id] = element
-
         # Update each schedule
         for schedule in element.schedules:
             schedule_instance = schedule_manager.get_schedule(schedule)

@@ -5,6 +5,7 @@ from datetime import datetime
 from src.calendar_elements.element_types import ReminderElement
 from src.schedule.schedule_model import Schedule
 from src.schedule.schedule_management import ScheduleManagement
+from src.calendar_elements.element_management import ElementManagement
 from src.user.user_management import UserManagement
 from unittest.mock import MagicMock, PropertyMock
 from src.user.user_model import User
@@ -226,6 +227,20 @@ class TestReminderElement(unittest.TestCase):
             "element_type": self.element_type
         }
         self.assertDictEqual(self.reminder.to_dict(), expected_dict)
+
+    def test_changes_on_elements_calls_element_management_update_element(self):
+        """
+        Verify if the update_element method is called when the 
+        elements are changed.  
+        """
+        element = ReminderElement("element1", "title1", datetime(2021, 1, 1), ["schedule1"], "description1", "reminder")
+        element_management = ElementManagement.get_instance(database_module=MagicMock())
+        element_management.update_element = MagicMock()
+        element.attach(element_management)
+        # Act
+        element.schedules = ["schedule2"]
+        # Assert
+        element_management.update_element.assert_called_once_with("element1")
 
     def get_mock_schedule(self, repeat_user = False) -> tuple[callable, MagicMock, MagicMock]:
         """Mock function to return a schedule object"""

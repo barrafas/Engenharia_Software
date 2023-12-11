@@ -66,14 +66,8 @@ class EventElement(Element):
     @schedules.setter
     def schedules(self, schedules: [str]):
         """Sets the schedules of the event."""
-        self.notify()
         self.__schedules = schedules
-
-    @element_type.setter
-    def element_type(self, element_type: str):
-        """Sets the type of the event."""
         self.notify()
-        self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -256,12 +250,6 @@ class TaskElement(Element):
     def schedules(self, schedules: [str]):
         """Sets the schedules of the task."""
         self.__schedules = schedules
-        self.notify()
-
-    @element_type.setter
-    def element_type(self, element_type: str):
-        """Sets the type of the task."""
-        self.__element_type = element_type
         self.notify()
 
     def get_display_interval(self) -> (datetime, datetime):
@@ -464,12 +452,6 @@ class ReminderElement(Element):
             self.notify()
         else:
             raise TypeError("Schedules must be a list of strings")
-
-    @element_type.setter
-    def element_type(self, element_type: str):
-        """Sets the type of the reminder."""
-        self.__element_type = element_type
-        self.notify()
 
     def get_display_interval(self) -> (datetime, datetime):
         """

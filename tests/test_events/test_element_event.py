@@ -10,6 +10,7 @@ from typing import Optional
 from src.schedule.schedule_model import Schedule
 from src.schedule.schedule_management import ScheduleManagement
 from src.user.user_management import UserManagement
+from src.calendar_elements.element_management import ElementManagement
 
 
 class TestEventElement(unittest.TestCase):
@@ -241,7 +242,20 @@ class TestEventElement(unittest.TestCase):
         }
         self.assertDictEqual(self.event.to_dict(), expected_dict)
 
-    
+    def test_changes_on_elements_calls_element_management_update_element(self):
+        """
+        Verify if the update_element method is called when the 
+        elements are changed.  
+        """
+        element = EventElement("event1", "title1", datetime(2021, 1, 1), datetime(2021, 1, 2), ["schedule1"], "description1")
+        element_management = ElementManagement.get_instance(database_module=MagicMock())
+        element_management.update_element = MagicMock()
+        element.attach(element_management)
+        # Act
+        element.schedules = ["schedule2"]
+        # Assert
+        element_management.update_element.assert_called_once_with("event1")
+
     def get_mock_schedule(self, repeat_user = False) -> tuple[callable, MagicMock, MagicMock]:
         """Mock function to return a schedule object"""
 

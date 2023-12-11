@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta
 from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
 from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank, \
-                                EmailCantBeBlank, TupleWithLessThanTwoDatetimeObjects
+                                EmailCantBeBlank
 import bcrypt
 
 class TestUserModel(unittest.TestCase):
