@@ -532,14 +532,15 @@ class TestScheduleManagement(unittest.TestCase):
         schedule_id = "schedule1"
         element_id = "element1"
         mock_element = MagicMock()
-        mock_element.schedules = []
-        self.schedule_management.schedules[schedule_id] = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, ["element2"])
+        test_schedule = Schedule(schedule_id, "Title", "Description", {"user1": "read"}, ["element2"])
+        test_schedule.attach(self.schedule_management)
+        self.schedule_management.schedules[schedule_id] = test_schedule
         with patch.object(ElementManagement, 'get_element', return_value=mock_element), \
-            patch.object(ElementManagement, 'update_element', return_value=None) as mock_update_element:
+             patch.object(ElementManagement, 'update') as mock_update:
             # Act
             self.schedule_management.add_element_to_schedule(schedule_id, element_id)
             # Assert
-            mock_update_element.assert_called_once_with(element_id)
+            mock_update.assert_called_once_with(mock_element)
 
 if __name__ == '__main__':
     unittest.main()

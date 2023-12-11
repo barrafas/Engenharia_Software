@@ -4,6 +4,7 @@
 """
 from abc import ABC, abstractmethod
 from datetime import datetime
+from src.observer.observer import Observer
 
 
 class Element(ABC):
@@ -20,6 +21,10 @@ class Element(ABC):
             get_schedules: Returns the schedules of the event.
             to_dict: Returns a dictionary representation of the event.
     """
+
+    def __init__(self):
+        self.__observers = []
+
     @abstractmethod
     def get_display_interval(self) -> (datetime, datetime):
         """Returns the interval that the event should ocupate in the calendar.
@@ -69,3 +74,28 @@ class Element(ABC):
         Returns:
             dict -- The dictionary representation of the event.
         """
+
+    def attach(self, observer: Observer) -> None:
+        """
+            Attach an observer to the subject.
+
+            Arguments:
+                observer -- the observer to attach.
+        """
+        self.__observers.append(observer)
+
+    def detach(self, observer: Observer) -> None:
+        """
+            Detach an observer from the subject.
+
+            Arguments:
+                observer -- the observer to detach.
+        """
+        self.__observers.remove(observer)
+
+    def notify(self) -> None:
+        """
+            Notify all the observers that the subject has changed.
+        """
+        for observer in self.__observers:
+            observer.update(self)

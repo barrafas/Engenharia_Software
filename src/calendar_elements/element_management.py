@@ -1,5 +1,6 @@
-from src.database.database_module import DatabaseModule
+from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
 from src.calendar_elements.element_interface import Element
+from src.observer.observer import Observer, Subject
 
 class ElementDoesNotExistError(Exception):
     """
@@ -11,7 +12,7 @@ class ElementAlreadyExistsError(Exception):
     Custom exception class for when a element already exists.
     """
 
-class ElementManagement:
+class ElementManagement(Observer):
     """
         Class responsible for managing the elements in the database.
 
@@ -24,12 +25,12 @@ class ElementManagement:
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: DatabaseModule = None, elements: dict = None):
+    def get_instance(cls, database_module: MongoModule = None, elements: dict = None):
         if cls._instance is None:
             cls._instance = cls(database_module, elements)
         return cls._instance
 
-    def __init__(self, database_module: DatabaseModule, elements: dict = None):
+    def __init__(self, database_module: MongoModule, elements: dict = None):
         self.db_module = database_module
         self.elements = elements if elements is not None else {}
 
@@ -63,6 +64,7 @@ class ElementManagement:
             element_data = self.db_module.select_data("elements", {"_id": element_id})
             element = ElementFactory.create_element(**element_data)
             self.elements[element_id] = element
+            element.attach(self)
             return element
         else:
             raise ElementDoesNotExistError(f"Element with id {element_id} does not found")
@@ -98,22 +100,16 @@ class ElementManagement:
         element = self.get_element(element_id)
         schedule_manager = ScheduleManagement.get_instance()
         for schedule in element.schedules:
-
             schedule_instance = schedule_manager.get_schedule(schedule)
             schedule_instance.elements = [element for element in \
                 schedule_instance.elements if element != element_id]
-            
-            schedule_manager.update_schedule(schedule)
 
         # Update each user
         users = element.get_users()
-        #user_ids = [user.id for user in users]
         user_manager = UserManagement.get_instance()
         for user in users:
             user.elements = [element for element in user.elements \
                  if element != element_id]
-
-            user_manager.update_user(user.id)
 
         self.db_module.delete_data('elements', {'_id': element_id})
         if element_id in self.elements:
@@ -171,8 +167,15 @@ class ElementManagement:
         for schedule in element.schedules:
             schedule_instance = schedule_manager.get_schedule(schedule)
             schedule_instance.elements = schedule_instance.elements + [element_id]
-            schedule_manager.update_schedule(schedule)
 
         return element
             
 
+    def update(self, element: Subject) -> None:
+        """
+        Called when the element is updated.
+
+        Args:
+            element: The element that was updated.
+        """
+        self.update_element(element.id)
