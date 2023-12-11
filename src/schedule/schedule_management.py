@@ -259,4 +259,5 @@ class ScheduleManagement(Observer):
         Args:
             schedule: The schedule that was updated.
         """
+        print(f"Schedule {schedule.id} was updated.")
         self.update_schedule(schedule.id)

@@ -170,6 +170,7 @@ class ElementManagement(Observer):
             schedule_instance = schedule_manager.get_schedule(schedule)
             schedule_instance.elements = schedule_instance.elements + [element_id]
 
+        element.attach(self)
         return element
             
 
@@ -180,4 +181,5 @@ class ElementManagement(Observer):
         Args:
             element: The element that was updated.
         """
+        print(f"Element {element.id} was updated.")
         self.update_element(element.id)

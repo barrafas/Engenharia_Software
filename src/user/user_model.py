@@ -80,6 +80,7 @@ class User(Subject):
         """Sets the schedules of the event."""
         self.__schedules = schedules
         self.notify()
+        print(f"User schedules: {self.schedules}")
 
     def to_dict(self) -> dict:
         """
@@ -98,7 +99,7 @@ class User(Subject):
             "username": self.username,
             "email": self.email,
             "schedules": self.schedules,
-            "password": self.hashed_password,
+            "hashed_password": self.hashed_password,
             "user_preferences": self.user_preferences
         }
     

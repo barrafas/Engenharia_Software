@@ -161,6 +161,7 @@ class UserManagement(Observer):
         data = self.db_module.select_data('users', {"_id": user_id})
         print(data[0])
         user = User(**data[0])
+        user.attach(self)
         print(user)
         self.users[user_id] = user
         return user
@@ -218,4 +219,5 @@ class UserManagement(Observer):
         Args:
             user: The user that was updated.
         """
+        print(f"User {user.id} was updated.")
         self.update_user(user.id)
