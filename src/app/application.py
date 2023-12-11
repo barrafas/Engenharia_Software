@@ -156,6 +156,6 @@ class Application:
 
         element_management = ElementManagement.get_instance()
         event = element_management.create_element(element_type = event_type, element_id = event_name,
-        title = event_name, description = description, schedules = [schedule.id], **kwargs)
+        title = event_name, description = description, schedules = [schedule], **kwargs)
 
         print(f"\033[92mEvent created: {event}\033[0m")
