@@ -95,7 +95,6 @@ class Application:
         user_management = UserManagement.get_instance()
 
         user = user_management.create_user(username, email, password, user_id=user_id)
-        user.attach(user_management)
 
         if user:
             print(f"\033[92mSign up successful! User {username} created.\033[0m")
@@ -110,6 +109,8 @@ class Application:
 
             print(f"\033[92mSchedule created: {schedule}\033[0m")
             print(f"\033[92mUser schedules: {user.schedules}\033[0m")
+
+            self.login(user_id, password)
 
             return True
         else:

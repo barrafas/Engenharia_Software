@@ -25,51 +25,6 @@ class TkinterUI:
         # inicializa a view padrão
         self.view = SplashView(self.root)
 
-    def show_main_elements(self, elements):
-
-        main_ui = MainUI(self.root, elements)
-        
-
-        self.logout_button = main_ui.logout_button
-        self.go_back_button = main_ui.go_back_button
-        self.user_events = main_ui.user_events
-        self.calendar_days = main_ui.calendar_days
-
-    def show_sign_up_elements(self):
-        # Lógica para exibir elementos relacionados ao login
-        user_id_label = customtkinter.CTkLabel(self.root, text="Username (seu usuário para login)")
-        user_id_label.pack()
-        user_id_entry = customtkinter.CTkEntry(self.root)
-        user_id_entry.pack()
-
-        username_label = customtkinter.CTkLabel(self.root, text="Nome de exibição")
-        username_label.pack()
-        username_entry = customtkinter.CTkEntry(self.root)
-        username_entry.pack()
-
-        email_label = customtkinter.CTkLabel(self.root, text="Email")
-        email_label.pack()
-        email_entry = customtkinter.CTkEntry(self.root)
-        email_entry.pack()
-
-        password_label = customtkinter.CTkLabel(self.root, text="Senha")
-        password_label.pack()
-        password_entry = customtkinter.CTkEntry(self.root, show="*")
-        password_entry.pack()
-
-        sign_up_button = customtkinter.CTkButton(self.root, text="Cadastrar")
-        sign_up_button.pack()
-
-        go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
-        go_back_button.pack()
-
-        self.user_id_entry = user_id_entry
-        self.username_entry = username_entry
-        self.email_entry = email_entry
-        self.password_entry = password_entry
-        self.sign_up_button = sign_up_button
-        self.go_back_button = go_back_button
-
 
     def show_day_events(self, day_events, day):
         # Lógica para exibir elementos relacionados ao login

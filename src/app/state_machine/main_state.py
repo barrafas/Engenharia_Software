@@ -11,6 +11,10 @@ class MainState(State):
     def __init__(self, context):
         super().__init__(context)
 
+        if not self.logged_in_user():
+            # transition to splash state
+            self.transition_to(StatesEnum.SPLASH)
+
         self.events = {}
         self.events = self.context.get_user_events()
 
@@ -19,6 +23,11 @@ class MainState(State):
         # update the view in the ui
         self.context.ui.view = self.view
 
+    def logged_in_user(self):
+        """
+        Get the logged in user.
+        """
+        return self.context.user
 
     def render(self):
         print("Rendering main page...")
@@ -37,7 +46,7 @@ class MainState(State):
         Handle logout button click.
         """
         self.transition_to(StatesEnum.LOGGOUT)
-    
+
     def go_back(self, _event):
         """
         Handle go back button click.
@@ -51,8 +60,5 @@ class MainState(State):
         day = args
         self.transition_to(StatesEnum.DAYEVENTS, day=day)
 
-
-
     def __str__(self):
         return "Main State"
-        

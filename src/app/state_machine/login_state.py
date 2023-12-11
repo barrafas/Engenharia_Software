@@ -1,3 +1,6 @@
+"""
+Login State, here the user must input his credentials to login.
+"""
 from src.app.state import State, StatesEnum
 from src.app.views.login_view import LoginView
 
