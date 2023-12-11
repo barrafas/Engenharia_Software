@@ -8,8 +8,12 @@ from src.schedule.schedule_management import EmptyPermissionsError
 from src.schedule.schedule_management import DuplicatedIDError
 from src.schedule.schedule_management import NonExistentIDError
 from src.schedule.schedule_model import Schedule
-from tests.test_schedule.mocks import Element, ElementManagement
-from tests.test_schedule.mocks import User, UserManagement
+from src.user.user_management import UserManagement
+from src.calendar_elements.element_management import ElementManagement
+from src.user.user_model import User
+from src.calendar_elements.element_types import EventElement
+from src.calendar_elements.element_types import TaskElement
+from src.calendar_elements.element_types import ReminderElement
 from unittest.mock import Mock, MagicMock, patch, PropertyMock
 
 
@@ -80,15 +84,17 @@ class TestScheduleManagement(unittest.TestCase):
         elements = ["element2", "element3"]
         mock_user = MagicMock()
         mock_element = MagicMock()
-        with patch.object(UserManagement, 'get_user', return_value=mock_user), \
-        patch.object(UserManagement, 'update_user', return_value=None), \
-        patch.object(ElementManagement, 'get_element', return_value=mock_element), \
-        patch.object(ElementManagement, 'update_element', return_value=None):
+        with patch.object(self.user_management, 'get_user', return_value=mock_user), \
+        patch.object(self.user_management, 'update_user', return_value=None), \
+        patch.object(self.user_management, 'user_exists', return_value=True), \
+        patch.object(self.element_management, 'get_element', return_value=mock_element), \
+        patch.object(self.element_management, 'update_element', return_value=None), \
+        patch.object(self.element_management, 'element_exists', return_value=True):
             # Act
             result = self.schedule_management.create_schedule(schedule_id,
             title, description, permissions, elements)
             with self.subTest():
-                self._test_create_schedule_insert_data(schedule_id,
+               self._test_create_schedule_insert_data(schedule_id,
             title, description, permissions, elements)
             with self.subTest():
                 self._test_create_schedule_return(result)
@@ -100,6 +106,7 @@ class TestScheduleManagement(unittest.TestCase):
             with self.subTest():
                 self._test_create_schedule_raises_error_if_schedule_exists(
                     schedule_id, title, description, permissions, elements)
+
 
     def _test_create_schedule_insert_data(self, schedule_id, title,
             description, permissions, elements):
@@ -149,10 +156,12 @@ class TestScheduleManagement(unittest.TestCase):
         permissions = {"user1": "write", "user2": "read"}
         elements = ["element2", "element3"]
         # Act & Assert
-        for title in invalid_titles:
-            with self.assertRaises((ValueError, TypeError)):
-                self.schedule_management.create_schedule(schedule_id, title,
-                        description, permissions, elements)
+        with patch.object(self.user_management, 'user_exists', return_value=True), \
+        patch.object(self.element_management, 'element_exists', return_value=True):
+            for title in invalid_titles:
+                with self.assertRaises((ValueError, TypeError)):
+                    self.schedule_management.create_schedule(schedule_id, title,
+                            description, permissions, elements)
 
     def test_create_schedule_raises_error_with_invalid_description(self):
         """Test that create_schedule raises an error when the description is invalid"""
@@ -165,10 +174,12 @@ class TestScheduleManagement(unittest.TestCase):
         permissions = {"user1": "write", "user2": "read"}
         elements = ["element2", "element3"]
         # Act & Assert
-        for description in invalid_descriptions:
-            with self.assertRaises((ValueError, TypeError)):
-                self.schedule_management.create_schedule(schedule_id, title,
-                        description, permissions, elements)
+        with patch.object(self.user_management, 'user_exists', return_value=True), \
+        patch.object(self.element_management, 'element_exists', return_value=True):
+            for description in invalid_descriptions:
+                with self.assertRaises((ValueError, TypeError)):
+                    self.schedule_management.create_schedule(schedule_id, title,
+                            description, permissions, elements)
 
     def test_create_schedule_raises_error_with_non_string_id(self):
         """
@@ -183,9 +194,11 @@ class TestScheduleManagement(unittest.TestCase):
         permissions = {"user1": "write", "user2": "read"}
         elements = ["element2", "element3"]
         # Act & Assert
-        with self.assertRaises(TypeError):
-            self.schedule_management.create_schedule(schedule_id, title,
-                    description, permissions, elements)
+        with patch.object(self.user_management, 'user_exists', return_value=True), \
+        patch.object(self.element_management, 'element_exists', return_value=True):
+            with self.assertRaises(TypeError):
+                self.schedule_management.create_schedule(schedule_id, title,
+                        description, permissions, elements)
 
     def test_create_schedule_raises_error_with_empty_permissions(self):
         """
@@ -201,12 +214,44 @@ class TestScheduleManagement(unittest.TestCase):
         permissions = {}  # Empty permissions
         elements = ["element2", "element3"]
         # Act & Assert
-        with self.assertRaises(EmptyPermissionsError):
-            self.schedule_management.create_schedule(schedule_id, title,
-                    description, permissions, elements)
+        with patch.object(self.user_management, 'user_exists', return_value=True), \
+        patch.object(self.element_management, 'element_exists', return_value=True):
+            with self.assertRaises(EmptyPermissionsError):
+                self.schedule_management.create_schedule(schedule_id, title,
+                        description, permissions, elements)
 
+    # def test_create_schedule_updates_elements(self):
+    #     """Test that create_schedule updates the elements"""
+    #     # Arrange
+    #     schedule_id = "schedule1"
+    #     title = "Test Title"
+    #     description = "Test Description"
+    #     permissions = {"user1": {}}
+    #     elements = ["element1", "element2", "element3"]
+    #     mock_user = MagicMock()
+    #     mock_element = MagicMock()
+    #     with patch.object(self.schedule_management,
+    #                     'schedule_exists',
+    #                     return_value=False), \
+    #         patch.object(self.user_management, 'get_user',
+    #                 return_value=mock_user), \
+    #         patch.object(self.user_management, 'update_user',
+    #                 return_value=None) as mock_update_user,\
+    #         patch.object(self.user_management, 'user_exists', 
+    #                 return_value=True),\
+    #         patch.object(self.element_management, 'get_element',
+    #                 return_value=mock_element), \
+    #         patch.object(self.element_management, 'update') as mock_update:
+    #         # Act
+    #         self.schedule_management.create_schedule(schedule_id, title,
+    #                 description, permissions, elements)
+    #         # Assert
+    #         assert mock_update.call_count == len(elements)
+    #         for element_id in elements:
+    #             mock_update.assert_any_call(mock_element)
+
+    
     def test_create_schedule_updates_elements(self):
-        """Test that create_schedule updates the elements"""
         # Arrange
         schedule_id = "schedule1"
         title = "Test Title"
@@ -215,23 +260,21 @@ class TestScheduleManagement(unittest.TestCase):
         elements = ["element1", "element2", "element3"]
         mock_user = MagicMock()
         mock_element = MagicMock()
-        with patch.object(self.schedule_management, 'schedule_exists',
-                return_value=False), \
-            patch.object(UserManagement, 'get_user',
-                    return_value=mock_user), \
-            patch.object(UserManagement, 'update_user',
-                    return_value=None) as mock_update_user,\
-            patch.object(ElementManagement, 'get_element',
-                    return_value=mock_element), \
-            patch.object(ElementManagement, 'update_element',
-                    return_value=None) as mock_update_element:
+        mock_element.schedules = []
+
+        with patch.object(self.user_management, 'user_exists', return_value=True), \
+             patch.object(self.user_management, 'get_user', return_value=mock_user), \
+             patch.object(self.element_management, 'element_exists', return_value=True), \
+             patch.object(self.element_management, 'get_element', return_value=mock_element), \
+             patch.object(self.schedule_management, 'schedule_exists', return_value=False):
+
             # Act
-            self.schedule_management.create_schedule(schedule_id, title,
-                    description, permissions, elements)
+            self.schedule_management.create_schedule(schedule_id, title, description, permissions, elements)
+
             # Assert
-            assert mock_update_element.call_count == len(elements)
-            for element_id in elements:
-                mock_update_element.assert_any_call(element_id)
+            for _ in elements:
+                self.assertIn(schedule_id, mock_element.schedules)
+
 
     def test_create_schedule_raises_error_for_nonexistent_element(self):
         """
@@ -395,13 +438,13 @@ class TestScheduleManagement(unittest.TestCase):
         permissions = {"user1": "write", "user2": "read"}
         elements = ["element2", "element3"]
         self.schedule_management.db_module.select_data = MagicMock(
-            return_value={
+            return_value=[{
             '_id': schedule_id, 
             'title': title, 
             'description': description, 
             'permissions': permissions, 
             'elements': elements
-        })
+        }])
         self.schedule_management.schedule_exists = MagicMock(return_value=True)
         # Act
         result = self.schedule_management.get_schedule(schedule_id)

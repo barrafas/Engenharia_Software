@@ -33,12 +33,6 @@ class EmailCantBeBlank(Exception):
     Custom exception class for when a email is blank.
     """
 
-class TupleWithLessThanTwoDatetimeObjects(Exception):
-    """
-    Custom exception class for when a tuple with less than two datetime objects
-    is passed to the check_disponibility method.
-    """
-
 class User(Subject):
     """
     User class
@@ -152,8 +146,6 @@ class User(Subject):
 
         schedule_management = ScheduleManagement.get_instance()
         elements = []
-        if not schedules:
-            schedules = self.schedules
         for schedule in schedules:
             schedule = schedule_management.get_schedule(schedule)
             elements += schedule.get_elements()
@@ -244,9 +236,9 @@ class User(Subject):
         """
         if isinstance(time, tuple) is False:
             raise TypeError("Time must be a tuple")
-        if len(time) < 2:
-            raise TupleWithLessThanTwoDatetimeObjects(
-                "The tuple must have at least two datetime objects")
+        if len(time) != 2:
+            raise TypeError(
+                "The tuple must have at two datetime objects")
         if (isinstance(time[0], datetime) is False) or \
                 (isinstance(time[1], datetime) is False):
             raise TypeError("The tuple must have datetime objects")
