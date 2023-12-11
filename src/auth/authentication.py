@@ -8,8 +8,6 @@ Exceptions:
     UserNotFound
 """
 import bcrypt
-
-from ..database.database_module import DatabaseModule
 from ..user.user_management import UserManagement
 
 # create a custom exception
@@ -30,20 +28,15 @@ class AuthenticationModule:
         user_management_module
     """
 
-    def __init__(self,
-                database_module: DatabaseModule):
+    def __init__(self):
         """
         Constructor for AuthenticationModule
 
-        Parameters:
-            database_module (DatabaseModule): database module
-
         Attributes:
-            database_module (DatabaseModule): database module
             user_management_module (UserManagement): user management module
         """
-        self.database_module = database_module
-        self.user_management_module = UserManagement(self.database_module)
+        # get the instance of the user management module
+        self.user_management_module = UserManagement.get_instance()
 
     def authenticate_user(self,
                             username: str,
