@@ -4,8 +4,8 @@ Módulo responsável por gerenciar a interface gráfica do programa.
 import customtkinter
 from src.app.views.splash_view import SplashView
 
-customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "green", "dark-blue"
 
 class TkinterUI:
     """
