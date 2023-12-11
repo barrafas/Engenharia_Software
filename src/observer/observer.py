@@ -1,5 +1,5 @@
 """
-Module that contains the observer interface for the schedule.
+Module that contains the observer interface.
 """
 from abc import ABC, abstractmethod
 
@@ -7,10 +7,10 @@ class Subject(ABC): ...
 
 class Observer(ABC):
     """
-    Observer interface, used to implement the observer pattern in the schedule.
-    solve the problem of circular dependencies between the schedule and the 
-    schedule management.
-    provide a update method that is called when the schedule is updated.
+    Observer interface, used to implement the observer pattern.
+    Solve the problem of circular dependencies between the instance and 
+    their manager.
+    Provide a update method that is called when the instance is updated.
     """
 
     @abstractmethod

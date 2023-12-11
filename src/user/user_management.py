@@ -7,8 +7,9 @@ Attributes:
     users: Dict of users, where the key is the id
 """
 import bcrypt
-from src.database.mongo_module import MongoModule
+from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
 from .user_model import User, UsernameCantBeBlank
+from src.observer.observer import Observer, Subject
 
 class UserAlreadyExistsError(Exception):
     """
@@ -16,13 +17,7 @@ class UserAlreadyExistsError(Exception):
     """
 
 
-class UserDoesNotExistError(Exception):
-    """
-    Custom exception class for when a user does not exist.
-    """
-
-
-class UserManagement:
+class UserManagement(Observer):
     """
     UserManagement class
     Responsible for managing the users in the database
@@ -34,23 +29,23 @@ class UserManagement:
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule = None):
+    def get_instance(cls, database_module: MongoModule = None, users: dict = None):
         if not cls._instance:
-            cls._instance = cls(database_module)
+            cls._instance = cls(database_module, users)
         return cls._instance
 
-    def __init__(self, database_module: MongoModule):
+    def __init__(self, database_module: MongoModule, users: dict = None):
         """
         Constructor for the UserManagement class
 
         Args:
             database_module: Database module
         """
-        self.db = database_module
-        self.users = {}
+        self.db_module = database_module
+        self.users = users if users is not None else {}
 
     def create_user(self, username: str, email: str, password: str,
-                    user_preferences: dict = None, id: str = None) -> User:
+                    user_preferences: dict = None, user_id: str = None) -> User:
         """
         Create a new user
 
@@ -68,10 +63,10 @@ class UserManagement:
         email = email.strip()
 
         if username == "":
-            raise UsernameCantBeBlank("Nome de usuário não pode ser vazio")
+            raise UsernameCantBeBlank("Username cannot be blank")
 
-        if self.user_exists(username):
-            raise UserAlreadyExistsError(f'Usuário {username} já existe')
+        if self.user_exists(user_id):
+            raise NonExistentIDError(f'User {user_id} already exists')
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
@@ -79,7 +74,7 @@ class UserManagement:
         # if not id:
         #     id = self.db.get_next_id("users")
 
-        user_info = {"_id": id,
+        user_info = {"_id": user_id,
                     "username": username,
                      "email": email, "schedules": [], 
                      "hashed_password": hashed_password, 
@@ -88,36 +83,49 @@ class UserManagement:
         self.db.insert_data('users', {**user_info})
 
         user = User(**user_info)
-        self.users[id] = user
+        self.users[user_id] = user
+        user.attach(self)
         return user
 
-    def delete_user(self, id: str) -> None:
+    def delete_user(self, user_id: str) -> None:
         """
         Delete a user
 
         Args:
-            username: Username
+            user_id: User ID
 
         Returns:
             Void
         """
 
-        if not self.user_exists(id):
-            raise UserDoesNotExistError(f'Usuário {id} não existe')
+        if not self.user_exists(user_id):
+            raise NonExistentIDError(f'User {user_id} does not exist')
 
-        self.db.delete_data('users', {"_id": id})
+        user = self.get_user(user_id)
+        # Update each schedule
+        schedule_manager = ScheduleManagement.get_instance()
+        for schedule in user.schedules:
+            schedule_instance = schedule_manager.get_schedule(schedule)
+            new_permissions = schedule_instance.permissions
+            new_permissions.pop(user_id)
+            schedule_instance.permissions = new_permissions
 
-    def user_exists(self, id: str) -> bool:
+        self.db.delete_data('users', {"_id": user_id})
+        if user_id in self.users:
+            remove = self.users.pop(user_id)
+            del remove
+
+    def user_exists(self, user_id: str) -> bool:
         """
         Check if a user exists
 
         Args:
-            username: Username
+            user_id: User ID
         
         Returns:
             True if the user exists, False otherwise
         """
-        data = self.db.select_data('users', {"_id": id})
+        data = self.db.select_data('users', {"_id": user_id})
         return len(data) > 0
 
     def hash_password(self, password: str) -> str:
@@ -134,57 +142,73 @@ class UserManagement:
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_password
 
-    def get_user(self, id: str) -> User:
+    def get_user(self, user_id: str) -> User:
         """
         Get a user
 
         Args:
-            username: Username
+            user_id: User ID
 
         Returns:
             The user if it exists, None otherwise
         """
-        data = self.db.select_data('users', {"_id": id})
+        data = self.db.select_data('users', {"_id": user_id})
         print(data[0])
         user = User(**data[0])
         print(user)
-        self.users[user._id] = user
+        self.users[user_id] = user
         return user
 
-    def update_user(self, id: str) -> None:
+    def update_user(self, user_id: str) -> None:
         """
         Updates a user in the db based on its current local state
 
         Args:
-            user: User
+            user_id: User ID
 
         Returns:
             Void
         """
-        if not self.user_exists(id):
-            raise UserDoesNotExistError(f'Usuário {id} não existe')
+        if not self.user_exists(user_id):
+            raise NonExistentIDError(f'User {user_id} does not exist')
         
-        user = self.users[id]
+        user = self.users[user_id]
         user_info = user.to_dict()
-        self.db.update_data('users', {"_id": id}, user_info)
+        self.db.update_data('users', {"_id": user_id}, user_info)
         return
 
 
 
-    def add_schedule_to_user(self, user_id: str, schedule_id: str) -> None:
+    def add_schedule_to_user(self, user_id: str, schedule_id: str, permission:str) -> None:
         """Function to add a schedule to a user
 
         Arguments:
             user_id -- ID of the user
             schedule_id -- ID of the schedule
+            permission -- Permission of the user in the schedule
 
         Returns:
             None
         """
+        schedule_manager = ScheduleManagement.get_instance()
         if not self.user_exists(user_id):
-            raise UserDoesNotExistError(f'Usuário {user_id} não existe')
+            raise NonExistentIDError(f'User {user_id} does not exist')
+        
 
-        user = self.users[user_id]
-        user.schedules.append(schedule_id)
-        self.update_user(user_id)
+        user = self.get_user(user_id)
+        if schedule_id not in user.schedules:
+            user.schedules = user.schedules + [schedule_id]
+            schedule = schedule_manager.get_schedule(schedule_id)
+            schedule.permissions = {**schedule.permissions, user_id: permission}
+        else:
+            raise DuplicatedIDError(f'Usuário {user_id} já está no schedule {schedule_id}')
         return
+
+    def update(self, schedule: Subject) -> None:
+        """
+        Called when the schedule is updated.
+
+        Args:
+            schedule: The schedule that was updated.
+        """
+        self.update_schedule(schedule.id)

@@ -4,7 +4,6 @@ Módulo responsável por criar os elementos do calendário
 Classes:
     EventFactory: classe responsável por criar os elementos do calendário
 """
-from ..calendar_elements.element_types import EventElement, TaskElement, ReminderElement
 from ..calendar_elements.element_interface import Element
 
 
@@ -29,11 +28,12 @@ class ElementFactory:
         Returns:
             Element -- An instance of the specified calendar element type.
         """
+        from ..calendar_elements.element_types import EventElement, TaskElement, ReminderElement
         if element_type == "event":
-            return EventElement(element_id, title, kwargs['start'], kwargs['end'], schedules)
+            return EventElement(element_id, title, kwargs['start'], kwargs['end'], schedules, kwargs['description'])
         elif element_type == "task":
-            return TaskElement(element_id, title, kwargs['due_date'], schedules)
+            return TaskElement(element_id, title, kwargs['due_date'], schedules, kwargs['description'])
         elif element_type == "reminder":
-            return ReminderElement(element_id, title, kwargs['reminder_date'], schedules)
+            return ReminderElement(element_id, title, kwargs['reminder_date'], schedules, kwargs['description'])
         else:
             raise ValueError(f"Unsupported element type: {element_type}")

@@ -12,7 +12,7 @@ from tests.test_schedule.mocks import Element,\
                                         ElementManagement,\
                                         User,\
                                         UserManagement
-from .schedule_observer import Observer, Subject
+from src.observer.observer import Observer, Subject
 
 class Schedule(Subject):
     """
@@ -74,7 +74,7 @@ class Schedule(Subject):
             self.__permissions = value
             self.notify()
         else:
-            raise ValueError("Permissions must be a dictionary of strings")
+            raise TypeError("Permissions must be a dictionary of strings")
 
     @elements.setter
     def elements(self, value):
@@ -82,7 +82,7 @@ class Schedule(Subject):
             self.__elements = value
             self.notify()
         else:
-            raise ValueError("Elements must be a list of strings")
+            raise TypeError("Elements must be a list of strings")
 
     def get_elements(self, types =  []) -> list:
         """
