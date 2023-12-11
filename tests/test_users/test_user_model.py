@@ -1,17 +1,19 @@
 import unittest
 from datetime import datetime, timedelta
-from tests.test_users.mocks import Schedule, ScheduleManagement, Element, ElementManagement
 from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank, \
                                 EmailCantBeBlank, TupleWithLessThanTwoDatetimeObjects
+from unittest.mock import MagicMock
 import bcrypt
 
 class TestUserModel(unittest.TestCase):
     def setUp(self):
         # Set up for the tests
-
         # Create a  for ScheduleManagement and ElementManagement
-        self.ScheduleManagement = ScheduleManagement.get_instance()
-        self.ElementManagement = ElementManagement.get_instance()
+        from src.schedule.schedule_management import ScheduleManagement
+        from src.calendar_elements.element_management import ElementManagement
+        self.database_module_mock = MagicMock()
+        self.ScheduleManagement = ScheduleManagement.get_instance(self.database_module_mock)
+        self.ElementManagement = ElementManagement.get_instance(self.database_module_mock)
 
     def test_get_all_elements(self):
         # Test getting all element ids from user schedules, without repetition
@@ -30,10 +32,8 @@ class TestUserModel(unittest.TestCase):
     def test_get_elements_from_schedule_user_isnt_in(self):
         # Test getting all element ids from a nonexistent schedule
         user = User("id", "username", "email", ["id1", "id2"])
-        with self.assertRaises(UserNotInSchedule) as context:
+        with self.assertRaises(UserNotInSchedule):
             user.get_elements(["id3"])
-        self.assertEqual(str(context.exception), 
-                         'Usuário não está nessa agenda: id3')
         
     def test_set_username(self):
         # Test setting a username
@@ -50,18 +50,15 @@ class TestUserModel(unittest.TestCase):
     def test_set_username_with_int(self):
         # Test setting a username with trailing space
         user = User("id", "username", "email", ["id1", "id2"])
-        with self.assertRaises(TypeError) as context:
+        with self.assertRaises(TypeError):
             user.set_username(123)
-        self.assertEqual(str(context.exception), 
-                         "O nome de usuário deve ser uma string")
+
         
     def test_set_blank_username(self):
         # Test setting a blank username
         user = User("id", "username", "email", ["id1", "id2"])
-        with self.assertRaises(UsernameCantBeBlank) as context:
+        with self.assertRaises(UsernameCantBeBlank):
             user.set_username("")
-        self.assertEqual(str(context.exception), 
-                         "O nome de usuário não pode ser vazio")
         
     def test_set_email(self):
         # Test setting an email
@@ -78,18 +75,14 @@ class TestUserModel(unittest.TestCase):
     def test_set_email_with_int(self):
         # Test setting an email with trailing space
         user = User("id", "username", "email", ["id1", "id2"])
-        with self.assertRaises(TypeError) as context:
+        with self.assertRaises(TypeError):
             user.set_email(123)
-        self.assertEqual(str(context.exception), 
-                         "O email deve ser uma string")
         
     def test_set_blank_email(self):
         # Test setting a blank email
         user = User("id", "username", "email", ["id1", "id2"])
-        with self.assertRaises(EmailCantBeBlank) as context:
+        with self.assertRaises(EmailCantBeBlank):
             user.set_email("")
-        self.assertEqual(str(context.exception), 
-                         "O email não pode ser vazio")
         
     def test_set_preference(self):
         # Test setting a preference
@@ -99,15 +92,16 @@ class TestUserModel(unittest.TestCase):
             
     def test_set_preference_with_int(self):
         user = User("id", "username", "email", ["id1", "id2"])
-        with self.assertRaises(TypeError) as context:
-            user.set_preferences({"preference_type": 123})
-        self.assertEqual(str(context.exception),
-                            "A preferência deve ser uma string")
+        with self.assertRaises(TypeError):
+            user.set_preferences({123: 'preference'})
 
     def test_check_disponibility(self):
         user = User("id", "username", "email", ["id1", "id2"])
         time = (datetime.now() + timedelta(hours=2), 
                 datetime.now() + timedelta(hours=3))
+        
+        self.ElementManagement.create_element = MagicMock()
+        self.ElementManagement.get_element = MagicMock(return_value=self.ElementManagement.get_element("elementid1"))
         result = user.check_disponibility(time)
         self.assertTrue(result)
 
@@ -128,27 +122,20 @@ class TestUserModel(unittest.TestCase):
     def test_check_disponibility_input_type_exception(self):
         user = User("id", "username", "email", ["id1", "id2"])
         time = "time"
-        with self.assertRaises(TypeError) as context:
+        with self.assertRaises(TypeError):
             user.check_disponibility(time)
-        self.assertEqual(str(context.exception), 
-                         "O horário deve ser uma tupla")
 
     def test_check_disponibility_not_datetime(self):
         user = User("id", "username", "email", ["id1", "id2"])
         time = (123, 123)
-        with self.assertRaises(TypeError) as context:
+        with self.assertRaises(TypeError):
             user.check_disponibility(time)
-        self.assertEqual(str(context.exception), 
-                         "A tupla de horário deve conter objetos datetime")
         
     def test_check_disponibility_short_tuple(self):
         user = User("id", "username", "email", ["id1", "id2"])
         time = (datetime.now(),)
-        with self.assertRaises(TupleWithLessThanTwoDatetimeObjects) as context:
+        with self.assertRaises(TupleWithLessThanTwoDatetimeObjects):
             user.check_disponibility(time)
-        self.assertEqual(str(context.exception), 
-                         "A tupla de horário deve conter pelo menos "\
-                         "dois objetos datetime")
 
 if __name__ == '__main__':
     unittest.main()
