@@ -114,7 +114,7 @@ class User(Subject):
             "username": self.username,
             "email": self.email,
             "schedules": self.schedules,
-            "hashed_password": self.hashed_password,
+            "hashed_password": self.get_hashed_password(),
             "user_preferences": self.user_preferences
         }
 
