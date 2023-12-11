@@ -127,10 +127,10 @@ class User(Subject):
             A list of elements ids the user is a part of
         '''
         if not schedules:
-            schedules = self.get_schedules()
+            schedules = self.schedules
         else:
             for schedule in schedules:
-                if schedule not in self.get_schedules():
+                if schedule not in self.schedules:
                     raise UserNotInSchedule(
                         f"Usuário não está nessa agenda: {schedule}")
     

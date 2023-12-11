@@ -87,9 +87,6 @@ class Application:
                                         schedule_description, schedule_permissions, [])
 
             print(f"\033[92mSchedule created: {schedule}\033[0m")
-
-            user_management.add_schedule_to_user(user_id, schedule_id, "owner")
-            print(f"\033[92mSchedule {schedule_id} added to user {user_id}\033[0m")
             print(f"\033[92mUser schedules: {user.schedules}\033[0m")
 
             return True
