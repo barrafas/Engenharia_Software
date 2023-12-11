@@ -8,6 +8,7 @@ class MainUI:
         self.logout_button = None
         self.go_back_button = None
         self.user_events = None
+        self.calendar_days = None
 
         self.elements = elements
 
@@ -112,11 +113,15 @@ class MainUI:
             "width": 50,
             "height": 40
         }
+
+        self.calendar_days = {}
+
         for w, week in enumerate(cal.monthdayscalendar(year, month), 2):
             for d, day in enumerate(week):
                 if day != 0:
                     day_button = customtkinter.CTkButton(self.calendar, text=day, width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
+                    self.calendar_days[(year, month, day)] = day_button
                 else:
                     day_button = customtkinter.CTkButton(self.calendar, text=" ", width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
