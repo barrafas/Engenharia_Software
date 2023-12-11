@@ -8,6 +8,7 @@ Exceptions:
     UserNotFound
 """
 import bcrypt
+
 from ..user.user_management import UserManagement
 
 class UserManagementNotInitializedError(Exception):
@@ -28,7 +29,6 @@ class AuthenticationModule:
         verify_password
 
     Attributes:
-        database_module
         user_management_module
     """
 

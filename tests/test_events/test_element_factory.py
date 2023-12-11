@@ -2,7 +2,7 @@
 
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock
+
 from src.calendar_elements.element_factory import ElementFactory
 from src.calendar_elements.element_types import EventElement, TaskElement, ReminderElement
 
@@ -53,7 +53,8 @@ class TestElementFactory(unittest.TestCase):
 
     def test_create_element_invalid_type(self):
         """Test the creation of an element with an invalid type."""
-        # Verify if an exception is raised when trying to create an element with an invalid type
+        # Verify if an exception is raised when trying to create an element 
+        # with an invalid type
         with self.assertRaises(ValueError):
             self.factory.create_element(element_type = "invalid_type",
                                         element_id = "4",
@@ -62,5 +63,5 @@ class TestElementFactory(unittest.TestCase):
                                         start=datetime(2023, 1, 1),
                                         end=datetime(2023, 1, 2))
 
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == '__main__': # pragma: no cover
+    unittest.main() # pragma: no cover

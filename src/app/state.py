@@ -4,6 +4,7 @@ and the enum of all possible states.
 """
 from abc import ABC, abstractmethod
 from enum import Enum, auto
+from src.app.application import Application
 
 class StatesEnum(Enum):
     """
@@ -24,7 +25,7 @@ class State(ABC):
     transition the Application to another State.
     """
 
-    def __init__(self, context):
+    def __init__(self, context: Application):
         self.context = context
         self.view = context.ui.view
 

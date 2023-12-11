@@ -28,9 +28,8 @@ class Schedule(Subject):
                 schedule_id -- id of the schedule.
                 title -- title of the schedule.
                 description -- description of the schedule.
-                permissions -- list of tuples (user_id, permission_type) 
-                        that represent the permissions of the users in the 
-                        schedule.
+                permissions -- dict where the key is the user id and the value
+                                 is the permission type.
                 elements -- list of elements ids that are displayed in the 
                             schedule.
         """

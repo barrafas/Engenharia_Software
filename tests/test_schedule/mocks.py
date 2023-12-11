@@ -106,6 +106,9 @@ class ElementManagement:
     def update_element(self, element_id: str) -> None:
         pass
 
+    # def update(self, subject: Schedule) -> None:
+    #     pass
+
 class User:
     def __init__(self, user_id: str):
         self.__id = user_id
