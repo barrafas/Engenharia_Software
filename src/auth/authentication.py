@@ -8,6 +8,7 @@ Exceptions:
     UserNotFound
 """
 import bcrypt
+
 from ..user.user_management import UserManagement
 
 class UserManagementNotInitializedError(Exception):
