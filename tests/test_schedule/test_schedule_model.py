@@ -292,7 +292,7 @@ class TestScheduleModel(unittest.TestCase):
         schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
         invalid_elements = "element2"
         # Act & Assert
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             schedule.elements = invalid_elements
 
     def test_changes_on_elements_calls_schedule_management_update_schedule(self):
