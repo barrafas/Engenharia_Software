@@ -44,12 +44,12 @@ from src.database.utils import TimeoutDecorator
 
 class DuplicatedIDError(Exception):
     """Raised when the ID already exists"""
-    pass
 
 class NonExistentIDError(Exception):
     """Raised when the ID does not exist"""
-    pass
 
+class ConnectionDBError(Exception):
+    """Raised when the connection to the database fails"""
 
 class MongoModule(DatabaseModule):
     """
@@ -120,9 +120,9 @@ class MongoModule(DatabaseModule):
             Exception: If already connected to the database.
         """
         # time.sleep(10) # Here just to test the timeout decorator
-        
+
         if self._client:
-            raise Exception("Already connected to the database.")
+            raise ConnectionDBError("Already connected to the database.")
 
         self._client = pymongo.MongoClient(
             host=self._host,
@@ -139,7 +139,7 @@ class MongoModule(DatabaseModule):
             Exception: If not connected to the database.
         """
         if not self._client:
-            raise Exception("Not connected to the database.")
+            raise ConnectionDBError("Not connected to the database.")
         # disconnect from the database
         self._client.close()
 
@@ -160,7 +160,7 @@ class MongoModule(DatabaseModule):
             Exception: If not connected to the database.
         """
         if not self._client:
-            raise Exception("Not connected to the database.")
+            raise ConnectionError("Not connected to the database.")
         self._db[collection_name].insert_one(data)
 
     def delete_data(self,

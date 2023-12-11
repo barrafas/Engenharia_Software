@@ -21,7 +21,6 @@ class Observer(ABC):
         Arguments:
             schedule -- the schedule that was updated.
         """
-        pass
 
 class Subject(ABC):
     """
@@ -49,11 +48,10 @@ class Subject(ABC):
         Arguments:
             observer -- the observer to detach.
         """
-        pass
 
     @abstractmethod
     def notify(self) -> None:
         """
         Notify all the observers that the subject has changed.
         """
-        pass
+        
