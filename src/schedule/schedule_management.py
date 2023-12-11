@@ -45,13 +45,12 @@ class ScheduleManagement(Observer):
         schedules: Dictionary of schedules, where the key is the schedule ID
             and the value is the schedule instance
     """
-
     _instance = None
 
     @classmethod
     def get_instance(cls,
                     database_module: MongoModule = None,
-                    schedules: dict = None):
+                    schedules: dict = None) -> 'ScheduleManagement':
         """
         Get the instance of the ScheduleManagement class
         """
@@ -77,7 +76,8 @@ class ScheduleManagement(Observer):
         self.db_module = database_module
         self.schedules = schedules if schedules else {}
 
-    def schedule_exists(self, schedule_id: str) -> bool:
+    def schedule_exists(self,
+                        schedule_id: str) -> bool:
         """
         Check if a schedule exists
 
@@ -164,7 +164,8 @@ class ScheduleManagement(Observer):
         schedule.attach(self)
         return schedule
 
-    def get_schedule(self, schedule_id: str) -> Schedule:
+    def get_schedule(self,
+                     schedule_id: str) -> Schedule:
         """
         Get a schedule by its ID
 
@@ -191,7 +192,8 @@ class ScheduleManagement(Observer):
             raise NonExistentIDError(
                 f"No schedule found with ID {schedule_id}")
 
-    def update_schedule(self, schedule_id: str) -> None:
+    def update_schedule(self,
+                        schedule_id: str) -> None:
         """
         Updates a schedule in the database
 
@@ -270,7 +272,8 @@ class ScheduleManagement(Observer):
             raise DuplicatedIDError(f"Element with ID {element_id} already \
                                     exists in schedule {schedule_id}")
 
-    def update(self, subject: Subject) -> None:
+    def update(self,
+               subject: Subject) -> None:
         """
         Called when the schedule is updated.
 

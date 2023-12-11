@@ -8,7 +8,6 @@ Classes:
 
 from src.observer.observer import Observer, Subject
 
-
 class Schedule(Subject):
     """
         Class that represents a schedule:
@@ -21,8 +20,12 @@ class Schedule(Subject):
         Each user can have a different permission in a schedule.
     """
 
-    def __init__(self, schedule_id: str, title: str, description: str,
-                 permissions: dict, elements: [str] = None):
+    def __init__(self,
+                 schedule_id: str,
+                 title: str,
+                 description: str,
+                 permissions: dict,
+                 elements: [str] = None):
         """
             Schedule constructor.
             Arguments:
