@@ -36,9 +36,9 @@ Usage:
     multiple instances of the class refer to the same database connection.
 """
 import pymongo
+
 from src.database.database_module import DatabaseModule
 from src.database.utils import TimeoutDecorator
-
 
 class DuplicatedIDError(Exception):
     """Raised when the ID already exists"""

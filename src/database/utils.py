@@ -9,6 +9,7 @@ Functions:
 """
 import functools
 import platform
+
 from src.database.database_module import DatabaseModule
 
 class TimeExceedError(Exception):

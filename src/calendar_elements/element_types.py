@@ -3,7 +3,11 @@
     elements that can be displayed in the calendar.
 """
 from datetime import datetime, timedelta
+
+from ..schedule.schedule_management import ScheduleManagement
+from ..user.user_management import UserManagement
 from .element_interface import Element
+
 
 class EventElement(Element):
     """
@@ -15,13 +19,13 @@ class EventElement(Element):
     """
 
     def __init__(self,
-                element_id: str,
-                title: str,
-                start: datetime,
-                end: datetime,
-                schedules: [str],
-                description: str = None,
-                element_type: str = "event"):
+                 element_id: str,
+                 title: str,
+                 start: datetime,
+                 end: datetime,
+                 schedules: [str],
+                 description: str = None,
+                 element_type: str = "event"):
         """
         EventElement constructor.
 
@@ -90,7 +94,7 @@ class EventElement(Element):
         # Return a list of Schedules objects
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
-    def get_users(self, filter_schedules = []) -> list:
+    def get_users(self, filter_schedules=[]) -> list:
         """
         Returns the users that are assigned to the event.
 
@@ -197,13 +201,13 @@ class TaskElement(Element):
     """
 
     def __init__(self,
-                element_id: str,
-                title: str,
-                due_date: datetime,
-                schedules: [str],
-                description: str = None,
-                state: str = None,
-                element_type: str = "task"):
+                 element_id: str,
+                 title: str,
+                 due_date: datetime,
+                 schedules: [str],
+                 description: str = None,
+                 state: str = None,
+                 element_type: str = "task"):
         """
         TaskElement constructor.
 
@@ -279,7 +283,7 @@ class TaskElement(Element):
         schedule_manager = ScheduleManagement.get_instance()
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
-    def get_users(self, filter_schedules = []) -> list:
+    def get_users(self, filter_schedules=[]) -> list:
         """
         Returns the users that are assigned to the task.
 
@@ -310,11 +314,11 @@ class TaskElement(Element):
         if due_date is None:
             raise ValueError("Due date cannot be None")
         elif not isinstance(due_date, datetime):
-            raise TypeError(f"Due date must be a datetime object, not {type(due_date)}")
+            raise TypeError(
+                f"Due date must be a datetime object, not {type(due_date)}")
         else:
             self.due_date = due_date
             self.notify()
-
 
     def set_state(self, state: str):
         """
@@ -389,6 +393,7 @@ class TaskElement(Element):
             "schedules": self.__schedules
         }
 
+
 class ReminderElement(Element):
     """
     A class that represents a reminder.
@@ -398,12 +403,12 @@ class ReminderElement(Element):
     """
 
     def __init__(self,
-                element_id: str,
-                title: str,
-                reminder_date: datetime,
-                schedules: [str],
-                description: str = None,
-                element_type: str = "reminder"):
+                 element_id: str,
+                 title: str,
+                 reminder_date: datetime,
+                 schedules: [str],
+                 description: str = None,
+                 element_type: str = "reminder"):
         """
         ReminderElement constructor.
 
@@ -480,7 +485,7 @@ class ReminderElement(Element):
         # Return a list of Schedules objects
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
 
-    def get_users(self, filter_schedules = []) -> list:
+    def get_users(self, filter_schedules=[]) -> list:
         """
         Returns the users that are assigned to the reminder.
 
@@ -545,7 +550,7 @@ class ReminderElement(Element):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
                 raise ValueError(
-                        "Description cannot have more than 500 characters")
+                    "Description cannot have more than 500 characters")
         self.description = description
         self.notify()
 
@@ -565,6 +570,3 @@ class ReminderElement(Element):
             "schedules": self.__schedules
         }
 
-# Importing here to avoid circular imports
-from ..schedule.schedule_management import ScheduleManagement
-from ..user.user_management import UserManagement

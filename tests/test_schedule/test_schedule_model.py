@@ -1,13 +1,24 @@
 import unittest
 from src.schedule.schedule_model import Schedule
-from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
-from unittest.mock import MagicMock
+#from tests.test_schedule.mocks import Element, User
+from unittest.mock import MagicMock, PropertyMock, patch
 from src.schedule.schedule_management import ScheduleManagement
+from src.user.user_model import User
+from src.user.user_management import UserManagement
+from src.calendar_elements.element_interface import Element
+from src.calendar_elements.element_management import ElementManagement
+from typing import Optional
 
 class TestScheduleModel(unittest.TestCase):
 
     def setUp(self):
         # Set up for the tests
+        db_module_mocl = MagicMock()
+        # initialize the management classes
+        ElementManagement.get_instance(database_module=db_module_mocl)
+        UserManagement.get_instance(database_module=db_module_mocl)
+        ScheduleManagement.get_instance(database_module=db_module_mocl)
+
         self.id = "schedule_id"
         self.title = "schedule_title"
         self.description = "schedule_description"
@@ -135,20 +146,48 @@ class TestScheduleModel(unittest.TestCase):
         })
 
     def test_get_elements(self):
-        # Test that get_elements returns the correct elements
-        element_management = ElementManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2'])
-        elements = schedule.get_elements()
-        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid2']]
-        self.assertEqual(elements, expected_elements)
+        """Test that get_elements returns the correct elements"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, ["element1", "element2"])
+        element_ids = ["element1", "element2"]
+        mock_element = MagicMock()
+        mock_element_management = MagicMock()
+        mock_element_management.get_element.return_value = mock_element
+
+        with patch.object(ElementManagement, 'get_instance', return_value=mock_element_management):
+
+            # Act
+            elements = schedule.get_elements()
+
+            # Assert
+            self.assertEqual(len(elements), len(element_ids))
+            for element in elements:
+                self.assertEqual(element, mock_element)
 
     def test_get_elements_with_types(self):
-        # Test that get_elements returns the correct elements with the specified types
-        element_management = ElementManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
-        elements = schedule.get_elements(['evento'])
-        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid4']]
-        self.assertEqual(elements, expected_elements)
+        """Test that get_elements returns the correct elements with the specified types"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, 
+                            ["element1", "element2", "element3", "element4"])
+        element_ids = ["element1", "element4"]
+        mock_element_evento = MagicMock()
+        mock_element_evento.type = 'evento'
+        mock_element_other = MagicMock()
+        mock_element_other.type = 'other'
+        mock_element_management = MagicMock()
+        mock_element_management.get_element.side_effect = lambda x: mock_element_evento if x in element_ids else mock_element_other
+
+        with patch.object(ElementManagement, 'get_instance', return_value=mock_element_management):
+
+            # Act
+            elements = schedule.get_elements(['evento'])
+
+            # Assert
+            self.assertEqual(len(elements), len(element_ids))
+            for element in elements:
+                self.assertEqual(element.type, 'evento')
 
     def test_get_elements_empty(self):
         # Test that get_elements returns an empty list when there are no elements
@@ -157,26 +196,74 @@ class TestScheduleModel(unittest.TestCase):
         self.assertEqual(elements, [])
     
     def test_get_elements_nonexistent_type(self):
-        # Test that get_elements returns an empty list when there are no elements with the specified type
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
-        elements = schedule.get_elements(['citrico'])
-        self.assertEqual(elements, [])
+        """Test that get_elements returns an empty list when there are no elements with the specified type"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, 
+                            ["element1", "element2", "element3", "element4"])
+        mock_element_evento = MagicMock()
+        mock_element_evento.type = 'evento'
+        mock_element_other = MagicMock()
+        mock_element_other.type = 'other'
+        mock_element_management = MagicMock()
+        mock_element_management.get_element.side_effect = lambda x: mock_element_evento if x == 'element1' else mock_element_other
+
+        with patch.object(ElementManagement, 'get_instance', return_value=mock_element_management):
+
+            # Act
+            elements = schedule.get_elements(['citrico'])
+
+            # Assert
+            self.assertEqual(elements, [])
+
+    # def test_get_users(self):
+    #     # Test that get_users returns the correct users
+    #     user_management = UserManagement.get_instance()
+    #     schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2'}, [])
+    #     users = schedule.get_users()
+    #     expected_users = [user_management.users['userid1'], user_management.users['userid2']]
+    #     self.assertEqual(users, expected_users)
 
     def test_get_users(self):
-        # Test that get_users returns the correct users
-        user_management = UserManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2'}, [])
-        users = schedule.get_users()
-        expected_users = [user_management.users['userid1'], user_management.users['userid2']]
-        self.assertEqual(users, expected_users)
+        """Test that get_users returns the correct users"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+         {"user1": "read", "user2": "write", "user3": "read"}, ["element1"])
+        user_ids = ["user1", "user2", "user3"]
+        mock_user = MagicMock()
+        mock_user_management = MagicMock()
+        mock_user_management.get_user.return_value = mock_user
+
+        with patch.object(UserManagement, 'get_instance', return_value=mock_user_management):
+
+            # Act
+            users = schedule.get_users()
+
+            # Assert
+            self.assertEqual(len(users), len(user_ids))
+            for user in users:
+                self.assertEqual(user, mock_user)
+
 
     def test_get_users_with_permission_types(self):
-        # Test that get_users returns the correct users with the specified permission types
-        user_management = UserManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2', 'userid3': 'permissiontype1'}, [])
-        users = schedule.get_users(['permissiontype1'])
-        expected_users = [user_management.users['userid1'], user_management.users['userid3']]
-        self.assertEqual(users, expected_users)
+        """Test that get_users returns the correct users with the specified permission types"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, ["element1"])
+        user_ids = ["user1", "user3"]
+        mock_user = MagicMock()
+        mock_user_management = MagicMock()
+        mock_user_management.get_user.return_value = mock_user
+
+        with patch.object(UserManagement, 'get_instance', return_value=mock_user_management):
+
+            # Act
+            users = schedule.get_users(['type1'])
+
+            # Assert
+            self.assertEqual(len(users), len(user_ids))
+            for user in users:
+                self.assertEqual(user, mock_user)
 
     # Cancelled test because it is not possible to have empty users
     #def test_get_users_empty(self):
@@ -205,7 +292,7 @@ class TestScheduleModel(unittest.TestCase):
         schedule = Schedule("schedule1", "Title", "Description", {"user1": "read"}, ["element1"])
         invalid_elements = "element2"
         # Act & Assert
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             schedule.elements = invalid_elements
 
     def test_changes_on_elements_calls_schedule_management_update_schedule(self):
@@ -218,6 +305,7 @@ class TestScheduleModel(unittest.TestCase):
         schedule.elements = ["changed_element1"]
         # Assert
         schedule_management.update_schedule.assert_called_once_with("schedule1")
+
 
 if __name__ == '__main__':
     unittest.main()
