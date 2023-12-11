@@ -150,12 +150,13 @@ class SignUpState(State):
         self.context.transition_to(SignInUp(self.context))
     
     def sign_up(self, event):
-        username = self.context._ui.user_id_entry.get()
+        user_id = self.context._ui.user_id_entry.get()
+        username = self.context._ui.username_entry.get()
         email = self.context._ui.email_entry.get()
         password = self.context._ui.password_entry.get()
 
         print("Signing up...")
-        if self.context.sign_up(username, email, password):
+        if self.context.sign_up(user_id, username, email, password):
             # transition to main state
             self.context.transition_to(LoggedOut(self.context))
 
