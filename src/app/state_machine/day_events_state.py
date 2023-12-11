@@ -17,6 +17,7 @@ class DayEventsState(State):
 
         self.day_events = day_events
         self.selected_day = selected_day
+        self.currently_selected_event = None
 
         # set the view
         self.view = DayEventsView(self.context.ui.root, self.day_events, self.selected_day)
@@ -38,35 +39,53 @@ class DayEventsState(State):
         self.view.create_event_button.bind("<Button-1>", self.create_event)
 
         self.bind_hour_buttons()
+        self.bind_event_buttons()
 
     def bind_hour_buttons(self):
         """
         Bind the hour buttons.
         """
-        for key, hour_frame in self.view.hour_buttons.items():
-            hour_frame.bind("<Button-1>", self.hour_button_click)
+        for (hour, minute), hour_frame in self.view.hour_buttons.items():
+            # adding a click event to the hour frame
+            hour_frame.bind("<Button-1>", lambda event, hour=hour, minute=minute: self.hour_button_click(event, hour, minute))
+            
             # adding a hover effect to the hour frame
-            color = hour_frame._fg_color
+            color = hour_frame._fg_color # pylint: disable=protected-access
             hover_color = "gray"
             hour_frame.bind("<Enter>", lambda event, frame=hour_frame, hover_color=hover_color: frame.configure(fg_color=hover_color))
             hour_frame.bind("<Leave>", lambda event, frame=hour_frame, color=color: frame.configure(fg_color=color))
+
 
     def bind_event_buttons(self):
         """
         Bind the event buttons.
         """
         for event_button in self.view.event_buttons:
-            event_button.bind("<Button-1>", self.event_button_click)
+            button = event_button["button"]
+            element = event_button["event"]
+            button.bind("<Button-1>", lambda event, element=element: self.event_button_click(event, element))
 
-    def event_button_click(self, event):
+    def event_button_click(self, event_, element):
         """
         Handle event button click.
         """
+        self.currently_selected_event = element
+        self.view.currently_selected_event = element
+        element_display = element.get_display_interval()[0]
+        self.view.currently_selected_hour = element_display.hour
+        self.view.currently_selected_minute = element_display.minute
 
-    def hour_button_click(self, event):
+        self.view.update_event_managing_elements()
+        
+
+    def hour_button_click(self, event_, hour, minute):
         """
         Handle hour button click.
         """
+        self.view.currently_selected_hour = int(hour)
+        self.view.currently_selected_minute = int(minute)
+        self.currently_selected_event = None
+        self.view.update_event_managing_elements()
 
     def logout(self, _event):
         """
