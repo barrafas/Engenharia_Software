@@ -322,7 +322,7 @@ class TaskElement(Element):
         if due_date is None:
             raise ValueError("Due date cannot be None")
         elif not isinstance(due_date, datetime):
-            raise TypeError("Due date must be a datetime object")
+            raise TypeError(f"Due date must be a datetime object, not {type(due_date)}")
         else:
             self.due_date = due_date
             self.notify()

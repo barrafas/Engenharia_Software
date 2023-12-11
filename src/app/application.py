@@ -140,6 +140,9 @@ class Application:
         schedule = self._user.schedules[0]
         print(f"Schedule: {schedule}")
 
+        # selected date is datetime.date, it should be datetime.datetime:
+        selected_date = datetime.datetime(selected_date.year, selected_date.month, selected_date.day)
+
         kwargs = {}
         if event_type == "task":
             kwargs["due_date"] = selected_date

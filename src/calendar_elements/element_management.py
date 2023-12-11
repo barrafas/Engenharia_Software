@@ -71,7 +71,7 @@ class ElementManagement(Observer):
             return self.elements[element_id]
         elif self.element_exists(element_id):
             element_data = self.db_module.select_data("elements",
-                    {"_id": element_id})
+                    {"_id": element_id})[0]
             element_data["element_id"] = element_data.pop("_id")
             element = ElementFactory.create_element(**element_data)
             self.elements[element_id] = element
@@ -177,6 +177,7 @@ class ElementManagement(Observer):
 
         element = ElementFactory.create_element(element_type, element_id, title,
             schedules, **kwargs)
+        element.attach(self)
         self.db_module.insert_data("elements", element.to_dict())
         self.elements[element_id] = element
 
@@ -186,7 +187,6 @@ class ElementManagement(Observer):
             schedule_instance.elements = (
                         schedule_instance.elements + [element_id])
 
-        element.attach(self)
         return element
 
 

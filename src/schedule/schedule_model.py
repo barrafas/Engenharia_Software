@@ -7,11 +7,6 @@ Classes:
     Schedule -- Class that represents a schedule in the calendar.
 """
 
-#from src.calendar_elements.element_interface import Element
-from tests.test_schedule.mocks import Element,\
-                                        ElementManagement,\
-                                        User,\
-                                        UserManagement
 from src.observer.observer import Observer, Subject
 
 class Schedule(Subject):
@@ -96,6 +91,7 @@ class Schedule(Subject):
                 [Element] -- List of element instances in the schedule that 
                 have the specified types.
         """
+        from src.calendar_elements.element_management import ElementManagement
         element_management = ElementManagement.get_instance()
         elements = []
         for element_id in self.__elements:
@@ -116,7 +112,7 @@ class Schedule(Subject):
             Returns:
                 [User] -- List of users that have the specified permission types
         """
-
+        from src.user.user_management import UserManagement
         user_management = UserManagement.get_instance()
         users = []
         for user_id, permission_type in self.__permissions.items():
