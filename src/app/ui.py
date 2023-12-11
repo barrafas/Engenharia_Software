@@ -71,6 +71,7 @@ class TkinterUI:
         self.logout_button = main_ui.logout_button
         self.go_back_button = main_ui.go_back_button
         self.user_events = main_ui.user_events
+        self.calendar_days = main_ui.calendar_days
 
     def show_sign_up_elements(self):
         # Lógica para exibir elementos relacionados ao login
@@ -106,6 +107,33 @@ class TkinterUI:
         self.password_entry = password_entry
         self.sign_up_button = sign_up_button
         self.go_back_button = go_back_button
+
+
+    def show_day_events(self, day_events, day):
+        # Lógica para exibir elementos relacionados ao login
+        print("Showing day events...")
+        print(day_events)
+        print(day)
+
+        self.logout_button = customtkinter.CTkButton(self.root, text="Logout")
+        self.logout_button.pack()
+
+        self.go_back_button = customtkinter.CTkButton(self.root, text="Voltar")
+        self.go_back_button.pack()
+
+        self.create_event_button = customtkinter.CTkButton(self.root, text="Criar evento")
+        self.create_event_button.pack()
+
+        self.event_name_entry = customtkinter.CTkEntry(self.root)
+        self.event_name_entry.pack()
+
+        values = ["Task", "Reminder", "Event"]
+        self.event_type_selector = customtkinter.CTkOptionMenu(self.root, values=values)
+        self.event_type_selector.pack()
+
+        day_events_label = customtkinter.CTkLabel(self.root, text=f"Eventos do dia {day}")
+        day_events_label.pack()
+
 
     def clear_elements(self):
         # Lógica para limpar elementos da interface
