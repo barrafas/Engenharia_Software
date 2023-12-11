@@ -70,7 +70,7 @@ class Application:
         The Application delegates part of its behavior to the current State
         object.
         """
-        user_management = UserManagement(self._db)
+        user_management = UserManagement.get_instance()
 
         if user_management.create_user(username, email, password, id=username):
             print(f"\033[92mSign up successful! User {username} created.\033[0m")

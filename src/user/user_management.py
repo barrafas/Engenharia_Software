@@ -31,6 +31,8 @@ class UserManagement(Observer):
     @classmethod
     def get_instance(cls, database_module: MongoModule = None, users: dict = None):
         if not cls._instance:
+            if not database_module:
+                raise Exception("Database module not provided")
             cls._instance = cls(database_module, users)
         return cls._instance
 
@@ -41,8 +43,11 @@ class UserManagement(Observer):
         Args:
             database_module: Database module
         """
+        from src.schedule.schedule_management import ScheduleManagement
         self.db_module = database_module
         self.users = users if users is not None else {}
+
+        ScheduleManagement.get_instance(database_module=self.db_module)
 
     def create_user(self, username: str, email: str, password: str,
                     user_preferences: dict = None, user_id: str = None) -> User:
@@ -80,7 +85,7 @@ class UserManagement(Observer):
                      "hashed_password": hashed_password, 
                      "user_preferences": user_preferences}
         
-        self.db.insert_data('users', {**user_info})
+        self.db_module.insert_data('users', {**user_info})
 
         user = User(**user_info)
         self.users[user_id] = user
@@ -110,7 +115,7 @@ class UserManagement(Observer):
             new_permissions.pop(user_id)
             schedule_instance.permissions = new_permissions
 
-        self.db.delete_data('users', {"_id": user_id})
+        self.db_module.delete_data('users', {"_id": user_id})
         if user_id in self.users:
             remove = self.users.pop(user_id)
             del remove
@@ -125,7 +130,7 @@ class UserManagement(Observer):
         Returns:
             True if the user exists, False otherwise
         """
-        data = self.db.select_data('users', {"_id": user_id})
+        data = self.db_module.select_data('users', {"_id": user_id})
         return len(data) > 0
 
     def hash_password(self, password: str) -> str:
@@ -152,7 +157,7 @@ class UserManagement(Observer):
         Returns:
             The user if it exists, None otherwise
         """
-        data = self.db.select_data('users', {"_id": user_id})
+        data = self.db_module.select_data('users', {"_id": user_id})
         print(data[0])
         user = User(**data[0])
         print(user)
@@ -174,7 +179,7 @@ class UserManagement(Observer):
         
         user = self.users[user_id]
         user_info = user.to_dict()
-        self.db.update_data('users', {"_id": user_id}, user_info)
+        self.db_module.update_data('users', {"_id": user_id}, user_info)
         return
 
 
@@ -204,11 +209,11 @@ class UserManagement(Observer):
             raise DuplicatedIDError(f'Usuário {user_id} já está no schedule {schedule_id}')
         return
 
-    def update(self, schedule: Subject) -> None:
+    def update(self, user: Subject) -> None:
         """
-        Called when the schedule is updated.
+        Called when the user is updated.
 
         Args:
-            schedule: The schedule that was updated.
+            user: The user that was updated.
         """
-        self.update_schedule(schedule.id)
+        self.update_user(user.id)
