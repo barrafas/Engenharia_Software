@@ -1,13 +1,24 @@
 import unittest
 from src.schedule.schedule_model import Schedule
-from tests.test_schedule.mocks import Element, ElementManagement, User, UserManagement
-from unittest.mock import MagicMock
+#from tests.test_schedule.mocks import Element, User
+from unittest.mock import MagicMock, PropertyMock, patch
 from src.schedule.schedule_management import ScheduleManagement
+from src.user.user_model import User
+from src.user.user_management import UserManagement
+from src.calendar_elements.element_interface import Element
+from src.calendar_elements.element_management import ElementManagement
+from typing import Optional
 
 class TestScheduleModel(unittest.TestCase):
 
     def setUp(self):
         # Set up for the tests
+        db_module_mocl = MagicMock()
+        # initialize the management classes
+        ElementManagement.get_instance(database_module=db_module_mocl)
+        UserManagement.get_instance(database_module=db_module_mocl)
+        ScheduleManagement.get_instance(database_module=db_module_mocl)
+
         self.id = "schedule_id"
         self.title = "schedule_title"
         self.description = "schedule_description"
@@ -162,21 +173,54 @@ class TestScheduleModel(unittest.TestCase):
         elements = schedule.get_elements(['citrico'])
         self.assertEqual(elements, [])
 
+    # def test_get_users(self):
+    #     # Test that get_users returns the correct users
+    #     user_management = UserManagement.get_instance()
+    #     schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2'}, [])
+    #     users = schedule.get_users()
+    #     expected_users = [user_management.users['userid1'], user_management.users['userid2']]
+    #     self.assertEqual(users, expected_users)
+
     def test_get_users(self):
-        # Test that get_users returns the correct users
-        user_management = UserManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2'}, [])
-        users = schedule.get_users()
-        expected_users = [user_management.users['userid1'], user_management.users['userid2']]
-        self.assertEqual(users, expected_users)
+        """Test that get_users returns the correct users"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+         {"user1": "read", "user2": "write", "user3": "read"}, ["element1"])
+        user_ids = ["user1", "user2", "user3"]
+        mock_user = MagicMock()
+        mock_user_management = MagicMock()
+        mock_user_management.get_user.return_value = mock_user
+
+        with patch.object(UserManagement, 'get_instance', return_value=mock_user_management):
+
+            # Act
+            users = schedule.get_users()
+
+            # Assert
+            self.assertEqual(len(users), len(user_ids))
+            for user in users:
+                self.assertEqual(user, mock_user)
+
 
     def test_get_users_with_permission_types(self):
-        # Test that get_users returns the correct users with the specified permission types
-        user_management = UserManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1', 'userid2': 'permissiontype2', 'userid3': 'permissiontype1'}, [])
-        users = schedule.get_users(['permissiontype1'])
-        expected_users = [user_management.users['userid1'], user_management.users['userid3']]
-        self.assertEqual(users, expected_users)
+        """Test that get_users returns the correct users with the specified permission types"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, ["element1"])
+        user_ids = ["user1", "user3"]
+        mock_user = MagicMock()
+        mock_user_management = MagicMock()
+        mock_user_management.get_user.return_value = mock_user
+
+        with patch.object(UserManagement, 'get_instance', return_value=mock_user_management):
+
+            # Act
+            users = schedule.get_users(['type1'])
+
+            # Assert
+            self.assertEqual(len(users), len(user_ids))
+            for user in users:
+                self.assertEqual(user, mock_user)
 
     # Cancelled test because it is not possible to have empty users
     #def test_get_users_empty(self):
@@ -218,6 +262,40 @@ class TestScheduleModel(unittest.TestCase):
         schedule.elements = ["changed_element1"]
         # Assert
         schedule_management.update_schedule.assert_called_once_with("schedule1")
+
+    def get_mock_user(self) -> tuple[callable, MagicMock, MagicMock, MagicMock, MagicMock]:
+        """Mock function to return a user object"""
+
+        # Set up the mock objects
+        user_1 = MagicMock(spec=User)
+        type(user_1).id = PropertyMock(return_value='user_1')
+        type(user_1).username = PropertyMock(return_value='user_1')
+        type(user_1).schedules = PropertyMock(return_value=['schedule_1', 'schedule_2'])
+
+        user_2 = MagicMock(spec=User)
+        type(user_2).id = PropertyMock(return_value='user_2')
+        type(user_2).username = PropertyMock(return_value='user_2')
+        type(user_2).schedules = PropertyMock(return_value=['schedule_1'])
+
+        user_3 = MagicMock(spec=User)
+        type(user_3).id = PropertyMock(return_value='user_3')
+        type(user_3).username = PropertyMock(return_value='user_3')
+        type(user_3).schedules = PropertyMock(return_value=['schedule_2'])
+
+        user_4 = MagicMock(spec=User)
+        type(user_4).id = PropertyMock(return_value='user_4')
+        type(user_4).username = PropertyMock(return_value='user_4')
+        type(user_4).schedules = PropertyMock(return_value=[])
+
+        def get_user_mock(id: str) -> Optional[MagicMock]:
+            return {
+                'user_1': user_1,
+                'user_2': user_2,
+                'user_3': user_3,
+                'user_4': user_4
+            }.get(id, None)
+
+        return get_user_mock, user_1, user_2, user_3, user_4
 
 if __name__ == '__main__':
     unittest.main()
