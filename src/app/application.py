@@ -118,10 +118,18 @@ class Application:
 
     def get_user_events(self):
         """
-        The Application delegates part of its behavior to the current State
-        object.
-        
-        Gets the events from the user and stores them in a dictionary
+        Return the user's events as a dictionary in the tree format:
+        {
+            year: {
+                month: {
+                    day: {
+                        hour: {
+                            minute: [event1, event2, ...]
+                        }
+                    }
+                }
+            }
+        }
 
         """
         elements = self._user.get_elements()
@@ -150,7 +158,6 @@ class Application:
 
 
         print(f"\033[92mUser events: {elements}, with len ={len(elements)}\033[0m")
-
 
         return elements
         
