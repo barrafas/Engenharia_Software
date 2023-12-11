@@ -127,7 +127,7 @@ class TkinterUI:
         self.event_name_entry = customtkinter.CTkEntry(self.root)
         self.event_name_entry.pack()
 
-        values = ["Task", "Reminder", "Event"]
+        values = ["task", "reminder", "event"]
         self.event_type_selector = customtkinter.CTkOptionMenu(self.root, values=values)
         self.event_type_selector.pack()
 

@@ -146,7 +146,7 @@ class ElementManagement(Observer):
             Element: Element instance.
         """
         if element_type not in ['event', 'task', 'reminder']:
-            raise ValueError("Element is not a valid type")
+            raise ValueError(f"Element is not a valid type ({element_type})")
         if not isinstance(element_id, str):
             raise TypeError("Schedule ID must be a string")
 

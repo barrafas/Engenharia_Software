@@ -164,7 +164,7 @@ class ScheduleManagement(Observer):
             return self.schedules[schedule_id]
         elif self.schedule_exists(schedule_id):
             schedule_data = self.db_module.select_data('schedules',
-                                                       {'_id': schedule_id})
+                                                       {'_id': schedule_id})[0]
             schedule = Schedule(schedule_id,
                                 schedule_data['title'],
                                 schedule_data['description'],

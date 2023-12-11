@@ -184,6 +184,8 @@ class DayEventsState(State):
         event_name = self.context._ui.event_name_entry.get()
         event_type = self.context._ui.event_type_selector.get()
 
+        print(f"[\033[92m <> \033[0m] Event name: {event_name}, Event type: {event_type}, Event date: {selected_date}")
+
         print("Creating event...")
         print(f"Event name: {event_name}")
         print(f"Event type: {event_type}")

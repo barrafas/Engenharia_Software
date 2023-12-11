@@ -141,12 +141,12 @@ class Application:
         print(f"Schedule: {schedule}")
 
         kwargs = {}
-        if event_type == "Task":
+        if event_type == "task":
             kwargs["due_date"] = selected_date
             kwargs["state"] = "TODO"
-        elif event_type == "Reminder":
+        elif event_type == "reminder":
             kwargs["reminder_date"] = selected_date
-        elif event_type == "Event":
+        elif event_type == "event":
             kwargs["start"] = selected_date
             kwargs["end"] = datetime.datetime(selected_date.year,
             selected_date.month, selected_date.day, selected_date.hour,
