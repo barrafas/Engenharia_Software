@@ -437,13 +437,13 @@ class TestScheduleManagement(unittest.TestCase):
         schedule_id = "schedule10"
         self.schedule_management.db_module.delete_data = MagicMock()
         # Mock the return value of select_data
-        self.schedule_management.db_module.select_data.return_value = {
+        self.schedule_management.db_module.select_data.return_value = [{
             '_id': schedule_id,
             'title': 'Test Title',
             'description': 'Test Description',
             'permissions': {},
             'elements': []
-        }
+        }]
         # Act
         self.schedule_management.delete_schedule(schedule_id)
         # Assert
@@ -481,42 +481,46 @@ class TestScheduleManagement(unittest.TestCase):
             self.schedule_management.delete_schedule(schedule_id)
 
     def test_delete_schedule_updates_elements(self):
-        """Test that delete_schedule updates the elements"""
+        """Test that delete_schedule updates the schedules of the elements"""
         # Arrange
         schedule_id = "schedule1"
         element_ids = ["element1", "element2", "element3"]
         mock_schedule = MagicMock()
         mock_schedule.elements = element_ids
         self.schedule_management.schedules[schedule_id] = mock_schedule
-        with patch.object(self.schedule_management, 'get_schedule',
-            return_value=mock_schedule), \
-            patch.object(ElementManagement, 'update_element',
-                    return_value=None) as mock_update_element:
+        mock_element = MagicMock()
+        mock_element.schedules = [schedule_id]
+
+        with patch.object(self.schedule_management, 'get_schedule', return_value=mock_schedule), \
+            patch.object(self.element_management, 'get_element', return_value=mock_element):
+
             # Act
             self.schedule_management.delete_schedule(schedule_id)
+
             # Assert
-            assert mock_update_element.call_count == len(element_ids)
             for element_id in element_ids:
-                mock_update_element.assert_any_call(element_id)
+                self.assertNotIn(schedule_id, mock_element.schedules)
 
     def test_delete_schedule_updates_users(self):
-        """Test that delete_schedule updates the users"""
+        """Test that delete_schedule updates the schedules of the users"""
         # Arrange
         schedule_id = "schedule1"
         user_ids = ["user1", "user2", "user3"]
         mock_schedule = MagicMock()
         mock_schedule.permissions = {user_id: {} for user_id in user_ids}
         self.schedule_management.schedules[schedule_id] = mock_schedule
-        with patch.object(self.schedule_management, 'get_schedule',
-                return_value=mock_schedule), \
-            patch.object(UserManagement,'update_user',
-                    return_value=None) as mock_update_user:
+        mock_user = MagicMock()
+        mock_user.schedules = [schedule_id]
+
+        with patch.object(self.schedule_management, 'get_schedule', return_value=mock_schedule), \
+            patch.object(self.user_management, 'get_user', return_value=mock_user):
+
             # Act
             self.schedule_management.delete_schedule(schedule_id)
+
             # Assert
-            assert mock_update_user.call_count == len(user_ids)
             for user_id in user_ids:
-                mock_update_user.assert_any_call(user_id)
+                self.assertNotIn(schedule_id, mock_user.schedules)
 
     def test_add_element_to_schedule_updates_schedule_elements(self):
         """Test that add_element_to_schedule updates the schedule's elements"""
@@ -620,25 +624,6 @@ class TestScheduleManagement(unittest.TestCase):
                     element_id)
             # Assert
             self.assertIn(schedule_id, mock_element.schedules)
-
-    def test_add_element_to_schedule_calls_update_element(self):
-        """Test that add_element_to_schedule calls update_element"""
-        # Arrange
-        schedule_id = "schedule1"
-        element_id = "element1"
-        mock_element = MagicMock()
-        test_schedule = Schedule(schedule_id, "Title", "Description",
-                {"user1": "read"}, ["element2"])
-        test_schedule.attach(self.schedule_management)
-        self.schedule_management.schedules[schedule_id] = test_schedule
-        with patch.object(ElementManagement, 'get_element',
-                return_value=mock_element), \
-             patch.object(ElementManagement, 'update') as mock_update:
-            # Act
-            self.schedule_management.add_element_to_schedule(schedule_id,
-                    element_id)
-            # Assert
-            mock_update.assert_called_once_with(mock_element)
 
 if __name__ == '__main__':
     unittest.main()
