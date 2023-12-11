@@ -1,6 +1,8 @@
 from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
 from src.calendar_elements.element_interface import Element
 from src.observer.observer import Observer, Subject
+from src.calendar_elements.element_factory import ElementFactory
+from src.schedule.schedule_management import ScheduleManagement
 
 class ElementDoesNotExistError(Exception):
     """
@@ -62,6 +64,7 @@ class ElementManagement(Observer):
             return self.elements[element_id]
         elif self.element_exists(element_id):
             element_data = self.db_module.select_data("elements", {"_id": element_id})
+            element_data["element_id"] = element_data.pop("_id")
             element = ElementFactory.create_element(**element_data)
             self.elements[element_id] = element
             element.attach(self)

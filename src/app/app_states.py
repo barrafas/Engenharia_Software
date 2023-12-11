@@ -37,7 +37,7 @@ class LoggedOut(State):
 
     def login(self, event):
 
-        username = self.context._ui.username_entry.get()
+        username = self.context._ui.user_id_entry.get()
         password = self.context._ui.password_entry.get()
 
         print("Logging in...")
@@ -73,7 +73,10 @@ class LoggedOut(State):
 class MainState(State):
     def __init__(self, context):
         self.context = context
+        self.events = {}
 
+        self.events = self.context.get_user_events()
+        
     def login(self):
         print("You are already logged in.")
 
@@ -84,12 +87,10 @@ class MainState(State):
 
     def render(self):
         print("Rendering main page...")
-        self.context._ui.show_main_elements()
 
-        # get user events
-        events = self.context.get_user_events()
-        event_string = ">> User events: \n - "+"\n - ".join(events)
-        self.context._ui.user_events.configure(text=event_string)
+        # show main elements
+        self.context._ui.show_main_elements(self.events)
+
 
         # bind events
         self.context._ui.logout_button.bind("<Button-1>", self.logout)
@@ -136,7 +137,7 @@ class SignUpState(State):
         self.context.transition_to(SignInUp(self.context))
     
     def sign_up(self, event):
-        username = self.context._ui.username_entry.get()
+        username = self.context._ui.user_id_entry.get()
         email = self.context._ui.email_entry.get()
         password = self.context._ui.password_entry.get()
 
