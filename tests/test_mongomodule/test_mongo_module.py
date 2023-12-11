@@ -102,7 +102,8 @@ class TestMongoModule(unittest.TestCase):
     def _disconnect_and_delete_data(self):
         self._disconnect_from_database()
         with self.assertRaises(Exception):
-            self.mongo_module.delete_data({"test": "test"})
+            self.mongo_module.delete_data(collection_name='teste',
+                                          condition={"test": "test"})
 
     def _connect_insert_and_update_data(self):
         self._connect_to_database()
@@ -124,7 +125,7 @@ class TestMongoModule(unittest.TestCase):
                                           condition={"test": "test"}, 
                                           new_data={"test": "test2"})
             
-            mock_update.assert_called_once_with({"test": "test"}, {"test": "test2"})
+            mock_update.assert_called_once_with({"test": "test"}, {"$set": {"test": "test2"}})
 
     def _connect_insert_and_select_data_internal(self, query, expected_result):
         self.mongo_module.insert_data(collection_name='teste',
