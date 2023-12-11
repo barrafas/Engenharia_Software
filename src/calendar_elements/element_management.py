@@ -107,8 +107,7 @@ class ElementManagement(Observer):
             schedule_instance.elements = [element for element in \
                 schedule_instance.elements if element != element_id]
 
-        # Update each user
-        users = element.get_users()
+        from src.user.user_management import UserManagement
         user_manager = UserManagement.get_instance()
         for user in users:
             user.elements = [element for element in user.elements \

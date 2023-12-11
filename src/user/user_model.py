@@ -90,8 +90,7 @@ class User(Subject):
 
         >>> user = User("id", "username", "email", ["id1", "id2"])
         >>> user.to_dict()
-        {'_id': 'id', 'username': 'username', 'email': 'email',
-        'schedules': ['id1', 'id2'], 'password': None, 'user_preferences': {}}
+        {'_id': 'id', 'username': 'username', 'email': 'email', 'schedules': ['id1', 'id2'], 'password': None, 'user_preferences': {}}
         """
         return {
             "_id": self.__id,
@@ -166,9 +165,9 @@ class User(Subject):
             username: user name 
 
         >>> user = User("id", "username", "email", ["id1", "id2"])
-        >>> user.set_username("new_username")
+        >>> user.set_username("newusername")
         >>> user.username
-        'new_username'           
+        'newusername'           
         """
         if type(username) != str:
             raise TypeError("O nome de usuário deve ser uma string")
@@ -285,3 +284,7 @@ class User(Subject):
         """
         for observer in self.__observers:
             observer.update(self)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
