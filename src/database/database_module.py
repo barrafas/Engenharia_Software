@@ -1,5 +1,4 @@
-"""
-Interface for database modules.
+""" Interface for database modules.
 
 Classes:
     DatabaseModule

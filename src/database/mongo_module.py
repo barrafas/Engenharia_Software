@@ -1,5 +1,4 @@
-"""
-mongo_module.py
+""" mongo_module.py
 
 This module defines a MongoDB implementation of the DatabaseModule interface 
 and demonstrates the Singleton pattern.
@@ -36,7 +35,6 @@ Usage:
     instance of the MongoModule class. The Singleton pattern ensures that 
     multiple instances of the class refer to the same database connection.
 """
-import time
 import pymongo
 from src.database.database_module import DatabaseModule
 from src.database.utils import TimeoutDecorator
@@ -216,15 +214,15 @@ class MongoModule(DatabaseModule):
 if __name__ == "__main__": # pragma: no cover
     mongo_module = MongoModule(  # pragma: no cover
         host="localhost", port=27017, database_name="test")  # pragma: no cover
-  # pragma: no cover
+     # pragma: no cover
     mongo_module2 = MongoModule(  # pragma: no cover
         host="localhost", port=27017, database_name="test")  # pragma: no cover
-  # pragma: no cover
+    # pragma: no cover
     if mongo_module == mongo_module2:  # pragma: no cover
         print("Singleton works, both variables contain the same instance.")  # pragma: no cover
     else:  # pragma: no cover
         print("Singleton failed, variables contain different instances.")  # pragma: no cover
-  # pragma: no cover
+    # pragma: no cover
     # timeout decorator  # pragma: no cover
     mongo_module = TimeoutDecorator(mongo_module, timeout_seconds=5)  # pragma: no cover
     mongo_module.connect()  # pragma: no cover
