@@ -146,20 +146,48 @@ class TestScheduleModel(unittest.TestCase):
         })
 
     def test_get_elements(self):
-        # Test that get_elements returns the correct elements
-        element_management = ElementManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2'])
-        elements = schedule.get_elements()
-        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid2']]
-        self.assertEqual(elements, expected_elements)
+        """Test that get_elements returns the correct elements"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, ["element1", "element2"])
+        element_ids = ["element1", "element2"]
+        mock_element = MagicMock()
+        mock_element_management = MagicMock()
+        mock_element_management.get_element.return_value = mock_element
+
+        with patch.object(ElementManagement, 'get_instance', return_value=mock_element_management):
+
+            # Act
+            elements = schedule.get_elements()
+
+            # Assert
+            self.assertEqual(len(elements), len(element_ids))
+            for element in elements:
+                self.assertEqual(element, mock_element)
 
     def test_get_elements_with_types(self):
-        # Test that get_elements returns the correct elements with the specified types
-        element_management = ElementManagement.get_instance()
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
-        elements = schedule.get_elements(['evento'])
-        expected_elements = [element_management.elements['elementid1'], element_management.elements['elementid4']]
-        self.assertEqual(elements, expected_elements)
+        """Test that get_elements returns the correct elements with the specified types"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, 
+                            ["element1", "element2", "element3", "element4"])
+        element_ids = ["element1", "element4"]
+        mock_element_evento = MagicMock()
+        mock_element_evento.type = 'evento'
+        mock_element_other = MagicMock()
+        mock_element_other.type = 'other'
+        mock_element_management = MagicMock()
+        mock_element_management.get_element.side_effect = lambda x: mock_element_evento if x in element_ids else mock_element_other
+
+        with patch.object(ElementManagement, 'get_instance', return_value=mock_element_management):
+
+            # Act
+            elements = schedule.get_elements(['evento'])
+
+            # Assert
+            self.assertEqual(len(elements), len(element_ids))
+            for element in elements:
+                self.assertEqual(element.type, 'evento')
 
     def test_get_elements_empty(self):
         # Test that get_elements returns an empty list when there are no elements
@@ -168,10 +196,25 @@ class TestScheduleModel(unittest.TestCase):
         self.assertEqual(elements, [])
     
     def test_get_elements_nonexistent_type(self):
-        # Test that get_elements returns an empty list when there are no elements with the specified type
-        schedule = Schedule('id', 'title', 'description', {'userid1': 'permissiontype1'}, ['elementid1', 'elementid2', 'elementid3', 'elementid4'])
-        elements = schedule.get_elements(['citrico'])
-        self.assertEqual(elements, [])
+        """Test that get_elements returns an empty list when there are no elements with the specified type"""
+        # Arrange
+        schedule = Schedule("schedule1", "Test Title", "Test Description",
+                            {"user1": "type1", "user2": "type2", "user3": "type1"}, 
+                            ["element1", "element2", "element3", "element4"])
+        mock_element_evento = MagicMock()
+        mock_element_evento.type = 'evento'
+        mock_element_other = MagicMock()
+        mock_element_other.type = 'other'
+        mock_element_management = MagicMock()
+        mock_element_management.get_element.side_effect = lambda x: mock_element_evento if x == 'element1' else mock_element_other
+
+        with patch.object(ElementManagement, 'get_instance', return_value=mock_element_management):
+
+            # Act
+            elements = schedule.get_elements(['citrico'])
+
+            # Assert
+            self.assertEqual(elements, [])
 
     # def test_get_users(self):
     #     # Test that get_users returns the correct users
@@ -263,39 +306,6 @@ class TestScheduleModel(unittest.TestCase):
         # Assert
         schedule_management.update_schedule.assert_called_once_with("schedule1")
 
-    def get_mock_user(self) -> tuple[callable, MagicMock, MagicMock, MagicMock, MagicMock]:
-        """Mock function to return a user object"""
-
-        # Set up the mock objects
-        user_1 = MagicMock(spec=User)
-        type(user_1).id = PropertyMock(return_value='user_1')
-        type(user_1).username = PropertyMock(return_value='user_1')
-        type(user_1).schedules = PropertyMock(return_value=['schedule_1', 'schedule_2'])
-
-        user_2 = MagicMock(spec=User)
-        type(user_2).id = PropertyMock(return_value='user_2')
-        type(user_2).username = PropertyMock(return_value='user_2')
-        type(user_2).schedules = PropertyMock(return_value=['schedule_1'])
-
-        user_3 = MagicMock(spec=User)
-        type(user_3).id = PropertyMock(return_value='user_3')
-        type(user_3).username = PropertyMock(return_value='user_3')
-        type(user_3).schedules = PropertyMock(return_value=['schedule_2'])
-
-        user_4 = MagicMock(spec=User)
-        type(user_4).id = PropertyMock(return_value='user_4')
-        type(user_4).username = PropertyMock(return_value='user_4')
-        type(user_4).schedules = PropertyMock(return_value=[])
-
-        def get_user_mock(id: str) -> Optional[MagicMock]:
-            return {
-                'user_1': user_1,
-                'user_2': user_2,
-                'user_3': user_3,
-                'user_4': user_4
-            }.get(id, None)
-
-        return get_user_mock, user_1, user_2, user_3, user_4
 
 if __name__ == '__main__':
     unittest.main()
