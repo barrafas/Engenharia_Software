@@ -1,3 +1,7 @@
+"""
+State machine pattern implementation, here we define the base state class
+and the enum of all possible states.
+"""
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
@@ -76,3 +80,6 @@ class State(ABC):
             self.context.transition_to(DayEventsState(self._context, **kwargs))
         else:
             raise ValueError(f"Invalid state: {state_enum}")
+
+    def __str__(self):
+        return "Unnammed State"
