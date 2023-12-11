@@ -28,7 +28,7 @@ Functions:
 from src.schedule.schedule_model import Schedule
 from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
 
-from src.observer.observer import Observer, Subject
+from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
 
 class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
@@ -64,6 +64,10 @@ class ScheduleManagement(Observer):
             database_module: Database module
 
         """
+
+        if not database_module:
+            raise DatabaseNotProvidedError("Database module not provided on object creation.")
+        
         self.db_module = database_module
         self.schedules = schedules if schedules else {}
 

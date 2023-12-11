@@ -16,6 +16,12 @@ class TestEventElement(unittest.TestCase):
     """Test the EventElement class"""
 
     def setUp(self):
+        db_module_mock = MagicMock()
+
+        # initialize the Managements
+        ScheduleManagement.get_instance(db_module_mock)
+        UserManagement.get_instance(db_module_mock)
+        
         self.id = "1"
         self.title = "Test Event"
         self.start = datetime(2023, 1, 1)

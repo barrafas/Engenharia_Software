@@ -15,6 +15,12 @@ class TestTaskElement(unittest.TestCase):
     """Test the TaskElement class"""
 
     def setUp(self):
+        db_module_mock = MagicMock()
+        
+        # initialize the Managements
+        ScheduleManagement.get_instance(db_module_mock)
+        UserManagement.get_instance(db_module_mock)
+
         self.id = "1"
         self.title = "Test Task"
         self.due_date = datetime(2023, 1, 1)

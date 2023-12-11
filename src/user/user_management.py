@@ -8,14 +8,13 @@ Attributes:
 """
 import bcrypt
 from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
-from src.observer.observer import Observer, Subject
+from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
 from .user_model import User, UsernameCantBeBlank
 
 class UserAlreadyExistsError(Exception):
     """
     Custom exception class for when a user already exists.
     """
-
 
 class UserManagement(Observer):
     """
@@ -34,8 +33,6 @@ class UserManagement(Observer):
         Get the instance of the UserManagement class
         """
         if not cls._instance:
-            if not database_module:
-                raise Exception("Database module not provided")
             cls._instance = cls(database_module, users)
         return cls._instance
 
@@ -46,11 +43,12 @@ class UserManagement(Observer):
         Args:
             database_module: Database module
         """
-        from src.schedule.schedule_management import ScheduleManagement
+
+        if not database_module:
+            raise DatabaseNotProvidedError("Database module not provided on object creation.")
+        
         self.db_module = database_module
         self.users = users if users is not None else {}
-
-        ScheduleManagement.get_instance(database_module=self.db_module)
 
     def create_user(self, username: str, email: str, password: str,
                     user_preferences: dict = None, user_id: str = None) -> User:
