@@ -22,11 +22,17 @@ class TestScheduleManagement(unittest.TestCase):
     def setUp(self):
         # Reset the singleton instance before each test
         ScheduleManagement._instance = None
-        self.db_module = Mock()
+        self.db_module = MagicMock()
         self.schedules = {
                 'schedule10': MagicMock(spec=Schedule),
             }
         self.schedule_management = ScheduleManagement.get_instance(self.db_module)
+        from src.calendar_elements.element_management import ElementManagement
+        ElementManagement._instance = None
+        self.element_management = ElementManagement.get_instance(self.db_module)
+        from src.user.user_management import UserManagement
+        UserManagement._instance = None
+        self.user_management = UserManagement.get_instance(self.db_module)
 
     def test_get_instance_creates_instance(self):
         """Test that get_instance creates an instance of ScheduleManagement"""
