@@ -15,6 +15,12 @@ class TestReminderElement(unittest.TestCase):
     """Test the ReminderElement class"""
 
     def setUp(self):
+        db_module_mock = MagicMock()
+
+        # initialize the Managements
+        ScheduleManagement.get_instance(db_module_mock)
+        UserManagement.get_instance(db_module_mock)
+
         self.id = "1"
         self.title = "Test Reminder"
         self.description = "Description"

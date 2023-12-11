@@ -4,7 +4,7 @@
 
 from src.database.mongo_module import MongoModule, NonExistentIDError
 from src.calendar_elements.element_interface import Element
-from src.observer.observer import Observer, Subject
+from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
 from src.calendar_elements.element_factory import ElementFactory
 
 class ElementDoesNotExistError(Exception):
@@ -40,6 +40,17 @@ class ElementManagement(Observer):
         return cls._instance
 
     def __init__(self, database_module: MongoModule, elements: dict = None):
+        """
+        Constructor for the ElementManagement class.
+        
+        Args:
+            database_module: Database module.
+            elements: Dictionary of elements, where the key is the element ID
+        """
+
+        if not database_module:
+            raise DatabaseNotProvidedError("Database module not provided on object creation.")
+        
         self.db_module = database_module
         self.elements = elements if elements is not None else {}
 

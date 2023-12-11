@@ -3,6 +3,11 @@ Module that contains the observer interface.
 """
 from abc import ABC, abstractmethod
 
+class DatabaseNotProvidedError(Exception):
+    """
+    Custom exception class for when a database is not provided.
+    """
+
 class Subject(ABC): ...
 
 class Observer(ABC):
