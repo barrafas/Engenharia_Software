@@ -57,7 +57,7 @@ class User(Subject):
         self.user_preferences = user_preferences if user_preferences else {}
 
     def __str__(self) -> str:
-        return f"User({self._id}, {self.username}, {self.email}," \
+        return f"User({self.__id}, {self.username}, {self.email}," \
         f"{self.schedules}, {self.user_preferences})"
     
     @property
@@ -98,7 +98,7 @@ class User(Subject):
             "username": self.username,
             "email": self.email,
             "schedules": self.schedules,
-            "password": self.__hashed_password,
+            "password": self.hashed_password,
             "user_preferences": self.user_preferences
         }
     

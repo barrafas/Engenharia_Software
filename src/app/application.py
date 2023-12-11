@@ -56,7 +56,7 @@ class Application:
         The Application delegates part of its behavior to the current State
         object.
         """
-        auth = AuthenticationModule(self._db)
+        auth = AuthenticationModule()
 
         if auth.authenticate_user(user_id, password):
             print(f"\033[92mUser {user_id} authenticated.\033[0m")
