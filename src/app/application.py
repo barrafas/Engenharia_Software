@@ -80,6 +80,13 @@ class Application:
         else:
             print("Login failed.")
 
+    def logout(self):
+        """
+        The Application delegates part of its behavior to the current State
+        object.
+        """
+        self._user = None
+
     def sign_up(self, user_id, username, email, password):
         """
         The Application delegates part of its behavior to the current State

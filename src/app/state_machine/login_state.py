@@ -5,6 +5,11 @@ class LoginState(State):
     def __init__(self, context):
         super().__init__(context)
 
+        # check if the user is already logged in
+        if self.context.user:
+            # transition to main state
+            self.transition_to(StatesEnum.MAIN)
+
         # set the view
         self.view = LoginView(self.context.ui.root)
         # update the view in the ui

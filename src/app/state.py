@@ -8,6 +8,7 @@ class StatesEnum(Enum):
     SPLASH = auto()
     SIGNUP = auto()
     LOGIN = auto()
+    LOGGOUT = auto()
     MAIN = auto()
     DAYEVENTS = auto()
 
@@ -64,6 +65,9 @@ class State(ABC):
         elif state_enum == StatesEnum.LOGIN:
             from src.app.state_machine.login_state import LoginState
             self.context.transition_to(LoginState(self._context, **kwargs))
+        elif state_enum == StatesEnum.LOGGOUT:
+            from src.app.state_machine.logging_out_state import LoggingOutState
+            self.context.transition_to(LoggingOutState(self._context, **kwargs))
         elif state_enum == StatesEnum.MAIN:
             from src.app.state_machine.main_state import MainState
             self.context.transition_to(MainState(self._context, **kwargs))

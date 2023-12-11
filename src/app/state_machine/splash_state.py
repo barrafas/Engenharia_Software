@@ -1,7 +1,13 @@
+"""
+Splash screen state, where the user can either sign in or sign up.
+"""
 from src.app.state import State, StatesEnum
 from src.app.views.splash_view import SplashView
 
 class SplashState(State):
+    """
+    Splash screen state, where the user can either sign in or sign up.
+    """
     def __init__(self, context):
         super().__init__(context)
 
