@@ -28,9 +28,9 @@ class TestAuthenticationModule(unittest.TestCase):
 
     def test_authenticate_user_success(self):
         """ Test the authenticate_user method success case """
-        self.auth_module.user_management_module.user_exists = MagicMock(\
+        self.auth_module.user_management_module.user_exists = MagicMock(
             return_value=True)
-        self.auth_module.user_management_module.get_user = MagicMock(\
+        self.auth_module.user_management_module.get_user = MagicMock(
             return_value=self.create_mock_user())
 
         # Mocking verify_password method
@@ -72,7 +72,7 @@ class TestAuthenticationModule(unittest.TestCase):
 
     def test_authenticate_user_user_not_found(self):
         """ Test the authenticate_user method user not found case """
-        self.auth_module.user_management_module.user_exists = MagicMock(\
+        self.auth_module.user_management_module.user_exists = MagicMock(
             return_value=False)
 
         with self.assertRaises(UserNotFound):
