@@ -15,7 +15,7 @@ class TestAuthenticationModule(unittest.TestCase):
     def setUp(self):
         # You may want to mock the database module for testing
         self.database_module_mock = MagicMock()
-        self.auth_module = AuthenticationModule(self.database_module_mock)
+        self.auth_module = AuthenticationModule()
 
     def test_authenticate_user_success(self):
         # Mocking user_exists and get_user methods
