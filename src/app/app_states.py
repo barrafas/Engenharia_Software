@@ -2,56 +2,6 @@ from src.app.state import State
 import datetime
 
 
-class MainState(State):
-    def __init__(self, context):
-        self.context = context
-        self.events = {}
-
-        self.events = self.context.get_user_events()
-        
-    def login(self):
-        print("You are already logged in.")
-
-    def logout(self, event):
-        print("Logging out...")
-        self.context.user = None
-        self.context.transition_to(SignInUp(self.context))
-
-    def render(self):
-        print("Rendering main page...")
-
-        # show main elements
-        self.context._ui.show_main_elements(self.events)
-
-
-        # bind events
-        self.context._ui.logout_button.bind("<Button-1>", self.logout)
-        self.context._ui.go_back_button.bind("<Button-1>", self.go_back)
-
-
-        print("Binding calendar events...")
-        # bind calendar events
-        for day, button in self.context._ui.calendar_days.items():
-            args = day
-            button.bind("<Button-1>", lambda event, args=args: self.show_day_events(event, args))
-
-    def show_day_events(self, event, args):
-        # transition to day events state
-        day = args
-        self.context.transition_to(DayEventsState(self.context, day))
-
-    def clear(self):
-        self.context._ui.clear_elements()
-
-    def go_back(self, event):
-        # transition to sign-in/up state
-        self.context.user = None
-        self.context.transition_to(LoggedOut(self.context))
-
-    def __str__(self):
-        return "Main State"
-        
-
 class SignUpState(State):
     def __init__(self, context):
         self.context = context
