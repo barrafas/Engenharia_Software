@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta
 from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank, \
-                                EmailCantBeBlank, TupleWithLessThanTwoDatetimeObjects
+                                EmailCantBeBlank
 from unittest.mock import MagicMock
 import bcrypt
 
@@ -134,7 +134,7 @@ class TestUserModel(unittest.TestCase):
     def test_check_disponibility_short_tuple(self):
         user = User("id", "username", "email", ["id1", "id2"])
         time = (datetime.now(),)
-        with self.assertRaises(TupleWithLessThanTwoDatetimeObjects):
+        with self.assertRaises(TypeError):
             user.check_disponibility(time)
 
 if __name__ == '__main__':
