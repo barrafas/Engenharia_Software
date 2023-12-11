@@ -1,12 +1,28 @@
+"""
+module that contains the User class and its exceptions.
+The User class represents a user of the application.
+
+Classes:
+
+    UserNotInSchedule -- Exception raised when a user is not in a schedule.
+
+    UsernameCantBeBlank -- Exception raised when a username is blank.
+
+    EmailCantBeBlank -- Exception raised when a email is blank.
+
+    User -- Class that represents a user of the application.
+"""
+
+
+from datetime import datetime
 from src.schedule.schedule_management import ScheduleManagement
 from src.calendar_elements.element_management import ElementManagement
 from src.observer.observer import Observer, Subject
 
-from datetime import datetime
 
 class UserNotInSchedule(Exception):
     """
-    Custom exception class for when a user already exists.
+    Custom exception class for when a user is not in a schedule.
     """
 class UsernameCantBeBlank(Exception):
     """
@@ -35,7 +51,7 @@ class User(Subject):
         hashed_password: user hashed password
         user_preferences: user preferences
     """
-    def __init__(self, _id: str, username: str, email: str, schedules: list=None, 
+    def __init__(self, _id: str, username: str, email: str, schedules: list=None,
                  hashed_password: str=None, user_preferences: dict=None):
         """
         Constructor for the User class
@@ -53,23 +69,23 @@ class User(Subject):
         self.username = username
         self.email = email
         self.__schedules = schedules if schedules else []
-        self.hashed_password = hashed_password
+        self.__hashed_password = hashed_password
         self.user_preferences = user_preferences if user_preferences else {}
 
     def __str__(self) -> str:
         return f"User({self.__id}, {self.username}, {self.email}," \
         f"{self.schedules}, {self.user_preferences})"
-    
+
     @property
     def id(self) -> str:
         """ method that returns the id of the user"""
         return self.__id
-    
+
     @property
     def schedules(self) -> list:
         """ method that returns the schedules of the user"""
         return self.__schedules
-    
+
     @property
     def observers(self):
         """ method that returns the observers of the user """
@@ -101,7 +117,7 @@ class User(Subject):
             "hashed_password": self.hashed_password,
             "user_preferences": self.user_preferences
         }
-    
+
     def get_schedules(self) -> list:
         """
         Get the user schedules
@@ -114,7 +130,7 @@ class User(Subject):
         for schedule_id in self.schedules:
             schedules.append(schedule_management.get_schedule(schedule_id))
         return schedules
-    
+
     def get_elements(self, schedules: list=None) -> list:
         '''
         Get all elements from the user schedules, without repetition, or
@@ -132,8 +148,8 @@ class User(Subject):
             for schedule in schedules:
                 if schedule not in self.schedules:
                     raise UserNotInSchedule(
-                        f"Usuário não está nessa agenda: {schedule}")
-    
+                        f"User isn't in: {schedule}")
+
         schedule_management = ScheduleManagement.get_instance()
         elements = []
         if not schedules:
@@ -156,8 +172,8 @@ class User(Subject):
         >>> user.get_hashed_password()
         'hashed_password'
         """
-        return self.hashed_password
-    
+        return self.__hashed_password
+
     def set_username(self, username: str):
         """
         Set the user name
@@ -170,14 +186,14 @@ class User(Subject):
         >>> user.username
         'newusername'           
         """
-        if type(username) != str:
-            raise TypeError("O nome de usuário deve ser uma string")
+        if isinstance(username, str) is False:
+            raise TypeError("Username must be a string")
         elif username == "":
-            raise UsernameCantBeBlank("O nome de usuário não pode ser vazio")
+            raise UsernameCantBeBlank("Username cannot be blank")
         else:
             self.username = username.strip()
             self.notify()
-    
+
     def set_email(self, email: str):
         """
         Set the user name
@@ -190,10 +206,10 @@ class User(Subject):
         >>> user.email
         'new_email'
         """
-        if type(email) != str:
-            raise TypeError("O email deve ser uma string")
+        if isinstance(email, str) is False:
+            raise TypeError("Email must be a string")
         elif email == "":
-            raise EmailCantBeBlank("O email não pode ser vazio")
+            raise EmailCantBeBlank("Email cannot be blank")
         else:
             self.email = email.strip()
             self.notify()
@@ -207,8 +223,8 @@ class User(Subject):
             preference: preference to be set
         """
         for preference_type, preference in preferences.items():
-            if type(preference) != str:
-                raise TypeError("A preferência deve ser uma string")
+            if isinstance(preference_type, str) is False:
+                raise TypeError("The preference must be a string")
             else:
                 self.user_preferences[preference_type] = preference
                 self.notify()
@@ -226,13 +242,14 @@ class User(Subject):
         Returns:
             True if the user is available, False otherwise
         """
-        if type(time) != tuple:
-            raise TypeError("O horário deve ser uma tupla")
+        if isinstance(time, tuple) is False:
+            raise TypeError("Time must be a tuple")
         if len(time) < 2:
             raise TupleWithLessThanTwoDatetimeObjects(
-                "A tupla de horário deve conter pelo menos dois objetos datetime")
-        if type(time[0]) != datetime or type(time[1]) != datetime:
-            raise TypeError("A tupla de horário deve conter objetos datetime")
+                "The tuple must have at least two datetime objects")
+        if (isinstance(time[0], datetime) is False) or \
+                (isinstance(time[1], datetime) is False):
+            raise TypeError("The tuple must have datetime objects")
 
         element_ids = self.get_elements()
         element_management = ElementManagement.get_instance()
@@ -241,26 +258,26 @@ class User(Subject):
             element = element_management.get_element(element_id)
             if element.type != 'evento':
                 continue
-            
+
             # Check if the start time of the element is within the given time period
             if time[0] <= element.start_time < time[1]:
                 return False
-            
+
             # Check if the end time of the element is within the given time period
             if time[0] < element.end_time <= time[1]:
                 return False
-            
-            # Check if the given time period is within the start 
+
+            # Check if the given time period is within the start
             # and end time of the element
             if element.start_time <= time[0] < element.end_time or \
                 element.start_time < time[1] <= element.end_time:
                 return False
-        
+
         return True
 
     def __repr__(self):
         return " <User>:"+str(self.to_dict())
-    
+
     def attach(self, observer: Observer) -> None:
         """
             Attach an observer to the subject.

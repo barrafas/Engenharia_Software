@@ -57,7 +57,7 @@ class EventElement(Element):
     def element_type(self):
         """Returns the type of the event."""
         return self.__element_type
-    
+
     @property
     def observers(self):
         """Returns the observers of the event."""
@@ -95,7 +95,7 @@ class EventElement(Element):
         schedule_manager = ScheduleManagement.get_instance()
         # Return a list of Schedules objects
         return [schedule_manager.get_schedule(id) for id in self.__schedules]
-        
+
     def get_users(self, filter_schedules = []) -> list:
         """
         Returns the users that are assigned to the event.
@@ -108,12 +108,12 @@ class EventElement(Element):
         """
         schedule_manager = ScheduleManagement.get_instance()
         schedules_to_use = filter_schedules or self.__schedules
-  
+
         users = set()
         for schedule_id in schedules_to_use:
             schedule = schedule_manager.get_schedule(schedule_id)
             users.update(schedule.permissions.keys())
-        
+
         user_manager = UserManagement.get_instance()
         return [user_manager.get_user(id) for id in users]
 
@@ -156,7 +156,7 @@ class EventElement(Element):
             raise ValueError("Title cannot be empty or blank")
         elif len(title) > 50:
             raise ValueError("Title cannot have more than 50 characters")
-        else:   
+        else:
             self.title = title
             self.notify()
 
@@ -171,7 +171,8 @@ class EventElement(Element):
             if not isinstance(description, str):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
-                raise ValueError("Description cannot have more than 500 characters")
+                raise ValueError(
+                    "Description cannot have more than 500 characters")
         self.description = description
         self.notify()
 
@@ -302,12 +303,12 @@ class TaskElement(Element):
         """
         schedule_manager = ScheduleManagement.get_instance()
         schedules_to_use = filter_schedules or self.__schedules
-  
+
         users = set()
         for schedule_id in schedules_to_use:
             schedule = schedule_manager.get_schedule(schedule_id)
             users.update(schedule.permissions.keys())
-        
+
         user_manager = UserManagement.get_instance()
         return [user_manager.get_user(id) for id in users]
 
@@ -341,7 +342,8 @@ class TaskElement(Element):
         elif not isinstance(state, str):
             raise TypeError("State must be a string")
         elif state not in valid_states:
-            raise ValueError("State must be either 'incomplete', 'complete', or 'cancelled'")
+            raise ValueError(
+                "State must be either 'incomplete','complete', or 'cancelled'")
         else:
             self.state = state
             self.notify()
@@ -377,7 +379,8 @@ class TaskElement(Element):
             if not isinstance(description, str):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
-                raise ValueError("Description cannot have more than 500 characters")
+                raise ValueError(
+                    "Description cannot have more than 500 characters")
         self.description = description
         self.notify()
 
@@ -397,7 +400,7 @@ class TaskElement(Element):
             "element_type": self.__element_type,
             "schedules": self.__schedules
         }
-      
+
 class ReminderElement(Element):
     """
     A class that represents a reminder.
@@ -447,7 +450,7 @@ class ReminderElement(Element):
     def element_type(self):
         """Returns the type of the reminder."""
         return self.__element_type
-    
+
     @property
     def observers(self):
         """Returns the observers of the event."""
@@ -474,7 +477,8 @@ class ReminderElement(Element):
         In the case of the reminder, it will be 10 minutes before
         the reminder date untill the reminder date.
         Returns:
-            (datetime, datetime) -- The interval that the reminder should ocupate in the calendar.
+            (datetime, datetime) -- The interval that the reminder 
+                should ocupate in the calendar.
         """
         ending_date = self.reminder_date
         # The reminder will be displayed 10 minutes before the reminder date.
@@ -503,15 +507,15 @@ class ReminderElement(Element):
         """
         schedule_manager = ScheduleManagement.get_instance()
         schedules_to_use = filter_schedules or self.__schedules
-  
+
         users = set()
         for schedule_id in schedules_to_use:
             schedule = schedule_manager.get_schedule(schedule_id)
             users.update(schedule.permissions.keys())
-        
+
         user_manager = UserManagement.get_instance()
         return [user_manager.get_user(id) for id in users]
-    
+
     def set_reminder_date(self, reminder_date: datetime) -> None:
         """
         Sets the reminder date of the reminder.
@@ -543,7 +547,7 @@ class ReminderElement(Element):
             raise ValueError("Title cannot be empty or blank")
         elif len(title) > 50:
             raise ValueError("Title cannot have more than 50 characters")
-        else:   
+        else:
             self.title = title
             self.notify()
 
@@ -558,7 +562,8 @@ class ReminderElement(Element):
             if not isinstance(description, str):
                 raise TypeError("Description must be a string")
             elif len(description) > 500:
-                raise ValueError("Description cannot have more than 500 characters")
+                raise ValueError(
+                        "Description cannot have more than 500 characters")
         self.description = description
         self.notify()
 

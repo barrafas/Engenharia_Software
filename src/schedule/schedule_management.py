@@ -82,7 +82,7 @@ class ScheduleManagement(Observer):
         # Get the schedules from the database that match the given ID
         schedule = self.db_module.select_data('schedules', {'_id': schedule_id})
         # If the list is not empty, the schedule exists
-        return bool(schedule)      
+        return bool(schedule)
 
     def create_schedule(self, schedule_id: str, title: str, description: str,
                         permissions: dict, elements: list) -> Schedule:
@@ -165,7 +165,7 @@ class ScheduleManagement(Observer):
         elif self.schedule_exists(schedule_id):
             schedule_data = self.db_module.select_data('schedules',
                                                        {'_id': schedule_id})
-            schedule = Schedule(schedule_id, 
+            schedule = Schedule(schedule_id,
                                 schedule_data['title'],
                                 schedule_data['description'],
                                 schedule_data['permissions'],

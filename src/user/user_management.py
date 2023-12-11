@@ -8,8 +8,8 @@ Attributes:
 """
 import bcrypt
 from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
-from .user_model import User, UsernameCantBeBlank
 from src.observer.observer import Observer, Subject
+from .user_model import User, UsernameCantBeBlank
 
 class UserAlreadyExistsError(Exception):
     """
@@ -30,6 +30,9 @@ class UserManagement(Observer):
 
     @classmethod
     def get_instance(cls, database_module: MongoModule = None, users: dict = None):
+        """
+        Get the instance of the UserManagement class
+        """
         if not cls._instance:
             if not database_module:
                 raise Exception("Database module not provided")
@@ -84,7 +87,7 @@ class UserManagement(Observer):
                      "email": email, "schedules": [], 
                      "hashed_password": hashed_password, 
                      "user_preferences": user_preferences}
-        
+
         self.db_module.insert_data('users', {**user_info})
 
         user = User(**user_info)
@@ -178,7 +181,7 @@ class UserManagement(Observer):
         """
         if not self.user_exists(user_id):
             raise NonExistentIDError(f'User {user_id} does not exist')
-        
+
         user = self.users[user_id]
         user_info = user.to_dict()
         self.db_module.update_data('users', {"_id": user_id}, user_info)
@@ -201,7 +204,7 @@ class UserManagement(Observer):
         schedule_manager = ScheduleManagement.get_instance()
         if not self.user_exists(user_id):
             raise NonExistentIDError(f'User {user_id} does not exist')
-        
+
 
         user = self.get_user(user_id)
         if schedule_id not in user.schedules:

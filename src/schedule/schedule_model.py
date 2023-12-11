@@ -25,7 +25,7 @@ class Schedule(Subject):
         and each element can be assigned to one or more schedules.
         Each user can have a different permission in a schedule.
     """
-    def __init__(self, schedule_id: str, title: str, description: str, 
+    def __init__(self, schedule_id: str, title: str, description: str,
             permissions: dict, elements: [str] = None):
         """
             Schedule constructor.
@@ -116,7 +116,7 @@ class Schedule(Subject):
             Returns:
                 [User] -- List of users that have the specified permission types
         """
-  
+
         user_management = UserManagement.get_instance()
         users = []
         for user_id, permission_type in self.__permissions.items():
