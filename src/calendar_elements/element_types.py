@@ -34,6 +34,7 @@ class EventElement(Element):
             schedules -- The schedules that the event is assigned to.
             element_type -- The type of the event.
         """
+        super().__init__()
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
 
@@ -56,15 +57,22 @@ class EventElement(Element):
     def element_type(self):
         """Returns the type of the event."""
         return self.__element_type
+    
+    @property
+    def observers(self):
+        """Returns the observers of the event."""
+        return self.__observers
 
     @schedules.setter
     def schedules(self, schedules: [str]):
         """Sets the schedules of the event."""
+        self.notify()
         self.__schedules = schedules
 
     @element_type.setter
     def element_type(self, element_type: str):
         """Sets the type of the event."""
+        self.notify()
         self.__element_type = element_type
 
     def get_display_interval(self) -> (datetime, datetime):
@@ -130,6 +138,7 @@ class EventElement(Element):
         else:
             self.start = start
             self.end = end
+            self.notify()
 
     def set_title(self, title: str) -> None:
         """
@@ -149,6 +158,7 @@ class EventElement(Element):
             raise ValueError("Title cannot have more than 50 characters")
         else:   
             self.title = title
+            self.notify()
 
     def set_description(self, description: str) -> None:
         """
@@ -163,6 +173,7 @@ class EventElement(Element):
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
         self.description = description
+        self.notify()
 
     def to_dict(self) -> dict:
         """
@@ -210,6 +221,7 @@ class TaskElement(Element):
             state -- The state of the task.
             element_type -- The type of the task.
         """
+        super().__init__()
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
 
@@ -234,15 +246,22 @@ class TaskElement(Element):
         """Returns the type of the task."""
         return self.__element_type
 
+    @property
+    def observers(self):
+        """Returns the observers of the event."""
+        return self.__observers
+
     @schedules.setter
     def schedules(self, schedules: [str]):
         """Sets the schedules of the task."""
         self.__schedules = schedules
+        self.notify()
 
     @element_type.setter
     def element_type(self, element_type: str):
         """Sets the type of the task."""
         self.__element_type = element_type
+        self.notify()
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -305,6 +324,7 @@ class TaskElement(Element):
             raise TypeError("Due date must be a datetime object")
         else:
             self.due_date = due_date
+            self.notify()
 
 
     def set_state(self, state: str):
@@ -324,6 +344,7 @@ class TaskElement(Element):
             raise ValueError("State must be either 'incomplete', 'complete', or 'cancelled'")
         else:
             self.state = state
+            self.notify()
 
     def set_title(self, title: str) -> None:
         """
@@ -343,6 +364,7 @@ class TaskElement(Element):
             raise ValueError("Title cannot have more than 50 characters")
         else:
             self.title = title
+            self.notify()
 
     def set_description(self, description: str) -> None:
         """
@@ -357,6 +379,7 @@ class TaskElement(Element):
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
         self.description = description
+        self.notify()
 
     def to_dict(self) -> dict:
         """
@@ -401,6 +424,7 @@ class ReminderElement(Element):
             description -- The description of the reminder.
             element_type -- The type of the reminder.
         """
+        super().__init__()
         self.__schedules = schedules if schedules else []
         self.__element_type = element_type
 
@@ -423,16 +447,26 @@ class ReminderElement(Element):
     def element_type(self):
         """Returns the type of the reminder."""
         return self.__element_type
+    
+    @property
+    def observers(self):
+        """Returns the observers of the event."""
+        return self.__observers
 
     @schedules.setter
-    def schedules(self, schedules: [str]):
+    def schedules(self, value):
         """Sets the schedules of the reminder."""
-        self.__schedules = schedules
+        if isinstance(value, list) and all(isinstance(i, str) for i in value):
+            self.__schedules = value
+            self.notify()
+        else:
+            raise TypeError("Schedules must be a list of strings")
 
     @element_type.setter
     def element_type(self, element_type: str):
         """Sets the type of the reminder."""
         self.__element_type = element_type
+        self.notify()
 
     def get_display_interval(self) -> (datetime, datetime):
         """
@@ -491,6 +525,7 @@ class ReminderElement(Element):
             raise TypeError("Reminder date must be a datetime object")
         else:
             self.reminder_date = reminder_date
+            self.notify()
 
     def set_title(self, title: str) -> None:
         """
@@ -510,6 +545,7 @@ class ReminderElement(Element):
             raise ValueError("Title cannot have more than 50 characters")
         else:   
             self.title = title
+            self.notify()
 
     def set_description(self, description: str) -> None:
         """
@@ -524,6 +560,7 @@ class ReminderElement(Element):
             elif len(description) > 500:
                 raise ValueError("Description cannot have more than 500 characters")
         self.description = description
+        self.notify()
 
     def to_dict(self) -> dict:
         """

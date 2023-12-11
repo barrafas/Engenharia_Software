@@ -1,5 +1,6 @@
 from src.schedule.schedule_management import ScheduleManagement
 from src.calendar_elements.element_management import ElementManagement
+from src.observer.observer import Observer, Subject
 
 from datetime import datetime
 
@@ -22,7 +23,7 @@ class TupleWithLessThanTwoDatetimeObjects(Exception):
     is passed to the check_disponibility method.
     """
 
-class User:
+class User(Subject):
     """
     User class
 
@@ -47,16 +48,38 @@ class User:
             hashed_password: user hashed password
             user_preferences: user preferences
         """
-        self._id = _id
+        self.__observers = []
+        self.__id = _id
         self.username = username
         self.email = email
-        self.schedules = schedules if schedules else []
+        self.__schedules = schedules if schedules else []
         self.hashed_password = hashed_password
         self.user_preferences = user_preferences if user_preferences else {}
 
     def __str__(self) -> str:
         return f"User({self._id}, {self.username}, {self.email}," \
         f"{self.schedules}, {self.user_preferences})"
+    
+    @property
+    def id(self) -> str:
+        """ method that returns the id of the user"""
+        return self.__id
+    
+    @property
+    def schedules(self) -> list:
+        """ method that returns the schedules of the user"""
+        return self.__schedules
+    
+    @property
+    def observers(self):
+        """ method that returns the observers of the user """
+        return self.__observers
+
+    @schedules.setter
+    def schedules(self, schedules: [str]):
+        """Sets the schedules of the event."""
+        self.__schedules = schedules
+        self.notify()
 
     def to_dict(self) -> dict:
         """
@@ -67,15 +90,15 @@ class User:
 
         >>> user = User("id", "username", "email", ["id1", "id2"])
         >>> user.to_dict()
-        {'id': 'id', 'username': 'username', 'email': 'email',
+        {'_id': 'id', 'username': 'username', 'email': 'email',
         'schedules': ['id1', 'id2'], 'password': None, 'user_preferences': {}}
         """
         return {
-            "id": self._id,
+            "_id": self.__id,
             "username": self.username,
             "email": self.email,
             "schedules": self.schedules,
-            "password": self.hashed_password,
+            "password": self.__hashed_password,
             "user_preferences": self.user_preferences
         }
     
@@ -84,13 +107,13 @@ class User:
         Get the user schedules
 
         Returns:
-            A list of schedules ids the user is a part of
-
-        >>> user = User("id", "username", "email", ["id1", "id2"])
-        >>> user.get_schedules()
-        ['id1', 'id2']
+            A list of schedules instances the user has access to
         """
-        return self.schedules
+        schedule_management = ScheduleManagement.get_instance()
+        schedules = []
+        for schedule_id in self.schedules:
+            schedules.append(schedule_management.get_schedule(schedule_id))
+        return schedules
     
     def get_elements(self, schedules: list=None) -> list:
         '''
@@ -113,6 +136,8 @@ class User:
     
         schedule_management = ScheduleManagement.get_instance()
         elements = []
+        if not schedules:
+            schedules = self.schedules
         for schedule in schedules:
             schedule = schedule_management.get_schedule(schedule)
             elements += schedule.get_elements()
@@ -151,6 +176,7 @@ class User:
             raise UsernameCantBeBlank("O nome de usuário não pode ser vazio")
         else:
             self.username = username.strip()
+            self.notify()
     
     def set_email(self, email: str):
         """
@@ -170,6 +196,7 @@ class User:
             raise EmailCantBeBlank("O email não pode ser vazio")
         else:
             self.email = email.strip()
+            self.notify()
 
     def set_preferences(self, preferences: dict):
         """
@@ -184,6 +211,7 @@ class User:
                 raise TypeError("A preferência deve ser uma string")
             else:
                 self.user_preferences[preference_type] = preference
+                self.notify()
 
 
     def check_disponibility(self, time: tuple) -> bool:
@@ -232,3 +260,28 @@ class User:
 
     def __repr__(self):
         return " <User>:"+str(self.to_dict())
+    
+    def attach(self, observer: Observer) -> None:
+        """
+            Attach an observer to the subject.
+
+            Arguments:
+                observer -- the observer to attach.
+        """
+        self.__observers.append(observer)
+
+    def detach(self, observer: Observer) -> None:
+        """
+            Detach an observer from the subject.
+
+            Arguments:
+                observer -- the observer to detach.
+        """
+        self.__observers.remove(observer)
+
+    def notify(self) -> None:
+        """
+            Notify all the observers that the subject has changed.
+        """
+        for observer in self.__observers:
+            observer.update(self)

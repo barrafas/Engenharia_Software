@@ -26,7 +26,7 @@ Functions:
 """
 
 from src.schedule.schedule_model import Schedule
-from src.database.mongo_module import MongoModule
+from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
 #from src.user.user_model import User
 #from src.user.user_management import UserManagement
 from tests.test_schedule.mocks import Element,\
@@ -34,18 +34,10 @@ from tests.test_schedule.mocks import Element,\
                                         User,\
                                         UserManagement
 
-from .schedule_observer import Observer, Subject
+from src.observer.observer import Observer, Subject
 
 class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
-    pass
-
-class DuplicatedIDError(Exception):
-    """Raised when the ID already exists"""
-    pass
-
-class NonExistentIDError(Exception):
-    """Raised when the ID does not exist"""
     pass
 
 class ScheduleManagement(Observer):
@@ -152,15 +144,11 @@ class ScheduleManagement(Observer):
         # Update each element and add the schedule to its schedules attribute
         for element_id in elements:
             element = element_manager.get_element(element_id)
-            element.schedules.append(schedule)
-            element_manager.update_element(element_id) # TODO: Observer for elements
-
+            element.schedules = element.schedules + [schedule_id]
         # Update each user and add the schedule to its schedules attribute
         for user_id in permissions.keys():
             user = user_manager.get_user(user_id)
-            user.schedules.append(schedule)
-            user_manager.update_user(user_id) # TODO: Observer for users
-
+            user.schedules = user.schedules + [schedule_id]
         schedule.attach(self)
         return schedule
 
@@ -185,6 +173,7 @@ class ScheduleManagement(Observer):
                                 schedule_data['permissions'],
                                 schedule_data['elements'])
             self.schedules[schedule_id] = schedule
+            schedule.attach(self)
             return schedule
         else:
             raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
@@ -217,17 +206,22 @@ class ScheduleManagement(Observer):
         schedule = self.get_schedule(schedule_id)
         element_manager = ElementManagement.get_instance()
         for element_id in schedule.elements:
-            element_manager.update_element(element_id)
+            element = element_manager.get_element(element_id)
+            element.schedules = [schedule for schedule in \
+                element.schedules if schedule != schedule_id]
 
         # Update each user
         user_ids = schedule.permissions.keys()
         user_manager = UserManagement.get_instance()
         for user_id in user_ids:
-            user_manager.update_user(user_id)
+            user = user_manager.get_user(user_id)
+            user.schedules = [schedule for schedule in \
+                user.schedules if schedule != schedule_id]
 
         self.db_module.delete_data('schedules', {'_id': schedule_id})
         if schedule_id in self.schedules:
-            del self.schedules[schedule_id]
+            remove = self.schedules.pop(schedule_id)
+            del remove
 
     def add_element_to_schedule(self,
                                 schedule_id: str,
@@ -246,12 +240,11 @@ class ScheduleManagement(Observer):
         if not self.schedule_exists(schedule_id):
             raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
 
-        schedule = self.schedules[schedule_id]
+        schedule = self.get_schedule(schedule_id)
         if element_id not in schedule.elements:
             schedule.elements = schedule.elements + [element_id]
             element = element_manager.get_element(element_id)
             element.schedules = element.schedules + [schedule_id]
-            element_manager.update_element(element_id)
         else:
             raise DuplicatedIDError(f"Element with ID {element_id} already \
                                     exists in schedule {schedule_id}")

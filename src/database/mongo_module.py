@@ -41,6 +41,16 @@ import pymongo
 from src.database.database_module import DatabaseModule
 from src.database.utils import TimeoutDecorator
 
+
+class DuplicatedIDError(Exception):
+    """Raised when the ID already exists"""
+    pass
+
+class NonExistentIDError(Exception):
+    """Raised when the ID does not exist"""
+    pass
+
+
 class MongoModule(DatabaseModule):
     """
     This class implements the DatabaseModule interface for MongoDB.
