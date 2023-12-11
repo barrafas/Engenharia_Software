@@ -1,9 +1,6 @@
 # Engenharia_Software
 Repositório para trabalho da disciplina Engenharia de Software. Como projeto, optamos por criar um aplicativo de calendário em grupo, focando na compatibilidade de agendas, fusos horários e discussões de eventos.
 
-O relatório está presente na pasta de documentação.
-
-
 Membros:
 
     Gustavo Sanches
@@ -21,7 +18,10 @@ Para certificar-se que todas as dependências foram instaladas em suas versões 
 Decidimos atualizar a entrega inicial referente aos casos de uso para melhor refletir as modificações que ocorreram no sistema ao longo do desenvolvimento. O arquivo Entrega_A1_Atualizado.pdf dentro da pasta de documentação é referente à essa entrega atualizada.
 
 **Testes realizados durante TDD:**
-Os testes realizados durante o processo de TDD foram registrados em notebooks Jupyter, que estão disponíveis dentro da pasta de testes de cada classe específica, contendo o histórico de iterações das funções testadas.
+Os testes realizados durante o processo de TDD foram registrados em notebooks Jupyter, que estão disponíveis dentro da pasta de testes de cada classe específica, contendo o histórico de iterações das funções testadas. 
+
+**Relatórios**
+O relatório do projeto (observações, padrões, desenvolvimento...) e relatório da cobertura do código estão presentes na pasta de documentação. 
 
 **Requisitos do sistema:**
 -   Gerenciamento de eventos pessoais:
