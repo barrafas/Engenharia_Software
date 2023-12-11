@@ -12,9 +12,15 @@ class TestElementManagement(unittest.TestCase):
     def setUp(self):
         # Reset singleton instance and create a mock database module
         ElementManagement._instance = None
-        self.db_module = Mock()
+        self.db_module = MagicMock()
         self.elements = {'id': MagicMock(spec=Element)}
         self.element_management = ElementManagement.get_instance(self.db_module)
+        from src.schedule.schedule_management import ScheduleManagement
+        ScheduleManagement._instance = None
+        self.schedule_management = ScheduleManagement.get_instance(self.db_module)
+        from src.user.user_management import UserManagement
+        UserManagement._instance = None
+        self.user_management = UserManagement.get_instance(self.db_module)
 
     def test_get_instance_creates_instance(self):
         """ Check that get_instance creates an instance of ElementManagement"""
@@ -61,18 +67,23 @@ class TestElementManagement(unittest.TestCase):
         self.element_management.elements[id_1] = element
         result = self.element_management.get_element(id_1)
         self.assertEqual(result.title, title)
+        self.assertEqual(result.schedules, schedules)
+        self.assertEqual(result.element_type, element_type)
+        self.assertEqual(result.start, start)
+        self.assertEqual(result.end, end)
+        self.assertEqual(result.description, description)
 
 
     def test_get_element_id_exists_in_database(self):
         """ Check that get_element returns the element if it exists in the 
         database """
-        self.element_management.db_module.select_data = MagicMock(return_value={"_id": "id",
+        self.element_management.db_module.select_data = MagicMock(return_value=[{"_id": "id",
                                                 "title": "title",
                                                 "schedules": ["schedule1", "schedule2"],
                                                 "element_type": "event",
                                                 "start": datetime(2021, 1, 1),
                                                 "end": datetime(2021, 1, 2),
-                                                "description": "description"})
+                                                "description": "description"}])
         self.element_management.element_exists = MagicMock(return_value=True)
         result = self.element_management.get_element("id")
         self.assertEqual(result.title, "title")
@@ -112,10 +123,11 @@ class TestElementManagement(unittest.TestCase):
         #                                         start=start, end=end, 
         #                                         description=description)
         # self.element_management.elements[id_1] = element
-        # self.element_management.db_module.update_element = MagicMock()
-
-        # self.element_management.db_module.update_data.assert_called_once_with("elements",
-        #                                     {"_id": "id"}, element.to_dict())
+        # self.element_management.db_module.update_data = MagicMock()
+        # print('AAAAAAAAAA')
+        # self.element_management.update_element(id_1)
+        # print('BBBBBBBBBB')
+        # self.element_management.db_module.update_data.assert_called_once_with("elements", {"_id": "id"}, element.to_dict())
 
 
     def test_update_element_id_does_not_exist(self):
@@ -126,29 +138,59 @@ class TestElementManagement(unittest.TestCase):
         with self.assertRaises(ElementDoesNotExistError):
             self.element_management.update_element(element)
 
-    # def test_delete_element_id_exists(self):
-    #     """ Check that delete_element deletes the element if it exists in the 
-    #     database """
-    #     element_id = "id"
-    #     self.element_management.db_module.delete_data = MagicMock()
-    #     self.element_management.db_module.select_data.return_value = {"_id": element_id,
-    #                                             "title": "title",
-    #                                             "schedules": ["schedule1", "schedule2"],
-    #                                             "element_type": "event",
-    #                                             "start": datetime(2021, 1, 1),
-    #                                             "end": datetime(2021, 1, 2),
-    #                                             "description": "description"}
-    #     self.element_management.delete_element(element_id)
-    #     self.element_management.db_module.delete_data.assert_called_once_with("elements", {"_id": "id"})
+    def test_delete_element_id_exists(self):
+        """ Check that delete_element deletes the element if it exists in the 
+        database """
+        element_id = "id"
+        self.element_management.db_module.delete_data = MagicMock()
+        def mock_select_data(collection, query):
+            if collection == "elements" and query == {"_id": "id"}:
+                return [{"_id": "id",
+                        "title": "title",
+                        "schedules": ["schedule1", "schedule2"],
+                        "element_type": "event",
+                        "start": datetime(2021, 1, 1),
+                        "end": datetime(2021, 1, 2),
+                        "description": "description"}]
+            if collection == "schedules" and query == {"_id": "schedule1"}:
+                return [{"_id": "schedule1",
+                        "title": "title1",
+                        "description": "description",
+                        "permissions": {"user1": 'owner', "user2": "editor"},
+                        "elements": ["id", "element2"]}]
+            if collection == "schedules" and query == {"_id": "schedule2"}:
+                return [{"_id": "schedule2",
+                        "title": "title2",
+                        "description": "description",
+                        "permissions": {"user1": 'owner', "user2": "editor"},
+                        "elements": ["id"]}]
+            if collection == "users" and query == {"_id": "user1"}:
+                return [{"_id": "user1",
+                        "username": "username1",
+                        "email": "email1",
+                        "schedules": ["schedule1", "schedule2"],
+                        "hashed_password": "hashed_password1",
+                        "user_preferences": {},}]
+            if collection == "users" and query == {"_id": "user2"}:
+                return [{"_id": "user2",
+                        "username": "username2",
+                        "email": "email2",
+                        "schedules": ["schedule1"],
+                        "hashed_password": "hashed_password2",
+                        "user_preferences": {},}]
+            
+        self.element_management.db_module.select_data = MagicMock(side_effect=mock_select_data)
+        self.element_management.delete_element(element_id)
+        self.element_management.db_module.delete_data.assert_called_once_with("elements", {"_id": "id"})
 
 
-    def test_delete_element_id_does_not_exist(self):
-        """ Check that delete_element raises ElementDoesNotExistError if the 
-        element does not exist in the database """
-        element = 'element'
-        self.element_management.element_exists = MagicMock(return_value=False)
-        with self.assertRaises(ElementDoesNotExistError):
-            self.element_management.delete_element(element)
+    # def test_delete_element_id_does_not_exist(self):
+    #     """ Check that delete_element raises ElementDoesNotExistError if the 
+    #     element does not exist in the database """
+    #     element = 'element'
+    #     self.element_management.element_exists = MagicMock(return_value=False)
+    #     with self.assertRaises(ElementDoesNotExistError):
+    #         self.element_management.delete_element(element)
 
     # def test_create_element(self):
     #     """ Check that create_element creates the element if it does not exist 

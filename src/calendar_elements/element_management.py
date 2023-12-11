@@ -130,13 +130,6 @@ class ElementManagement(Observer):
             schedule_instance.elements = [element for element in \
                 schedule_instance.elements if element != element_id]
 
-
-        from src.user.user_management import UserManagement
-        user_manager = UserManagement.get_instance()
-        for user in users:
-            user.elements = [element for element in user.elements \
-                 if element != element_id]
-
         self.db_module.delete_data('elements', {'_id': element_id})
         if element_id in self.elements:
             remove = self.elements.pop(element_id)
