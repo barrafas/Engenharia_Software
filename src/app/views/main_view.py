@@ -21,6 +21,7 @@ class MainView(View):
         self.sidebar = None
         self.navbar = None
         self.main_frame = None
+        self.month_frame = None
 
         self.calendar_frame = None
         self.calendar_buttons = {}
@@ -74,6 +75,7 @@ class MainView(View):
         self.main_frame = customtkinter.CTkFrame(self.root)
         self.main_frame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
 
+
         # main elements
         self.show_main_elements()
 
@@ -81,12 +83,17 @@ class MainView(View):
         user_events_label = customtkinter.CTkLabel(self.main_frame, text="Eventos do usuário")
         user_events_label.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
+        self.month_frame = customtkinter.CTkFrame(self.main_frame)
+        self.month_frame.grid(row=1, column=0, padx=1, pady=1, sticky="nsew")
+
         # self.user_events = customtkinter.CTkLabel(self.main_frame, text=">> User events: loading... ")
         # self.user_events.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
         
         print(f">> User events: {self.elements}")
 
         self.show_calendar()
+        self.show_next_month()
+        self.show_previous_month()
 
     def show_calendar(self):
         self.calendar_frame = customtkinter.CTkFrame(self.main_frame)
@@ -125,4 +132,11 @@ class MainView(View):
                 else:
                     day_button = customtkinter.CTkButton(self.calendar_frame, text=" ", width=calendar_day_size["width"], height=calendar_day_size["height"])
                     day_button.grid(row=w, column=d, padx=1, pady=1, sticky="nsew")
-        
+
+    def show_next_month(self):
+        self.next_month_button = customtkinter.CTkButton(self.month_frame, text=">", width=50, height=2)
+        self.next_month_button.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+
+    def show_previous_month(self):
+        self.prev_month_button = customtkinter.CTkButton(self.month_frame, text="<", width=50, height=2)
+        self.prev_month_button.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
