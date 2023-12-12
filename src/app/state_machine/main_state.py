@@ -6,6 +6,8 @@ import datetime
 from src.app.views.main_view import MainView
 from src.app.state import State, StatesEnum
 
+from src.schedule.schedule_management import ScheduleManagement
+
 class MainState(State):
     """
     Main state is the state that shows the user's calendar.
@@ -34,6 +36,8 @@ class MainState(State):
         self.context.ui.view = self.view
 
         self.view.logged_user_name = self.logged_in_user().username
+        self.view.schedules = self.context.user.get_schedules()
+        self.view.selected_schedules_ids = self.context.selected_schedules
 
     def logged_in_user(self):
         """
@@ -57,7 +61,37 @@ class MainState(State):
         # bind calendar buttons, each key of the tree is the (year, month, day) tuple
         for yy_mm_dd, button in self.view.calendar_buttons.items():
             button.bind("<Button-1>", lambda event, args=yy_mm_dd: self.show_day_events(event, args))
+
+        # bind schedule checkboxes
+        for schedule_id, checkbox in self.view.schedules_checkboxes.items():
+            checkbox.bind("<Button-1>", lambda event, args=schedule_id: self.toggle_schedule(event, args))
+        
+        # bind add schedule button
+        self.view.add_schedule_button.bind("<Button-1>", self.add_schedule)
     
+    def toggle_schedule(self, _event, schedule_id):
+        """
+        Toggle the schedule checkbox.
+        """
+        if schedule_id in self.context.selected_schedules:
+            self.context.selected_schedules.remove(schedule_id)
+        else:
+            self.context.selected_schedules.append(schedule_id)
+
+        self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year)
+
+    def add_schedule(self, _event):
+        """
+        Handle add schedule button click.
+        """
+        user = self.context.user
+        schedule_management = ScheduleManagement.get_instance()
+        new_id = user.id + "_" + str(len(user.schedules))
+        new_schedule = schedule_management.create_schedule(schedule_id=new_id, description="", elements=[], permissions={user.id: "owner"})
+        user.add_schedule(new_schedule)
+
+        self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year, selected_schedules_ids=self.context.selected_schedules)
+
     def logout(self, _event):
         """
         Handle logout button click.

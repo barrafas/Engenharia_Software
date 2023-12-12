@@ -19,6 +19,11 @@ class MainView(View):
         self.logged_user_name = ""
 
         self.elements = elements
+        self.schedules = None
+        self.selected_schedules_ids = None
+
+        self.schedules_checkboxes = {}
+        self.add_schedule_button = None
 
         self.sidebar = None
         self.navbar = None
@@ -61,7 +66,18 @@ class MainView(View):
     def show_sidebar_elements(self):
         self.logout_button = customtkinter.CTkButton(self.sidebar, text="Logout")
         self.logout_button.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
-    
+
+        schedules_frame = customtkinter.CTkFrame(self.sidebar)
+        schedules_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        for schedule in self.schedules:
+            schedule_checkbox = customtkinter.CTkCheckBox(schedules_frame, text=schedule.title)
+            schedule_checkbox.pack(anchor="w", padx=10, pady=10, expand=True, fill="x")
+            if schedule.id in self.selected_schedules_ids:
+                schedule_checkbox.select()
+        
+        self.add_schedule_button = customtkinter.CTkButton(self.sidebar, text="Adicionar agenda")
+        self.add_schedule_button.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+
     def show_navbar(self):
         self.navbar = customtkinter.CTkFrame(self.root)
         self.navbar.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
@@ -96,7 +112,7 @@ class MainView(View):
         self.show_previous_month()
         
         self.export_data_button = customtkinter.CTkButton(self.sidebar, text="Exportar dados")
-        self.export_data_button.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self.export_data_button.grid(row=3, column=0, padx=10, pady=10, sticky="w")
 
     def show_calendar(self):
         self.calendar_frame = customtkinter.CTkFrame(self.main_frame)
