@@ -160,11 +160,11 @@ class TestUserModel(unittest.TestCase):
         # Arrange
         user = User("id", "username", "email", ["schedule1", "schedule2"])
         mock_element1 = MagicMock()
-        mock_element1.type = 'evento'
+        mock_element1.type = 'event'
         mock_element1.start_time = datetime.now() + timedelta(hours=3)
         mock_element1.end_time = datetime.now() + timedelta(hours=4)
         mock_element2 = MagicMock()
-        mock_element2.type = 'evento'
+        mock_element2.type = 'event'
         mock_element2.start_time = datetime.now() + timedelta(hours=5)
         mock_element2.end_time = datetime.now() + timedelta(hours=6)
         mock_schedule1 = MagicMock()
@@ -172,29 +172,70 @@ class TestUserModel(unittest.TestCase):
         mock_schedule2 = MagicMock()
         mock_schedule2.get_elements.return_value = [mock_element2]
         mock_schedule_management = MagicMock()
-        mock_schedule_management.get_schedule.side_effect = lambda x: mock_schedule1 if x == 'schedule1' else mock_schedule2
+        mock_element_management = MagicMock()
+        with patch.object(self.schedule_management, 'get_instance', return_value=mock_schedule_management), \
+            patch.object(self.schedule_management, 'get_schedule', side_effect=lambda x: mock_schedule1 if x == 'schedule1' else mock_schedule2), \
+            patch.object(self.element_management, 'get_instance', return_value=mock_element_management), \
+            patch.object(self.element_management, 'get_element', side_effect=lambda x: mock_element1 if x == 'element_id1' else mock_element2):
+            # Act
+            result = user.check_disponibility((datetime.now(), datetime.now() + timedelta(hours=2)))
+            # Assert
+            self.assertTrue(result)
 
-        with patch.object(self.schedule_management, 'get_instance', return_value=mock_schedule_management):
+    def test_check_disponibility_end_time_same_as_other_event_start_time(self):
+        """Test that check_disponibility returns True when the end time of the checked period is the same as the start time of an existing event"""
+        # Arrange
+        user = User("id", "username", "email", ["schedule1", "schedule2"])
+        mock_element1 = MagicMock()
+        mock_element1.type = 'event'
+        mock_element1.start_time = datetime.now() + timedelta(hours=2)
+        mock_element1.end_time = datetime.now() + timedelta(hours=3)
+        mock_element2 = MagicMock()
+        mock_element2.type = 'event'
+        mock_element2.start_time = datetime.now() + timedelta(hours=4)
+        mock_element2.end_time = datetime.now() + timedelta(hours=5)
+        mock_schedule1 = MagicMock()
+        mock_schedule1.get_elements.return_value = [mock_element1]
+        mock_schedule2 = MagicMock()
+        mock_schedule2.get_elements.return_value = [mock_element2]
+        mock_schedule_management = MagicMock()
+        mock_element_management = MagicMock()
+        with patch.object(self.schedule_management, 'get_instance', return_value=mock_schedule_management), \
+            patch.object(self.schedule_management, 'get_schedule', side_effect=lambda x: mock_schedule1 if x == 'schedule1' else mock_schedule2), \
+            patch.object(self.element_management, 'get_instance', return_value=mock_element_management), \
+            patch.object(self.element_management, 'get_element', side_effect=lambda x: mock_element1 if x == 'element_id1' else mock_element2):
+            # Act
+            result = user.check_disponibility((datetime.now(), datetime.now() + timedelta(hours=2)))
+            # Assert
+            self.assertTrue(result)
 
+    def test_check_disponibility_ignoring_non_event_elements(self):
+        """Test that check_disponibility returns True when the checked period conflicts with a non-event element"""
+        # Arrange
+        user = User("id", "username", "email", ["schedule1", "schedule2"])
+        mock_element1 = MagicMock()
+        mock_element1.type = 'reminder'
+        mock_element1.start_time = datetime.now() + timedelta(hours=1)
+        mock_element1.end_time = datetime.now() + timedelta(hours=3)
+        mock_element2 = MagicMock()
+        mock_element2.type = 'event'
+        mock_element2.start_time = datetime.now() + timedelta(hours=4)
+        mock_element2.end_time = datetime.now() + timedelta(hours=5)
+        mock_schedule1 = MagicMock()
+        mock_schedule1.get_elements.return_value = [mock_element1]
+        mock_schedule2 = MagicMock()
+        mock_schedule2.get_elements.return_value = [mock_element2]
+        mock_schedule_management = MagicMock()
+        mock_element_management = MagicMock()
+        with patch.object(self.schedule_management, 'get_instance', return_value=mock_schedule_management), \
+            patch.object(self.schedule_management, 'get_schedule', side_effect=lambda x: mock_schedule1 if x == 'schedule1' else mock_schedule2), \
+            patch.object(self.element_management, 'get_instance', return_value=mock_element_management), \
+            patch.object(self.element_management, 'get_element', side_effect=lambda x: mock_element1 if x == 'element_id1' else mock_element2):
             # Act
             result = user.check_disponibility((datetime.now(), datetime.now() + timedelta(hours=2)))
 
             # Assert
             self.assertTrue(result)
-
-    def test_check_disponibility_end_time_same_as_other_event_start_time(self):
-        user = User("id", "username", "email", ["id1", "id2"])
-        time = (datetime.now() + timedelta(hours=11), 
-                self.element_management.get_element("elementid5").start_time)
-        result = user.check_disponibility(time)
-        self.assertTrue(result)
-
-    def test_check_disponibility_ignoring_non_event_elements(self):
-        user = User("id", "username", "email", ["id1", "id2"])
-        time = (self.element_management.get_element("elementid3").start_time,
-                self.element_management.get_element("elementid3").end_time)
-        result = user.check_disponibility(time)
-        self.assertTrue(result)
 
     def test_check_disponibility_input_type_exception(self):
         user = User("id", "username", "email", ["id1", "id2"])
