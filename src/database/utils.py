@@ -125,7 +125,8 @@ class TimeoutDecorator(DatabaseModule):
 
     def connect(self):
         """ Connect to the database."""
-        return self._timeout_wrapper(self._decorated.connect)()
+        # return self._timeout_wrapper(self._decorated.connect)()
+        return self._decorated.connect()
 
     def disconnect(self):
         """ Disconnect from the database."""
@@ -151,3 +152,28 @@ class TimeoutDecorator(DatabaseModule):
         """ Select data from the database."""
         return self._timeout_wrapper(self._decorated.select_data)(collection_name,
                                                                   condition)
+
+    def __str__(self):
+        """ String representation of the object."""
+        return "@timeout("+str(self._decorated)+")"
+
+    # setting the getters for the attributes of the decorated object
+    @property
+    def host(self):
+        """ Getter for the host attribute."""
+        return self._decorated.host
+
+    @property
+    def port(self):
+        """ Getter for the port attribute."""
+        return self._decorated.port
+
+    @property
+    def user(self):
+        """ Getter for the user attribute."""
+        return self._decorated.user
+    
+    @property
+    def password(self):
+        """ Getter for the password attribute."""
+        return self._decorated.password

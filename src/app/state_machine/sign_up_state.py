@@ -20,7 +20,6 @@ class SignUpState(State):
         self.context.ui.view = self.view
 
     def render(self):
-        print("Rendering sign up page...")
         self.view.show()
 
         # bind events

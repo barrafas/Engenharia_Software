@@ -60,7 +60,6 @@ class TestReminderElement(unittest.TestCase):
         """
         expected_interval = (
             datetime(2022, 12, 31, 23, 50), datetime(2023, 1, 1))
-        print(self.reminder.get_display_interval())
         self.assertEqual(self.reminder.get_display_interval(),
                          expected_interval)
 

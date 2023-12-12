@@ -32,7 +32,6 @@ class DayEventsState(State):
         return self.context.user
 
     def render(self):
-        print("Rendering day events page...")
         self.view.show()
 
         # bind events

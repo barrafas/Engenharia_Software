@@ -28,9 +28,6 @@ class TkinterUI:
 
     def show_day_events(self, day_events, day):
         # Lógica para exibir elementos relacionados ao login
-        print("Showing day events...")
-        print(day_events)
-        print(day)
 
         self.logout_button = customtkinter.CTkButton(self.root, text="Logout")
         self.logout_button.pack()
