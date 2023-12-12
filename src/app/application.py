@@ -9,6 +9,8 @@ from src.user.user_management import UserManagement
 from src.calendar_elements.element_management import ElementManagement
 from src.schedule.schedule_management import ScheduleManagement
 from src.auth.authentication import AuthenticationModule
+from src.database.mongo_module import MongoModule
+from src.database.utils import TimeoutDecorator
 
 class Application:
     """
@@ -23,7 +25,40 @@ class Application:
         self._user = None
         self.selected_schedules = []
 
+    def initialize_database(self, database_url, database_port, database_user, database_password):
+        """
+        Initialize the database
+        """
+        if database_user == "None" or database_password == "":
+            database_user = None
+            database_password = None
+        if database_password == "None" or database_password == "":
+            database_password = None
+        database_port = int(database_port)
+        MongoModule._instance = None
+        user = {}
+        if database_user:
+            user = {"user": database_user, "password": database_password}
+        self._db = TimeoutDecorator(
+                    MongoModule(host = database_url,
+                        port = database_port,
+                        database_name = "calendar_app",
+                        **user)
+                    , 5)
+
+        self._db.connect()
+        print(f"\033[92mDatabase initialized: {self._db}\033[0m")
+
+        self.initialize_managers()
+
+    def initialize_managers(self):
+        """
+        Initialize the managers
+        """
         # initialize modules
+        ScheduleManagement._instance = None
+        ElementManagement._instance = None
+        UserManagement._instance = None
         ScheduleManagement.get_instance(database_module=self._db)
         ElementManagement.get_instance(database_module=self._db)
         UserManagement.get_instance(database_module=self._db)
@@ -39,6 +74,15 @@ class Application:
         state.render()
 
     @property
+    def db(self):
+        return self._db
+    
+    @db.setter
+    def db(self, db):
+        self._db = db
+        self.initialize_managers()
+
+    @property
     def state(self):
         return self._state
     
@@ -49,8 +93,11 @@ class Application:
     @user.setter
     def user(self, user):
         self._user = user
-        self.selected_schedules = user.schedules
-    
+        if user:
+            self.selected_schedules = user.schedules
+        else:
+            self.selected_schedules = []
+
     @property
     def ui(self):
         return self._ui
