@@ -226,7 +226,7 @@ class User(Subject):
         """
         Checks if the user is available at a given time, based on the user's
         schedules and elements. It should not raise a conflict if the type
-        of the element is not 'evento'.
+        of the element is not 'event'.
 
         Args:
             time: tuple with the start and end time to be checked
@@ -248,7 +248,7 @@ class User(Subject):
 
         for element_id in element_ids:
             element = element_management.get_element(element_id)
-            if element.type != 'evento':
+            if element.type != 'event':
                 continue
 
             # Check if the start time of the element is within the given time period

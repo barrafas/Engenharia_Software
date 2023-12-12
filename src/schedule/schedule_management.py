@@ -1,5 +1,4 @@
-"""
-Module for the ScheduleManagement class.
+""" Module for the ScheduleManagement class.
 
 This module contains the ScheduleManagement class. This class is responsible
 for managing the schedules in the database.
@@ -20,19 +19,21 @@ Functions:
     create_schedule: Create a new schedule
     get_schedule: Get a schedule by its ID
     update_schedule: Updates a schedule in the database
-    delete_schedule: Deletes a schedule from the database and the schedules dictionary
+    delete_schedule: Deletes a schedule from the database and the schedules 
+        dictionary
     add_element_to_schedule: Add an element to a schedule
     update: Called when the schedule is updated.
 """
 
-from src.schedule.schedule_model import Schedule
-from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
-
+from src.database.mongo_module import MongoModule,DuplicatedIDError,NonExistentIDError
 from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
+from src.schedule.schedule_model import Schedule
+
 
 class EmptyPermissionsError(Exception):
     """Raised when the permissions list is empty"""
     pass
+
 
 class ScheduleManagement(Observer):
     """
@@ -44,11 +45,12 @@ class ScheduleManagement(Observer):
         schedules: Dictionary of schedules, where the key is the schedule ID
             and the value is the schedule instance
     """
-
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule = None, schedules: dict = None):
+    def get_instance(cls,
+                    database_module: MongoModule = None,
+                    schedules: dict = None) -> 'ScheduleManagement':
         """
         Get the instance of the ScheduleManagement class
         """
@@ -56,7 +58,9 @@ class ScheduleManagement(Observer):
             cls._instance = cls(database_module, schedules)
         return cls._instance
 
-    def __init__(self, database_module: MongoModule, schedules: dict = None):
+    def __init__(self,
+                database_module: MongoModule,
+                schedules: dict = None):
         """
         Constructor for the ScheduleManagement class
 
@@ -66,13 +70,14 @@ class ScheduleManagement(Observer):
         """
 
         if not database_module:
-            raise DatabaseNotProvidedError("Database module not provided on object creation.")
-        
+            raise DatabaseNotProvidedError(
+                "Database module not provided on object creation.")
+
         self.db_module = database_module
         self.schedules = schedules if schedules else {}
 
-
-    def schedule_exists(self, schedule_id: str) -> bool:
+    def schedule_exists(self,
+                        schedule_id: str) -> bool:
         """
         Check if a schedule exists
 
@@ -84,12 +89,17 @@ class ScheduleManagement(Observer):
         """
 
         # Get the schedules from the database that match the given ID
-        schedule = self.db_module.select_data('schedules', {'_id': schedule_id})
+        schedule = self.db_module.select_data(
+            'schedules', {'_id': schedule_id})
         # If the list is not empty, the schedule exists
         return bool(schedule)
 
-    def create_schedule(self, schedule_id: str, title: str, description: str,
-                        permissions: dict, elements: list) -> Schedule:
+    def create_schedule(self,
+                        schedule_id: str,
+                        title: str,
+                        description: str,
+                        permissions: dict,
+                        elements: list) -> Schedule:
         """
         Create a new schedule
 
@@ -103,6 +113,9 @@ class ScheduleManagement(Observer):
         Returns:
             The created schedule instance
         """
+        from src.calendar_elements.element_management import ElementManagement
+        from src.user.user_management import UserManagement
+
         # Possible errors:
         if self.schedule_exists(schedule_id):
             raise DuplicatedIDError(f"A schedule with ID {schedule_id} \
@@ -111,9 +124,6 @@ class ScheduleManagement(Observer):
             raise TypeError("Schedule ID must be a string")
         if not permissions:
             raise EmptyPermissionsError("Permissions cannot be empty")
-
-        from src.user.user_management import UserManagement
-        from src.calendar_elements.element_management import ElementManagement
 
         # Check if each element exists
         element_manager = ElementManagement.get_instance()
@@ -136,10 +146,10 @@ class ScheduleManagement(Observer):
                             elements)
 
         self.db_module.insert_data('schedules', {'_id': schedule_id,
-                                                'title': title, 
-                                                'description': description, 
-                                                'permissions': permissions,
-                                                'elements': elements})
+                                                 'title': title,
+                                                 'description': description,
+                                                 'permissions': permissions,
+                                                 'elements': elements})
         # Add the schedule to the dictionary
         self.schedules[schedule_id] = schedule
 
@@ -154,7 +164,8 @@ class ScheduleManagement(Observer):
         schedule.attach(self)
         return schedule
 
-    def get_schedule(self, schedule_id: str) -> Schedule:
+    def get_schedule(self,
+                     schedule_id: str) -> Schedule:
         """
         Get a schedule by its ID
 
@@ -178,9 +189,11 @@ class ScheduleManagement(Observer):
             schedule.attach(self)
             return schedule
         else:
-            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
+            raise NonExistentIDError(
+                f"No schedule found with ID {schedule_id}")
 
-    def update_schedule(self, schedule_id: str) -> None:
+    def update_schedule(self,
+                        schedule_id: str) -> None:
         """
         Updates a schedule in the database
 
@@ -188,7 +201,8 @@ class ScheduleManagement(Observer):
             schedule_id: Schedule ID
         """
         if schedule_id not in self.schedules:
-            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
+            raise NonExistentIDError(
+                f"No schedule found with ID {schedule_id}")
 
         schedule = self.schedules[schedule_id]
         new_data = schedule.to_dict()
@@ -201,27 +215,28 @@ class ScheduleManagement(Observer):
         Args:
             schedule_id: Schedule ID
         """
-        if not self.schedule_exists(schedule_id):
-            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
-
-        from src.user.user_management import UserManagement
         from src.calendar_elements.element_management import ElementManagement
-        
+        from src.user.user_management import UserManagement
+
+        if not self.schedule_exists(schedule_id):
+            raise NonExistentIDError(
+                f"No schedule found with ID {schedule_id}")
+
         # Update each element
         schedule = self.get_schedule(schedule_id)
         element_manager = ElementManagement.get_instance()
         for element_id in schedule.elements:
             element = element_manager.get_element(element_id)
-            element.schedules = [schedule for schedule in \
-                element.schedules if schedule != schedule_id]
+            element.schedules = [schedule for schedule in
+                                 element.schedules if schedule != schedule_id]
 
         # Update each user
         user_ids = schedule.permissions.keys()
         user_manager = UserManagement.get_instance()
         for user_id in user_ids:
             user = user_manager.get_user(user_id)
-            user.schedules = [schedule for schedule in \
-                user.schedules if schedule != schedule_id]
+            user.schedules = [schedule for schedule in
+                              user.schedules if schedule != schedule_id]
 
         self.db_module.delete_data('schedules', {'_id': schedule_id})
         if schedule_id in self.schedules:
@@ -245,7 +260,8 @@ class ScheduleManagement(Observer):
             raise NonExistentIDError(f"No element found with ID {element_id}")
 
         if not self.schedule_exists(schedule_id):
-            raise NonExistentIDError(f"No schedule found with ID {schedule_id}")
+            raise NonExistentIDError(
+                f"No schedule found with ID {schedule_id}")
 
         schedule = self.get_schedule(schedule_id)
         if element_id not in schedule.elements:
@@ -256,12 +272,13 @@ class ScheduleManagement(Observer):
             raise DuplicatedIDError(f"Element with ID {element_id} already \
                                     exists in schedule {schedule_id}")
 
-    def update(self, schedule: Subject) -> None:
+    def update(self,
+               subject: Subject) -> None:
         """
         Called when the schedule is updated.
 
         Args:
             schedule: The schedule that was updated.
         """
-        print(f"Schedule {schedule.id} was updated.")
-        self.update_schedule(schedule.id)
+        print(f"Schedule {subject.id} was updated.")
+        self.update_schedule(subject.id)

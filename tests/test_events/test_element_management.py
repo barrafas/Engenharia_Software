@@ -5,10 +5,11 @@ from datetime import datetime
 from unittest.mock import Mock, MagicMock
 
 from src.calendar_elements.element_management import ElementManagement, \
-                                                    ElementAlreadyExistsError, \
-                                                    ElementDoesNotExistError
+    ElementAlreadyExistsError, \
+    ElementDoesNotExistError
 from src.calendar_elements.element_factory import ElementFactory
 from src.calendar_elements.element_interface import Element
+
 
 class TestElementManagement(unittest.TestCase):
     """ Tests for ElementManagement class """
@@ -84,8 +85,13 @@ class TestElementManagement(unittest.TestCase):
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 2)
         description = "description"
-        element = ElementFactory.create_element(
-            element_type, id_1, title, schedules, start=start, end=end, description=description)
+        element = ElementFactory.create_element(element_type,
+                                                id_1,
+                                                title,
+                                                schedules,
+                                                start=start,
+                                                end=end,
+                                                description=description)
         self.element_management.elements[id_1] = element
         result = self.element_management.get_element(id_1)
         self.assertEqual(result.title, title)
@@ -145,7 +151,7 @@ class TestElementManagement(unittest.TestCase):
         element_id = "id"
         self.element_management.db_module.delete_data = MagicMock()
 
-        def mock_select_data(collection, query):
+        def mock_select_data(collection, query: dict):
             if collection == "elements" and query == {"_id": "id"}:
                 return [{"_id": "id",
                         "title": "title",
@@ -170,8 +176,8 @@ class TestElementManagement(unittest.TestCase):
         self.element_management.db_module.select_data = MagicMock(
             side_effect=mock_select_data)
         self.element_management.delete_element(element_id)
-        self.element_management.db_module.delete_data.assert_called_once_with("elements", {
-                                                                              "_id": "id"})
+        self.element_management.db_module.delete_data.assert_called_once_with("elements",
+                                                                             {"_id": "id"})
 
     def test_delete_element_id_does_not_exist(self):
         """ Check that delete_element raises ElementDoesNotExistError if the 
@@ -217,11 +223,24 @@ class TestElementManagement(unittest.TestCase):
         start = datetime(2021, 1, 1)
         end = datetime(2021, 1, 2)
         description = "description"
-        element = ElementFactory.create_element(
-            element_type, element_id, title, schedules, start=start, end=end, description=description)
+        element = ElementFactory.create_element(element_type,
+                                                element_id,
+                                                title,
+                                                schedules,
+                                                start=start,
+                                                end=end,
+                                                description=description)
+
         self.element_management.element_exists = MagicMock(return_value=False)
-        self.element_management.create_element(element_type=element_type, element_id=element_id,
-                                               title=title, schedules=schedules, start=start, end=end, description=description)
+
+        self.element_management.create_element(element_type=element_type,
+                                               element_id=element_id,
+                                               title=title,
+                                               schedules=schedules,
+                                               start=start,
+                                               end=end,
+                                               description=description)
+
         self.db_module.insert_data.assert_called_once_with(
             "elements", element.to_dict())
 
@@ -366,5 +385,5 @@ class TestElementManagement(unittest.TestCase):
                 description=description)
 
 
-if __name__ == '__main__': # pragma: no cover
-    unittest.main() # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
+    unittest.main()  # pragma: no cover

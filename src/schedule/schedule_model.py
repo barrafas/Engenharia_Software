@@ -1,5 +1,4 @@
-"""
-module that contains the Schedule class.
+""" Module that contains the Schedule class.
 The Schedule class represents a schedule in the calendar.
 
 Classes:
@@ -20,8 +19,13 @@ class Schedule(Subject):
         and each element can be assigned to one or more schedules.
         Each user can have a different permission in a schedule.
     """
-    def __init__(self, schedule_id: str, title: str, description: str,
-            permissions: dict, elements: [str] = None):
+
+    def __init__(self,
+                 schedule_id: str,
+                 title: str,
+                 description: str,
+                 permissions: dict,
+                 elements: [str] = None):
         """
             Schedule constructor.
             Arguments:
@@ -78,7 +82,7 @@ class Schedule(Subject):
         else:
             raise TypeError("Elements must be a list of strings")
 
-    def get_elements(self, types =  []) -> list:
+    def get_elements(self, types=[]) -> list:
         """
             Returns a list of elements IDs for elements that are displayed in 
             the schedule.
@@ -91,6 +95,7 @@ class Schedule(Subject):
                 have the specified types.
         """
         from src.calendar_elements.element_management import ElementManagement
+
         element_management = ElementManagement.get_instance()
         elements = []
         for element_id in self.__elements:
@@ -99,7 +104,7 @@ class Schedule(Subject):
                 elements.append(element)
         return elements
 
-    def get_users(self, permission_types = []) -> list:
+    def get_users(self, permission_types=[]) -> list:
         """
             Returns a list of users that have the specified permission types.
             If no permission types are specified, returns all the users in the 
@@ -112,6 +117,7 @@ class Schedule(Subject):
                 [User] -- List of users that have the specified permission types
         """
         from src.user.user_management import UserManagement
+
         user_management = UserManagement.get_instance()
         users = []
         for user_id, permission_type in self.__permissions.items():

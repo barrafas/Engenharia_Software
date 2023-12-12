@@ -28,7 +28,9 @@ class UserManagement(Observer):
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule = None, users: dict = None):
+    def get_instance(cls,
+                    database_module: MongoModule = None,
+                    users: dict = None) -> 'UserManagement':
         """
         Get the instance of the UserManagement class
         """
@@ -36,7 +38,9 @@ class UserManagement(Observer):
             cls._instance = cls(database_module, users)
         return cls._instance
 
-    def __init__(self, database_module: MongoModule, users: dict = None):
+    def __init__(self,
+                database_module: MongoModule,
+                users: dict = None):
         """
         Constructor for the UserManagement class
 
@@ -76,9 +80,6 @@ class UserManagement(Observer):
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
-
-        # if not id:
-        #     id = self.db.get_next_id("users")
 
         user_info = {"_id": user_id,
                     "username": username,

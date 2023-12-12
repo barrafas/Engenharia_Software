@@ -32,8 +32,9 @@ class ElementManagement(Observer):
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule = None,
-                     elements: dict = None):
+    def get_instance(cls, 
+                     database_module: MongoModule = None,
+                     elements: dict = None) -> 'ElementManagement':
         """
         Get the instance of the ElementManagement class.
         """
@@ -137,8 +138,12 @@ class ElementManagement(Observer):
             remove = self.elements.pop(element_id)
             del remove
 
-    def create_element(self, element_type: str, element_id: str, title: str,
-                       schedules: list, **kwargs) -> Element:
+    def create_element(self,
+                       element_type: str,
+                       element_id: str,
+                       title: str,
+                       schedules: list,
+                       **kwargs) -> Element:
         """
         Create a new element.
 
@@ -176,6 +181,7 @@ class ElementManagement(Observer):
 
         # Check if each schedule exists
         from src.schedule.schedule_management import ScheduleManagement
+
         schedule_manager = ScheduleManagement.get_instance()
         for schedule_id in schedules:
             if not schedule_manager.schedule_exists(schedule_id):
@@ -197,7 +203,8 @@ class ElementManagement(Observer):
 
         return element
 
-    def update(self, element: Subject) -> None:
+    def update(self,
+               element: Subject) -> None:
         """
         Called when the element is updated.
 
