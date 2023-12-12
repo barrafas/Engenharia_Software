@@ -16,6 +16,8 @@ class MainView(View):
         self.logout_button = None
         self.go_back_button = None
 
+        self.logged_user_name = ""
+
         self.elements = elements
 
         self.sidebar = None
@@ -68,8 +70,11 @@ class MainView(View):
         self.show_navbar_elements()
 
     def show_navbar_elements(self):
+        self.logged_user_name_label = customtkinter.CTkLabel(self.navbar, text=f"Bem vindo {self.logged_user_name}!")
+        self.logged_user_name_label.grid(row=0, column=0, padx=10, pady=10, sticky="we")
+
         self.go_back_button = customtkinter.CTkButton(self.navbar, text="Voltar")
-        self.go_back_button.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        self.go_back_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
     def show_main(self):
         self.main_frame = customtkinter.CTkFrame(self.root)
@@ -86,17 +91,12 @@ class MainView(View):
         self.month_frame = customtkinter.CTkFrame(self.main_frame)
         self.month_frame.grid(row=1, column=0, padx=1, pady=1, sticky="nsew")
 
-        # self.user_events = customtkinter.CTkLabel(self.main_frame, text=">> User events: loading... ")
-        # self.user_events.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
-        
-        print(f">> User events: {self.elements}")
-
         self.show_calendar()
         self.show_next_month()
         self.show_previous_month()
         
-        self.export_data_button = customtkinter.CTkButton(self.main_frame, text="Exportar dados")
-        self.export_data_button.grid(row=1, column=3, padx=10, pady=10, sticky="ew")
+        self.export_data_button = customtkinter.CTkButton(self.sidebar, text="Exportar dados")
+        self.export_data_button.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 
     def show_calendar(self):
         self.calendar_frame = customtkinter.CTkFrame(self.main_frame)

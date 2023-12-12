@@ -33,6 +33,8 @@ class MainState(State):
         # update the view in the ui
         self.context.ui.view = self.view
 
+        self.view.logged_user_name = self.logged_in_user().username
+
     def logged_in_user(self):
         """
         Get the logged in user.
@@ -40,7 +42,6 @@ class MainState(State):
         return self.context.user
 
     def render(self):
-        print("Rendering main page...")
         self.view.selected_date = datetime.date(self.selected_year, self.selected_month, 1)
         self.view.show()
 
