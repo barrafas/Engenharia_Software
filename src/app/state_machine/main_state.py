@@ -1,9 +1,10 @@
 """
 Main state is the state that shows the user's calendar.
 """
-from src.app.state import State, StatesEnum
-from src.app.views.main_view import MainView
 import datetime
+
+from src.app.views.main_view import MainView
+from src.app.state import State, StatesEnum
 
 class MainState(State):
     """
@@ -49,6 +50,8 @@ class MainState(State):
 
         self.view.next_month_button.bind("<Button-1>", self.go_next_month)
         self.view.prev_month_button.bind("<Button-1>", self.go_prev_month)
+
+        self.view.export_data_button.bind("<Button-1>", self.export_data)
 
         # bind calendar buttons, each key of the tree is the (year, month, day) tuple
         for yy_mm_dd, button in self.view.calendar_buttons.items():
@@ -102,6 +105,12 @@ class MainState(State):
             self.selected_month -= 1
 
         self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year)
+
+    def export_data(self, _event):
+        """
+        Handle export data button click.
+        """
+        self.context.export_data()
 
     def __str__(self):
         return "Main State"
