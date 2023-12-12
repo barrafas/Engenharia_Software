@@ -24,8 +24,7 @@ class EventElement(Element):
                  start: datetime,
                  end: datetime,
                  schedules: [str],
-                 description: str = None,
-                 element_type: str = "event"):
+                 description: str = None):
         """
         EventElement constructor.
 
@@ -40,7 +39,7 @@ class EventElement(Element):
         """
         super().__init__()
         self.__schedules = schedules if schedules else []
-        self.__element_type = element_type
+        self.__element_type = 'event'
 
         self.__id = element_id
         self.set_title(title)
@@ -206,8 +205,7 @@ class TaskElement(Element):
                  due_date: datetime,
                  schedules: [str],
                  description: str = None,
-                 state: str = None,
-                 element_type: str = "task"):
+                 state: str = None):
         """
         TaskElement constructor.
 
@@ -222,7 +220,7 @@ class TaskElement(Element):
         """
         super().__init__()
         self.__schedules = schedules if schedules else []
-        self.__element_type = element_type
+        self.__element_type = 'task'
 
         self.__id = element_id
         self.set_state(state)
@@ -407,8 +405,7 @@ class ReminderElement(Element):
                  title: str,
                  reminder_date: datetime,
                  schedules: [str],
-                 description: str = None,
-                 element_type: str = "reminder"):
+                 description: str = None):
         """
         ReminderElement constructor.
 
@@ -422,7 +419,7 @@ class ReminderElement(Element):
         """
         super().__init__()
         self.__schedules = schedules if schedules else []
-        self.__element_type = element_type
+        self.__element_type = "reminder"
 
         self.__id = element_id
         self.set_title(title)

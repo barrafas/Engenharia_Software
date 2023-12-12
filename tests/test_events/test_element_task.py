@@ -34,8 +34,7 @@ class TestTaskElement(unittest.TestCase):
                                 self.due_date,
                                 self.schedules,
                                 self.description,
-                                self.state,
-                                self.element_type)
+                                self.state)
 
         # Access private attributes for testing
         self.task._TaskElement__id = self.id
