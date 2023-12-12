@@ -74,6 +74,8 @@ class MainView(View):
             schedule_checkbox.pack(anchor="w", padx=10, pady=10, expand=True, fill="x")
             if schedule.id in self.selected_schedules_ids:
                 schedule_checkbox.select()
+            else:
+                schedule_checkbox.deselect()
         
         self.add_schedule_button = customtkinter.CTkButton(self.sidebar, text="Adicionar agenda")
         self.add_schedule_button.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
