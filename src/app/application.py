@@ -5,10 +5,12 @@ The Application defines the interface of interest to clients.
 from __future__ import annotations
 
 import random
-from src.user.user_management import UserManagement
+
 from src.calendar_elements.element_management import ElementManagement
 from src.schedule.schedule_management import ScheduleManagement
 from src.auth.authentication import AuthenticationModule
+from src.database.export_module import ExportModule
+from src.user.user_management import UserManagement
 
 class Application:
     """
@@ -187,3 +189,13 @@ class Application:
         """
         element_management = ElementManagement.get_instance()
         element_management.delete_element(element.id)
+
+    def export_data(self):
+        """
+        Handle export data request.
+        """
+        user_id = self.user.id
+
+        export_module = ExportModule(self._db)
+
+        export_module.export_data(user_id)
