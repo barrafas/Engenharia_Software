@@ -2,3 +2,4 @@ pymongo
 customtkinter
 pytest
 bcrypt
+pandas
