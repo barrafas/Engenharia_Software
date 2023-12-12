@@ -95,8 +95,8 @@ class MainView(View):
         self.show_next_month()
         self.show_previous_month()
         
-        self.export_data_button = customtkinter.CTkButton(self.main_frame, text="Exportar dados")
-        self.export_data_button.grid(row=1, column=3, padx=10, pady=10, sticky="ew")
+        self.export_data_button = customtkinter.CTkButton(self.sidebar, text="Exportar dados")
+        self.export_data_button.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 
     def show_calendar(self):
         self.calendar_frame = customtkinter.CTkFrame(self.main_frame)
