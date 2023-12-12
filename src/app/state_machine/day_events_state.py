@@ -151,7 +151,7 @@ class DayEventsState(State):
 
         if self.context.create_event(event_type, title=event_name,
             schedules=selected_schedules, **kwargs):
-            self.transition_to(StatesEnum.MAIN)
+            self.transition_to(StatesEnum.MAIN, month=month, year=year)
 
     def delete_event(self, _event):
         """
@@ -159,7 +159,7 @@ class DayEventsState(State):
         """
         if self.currently_selected_event:
             self.context.delete_element(self.currently_selected_event)
-            self.transition_to(StatesEnum.MAIN)
+            self.transition_to(StatesEnum.MAIN, month=self.selected_day.month, year=self.selected_day.year)
 
     def update_event(self, _event):
         """
@@ -197,7 +197,7 @@ class DayEventsState(State):
             selected_date.month, selected_date.day, selected_date.hour,
             selected_date.minute) + datetime.timedelta(hours=1)
 
-            self.transition_to(StatesEnum.MAIN)
+            self.transition_to(StatesEnum.MAIN, month=month, year=year)
 
     def logout(self, _event):
         """
@@ -209,4 +209,4 @@ class DayEventsState(State):
         """
         Handle go back button click.
         """
-        self.transition_to(StatesEnum.MAIN)
+        self.transition_to(StatesEnum.MAIN, month=self.selected_day.month, year=self.selected_day.year)

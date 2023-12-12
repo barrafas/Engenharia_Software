@@ -9,7 +9,7 @@ class MainState(State):
     """
     Main state is the state that shows the user's calendar.
     """
-    def __init__(self, context):
+    def __init__(self, context, month = None, year = None):
         super().__init__(context)
 
         if not self.logged_in_user():
@@ -17,6 +17,9 @@ class MainState(State):
             self.transition_to(StatesEnum.SPLASH)
 
         self.events_tree = self.context.get_user_events()
+
+        self.selected_month = month
+        self.selected_year = year
 
         # set the view
         self.view = MainView(self.context.ui.root, self.events_tree)
@@ -40,7 +43,7 @@ class MainState(State):
         # bind calendar buttons, each key of the tree is the (year, month, day) tuple
         for yy_mm_dd, button in self.view.calendar_buttons.items():
             button.bind("<Button-1>", lambda event, args=yy_mm_dd: self.show_day_events(event, args))
-
+    
     def logout(self, _event):
         """
         Handle logout button click.
