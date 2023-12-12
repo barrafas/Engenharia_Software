@@ -6,7 +6,8 @@ import unittest
 from src.user.user_management import UserManagement, \
 UsernameCantBeBlank, User
 from unittest.mock import Mock, MagicMock, patch
-from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
+from src.database.mongo_module import MongoModule, DuplicatedIDError, \
+    NonExistentIDError
 from src.calendar_elements.element_management import ElementManagement
 from src.calendar_elements.element_interface import Element
 from src.schedule.schedule_model import Schedule
@@ -14,6 +15,7 @@ from src.schedule.schedule_management import ScheduleManagement
 import bcrypt
 
 class TestUserManagementModule(unittest.TestCase):
+    """Test for the UserManagement class"""
     def setUp(self):
         """Set up for the tests"""
         UserManagement._instance = None
@@ -42,7 +44,8 @@ class TestUserManagementModule(unittest.TestCase):
         mock_db_module = MagicMock()
         mock_db_module.select_data.return_value = []
         user_management = UserManagement(mock_db_module)
-        user_management.hash_password = MagicMock(return_value=hashed_password.encode('utf-8'))
+        user_management.hash_password = MagicMock(
+            return_value=hashed_password.encode('utf-8'))
         expected_user_info = {"_id": user_id,
                             "username": username,
                             "email": email,
@@ -50,12 +53,15 @@ class TestUserManagementModule(unittest.TestCase):
                             "hashed_password": hashed_password,
                             "user_preferences": user_preferences}
         # Act
-        user_management.create_user(username, email, password, user_preferences, user_id)
+        user_management.create_user(
+            username, email, password, user_preferences, user_id)
         # Assert
-        mock_db_module.insert_data.assert_called_once_with('users', expected_user_info)
+        mock_db_module.insert_data.assert_called_once_with(
+            'users', expected_user_info)
 
     def test_create_existing_user(self):
-        """Test that create_user raises DuplicatedIDError when the user id already exists"""
+        """Test that create_user raises DuplicatedIDError when the user
+        id already exists"""
         # Arrange
         username = 'username'
         email = 'email@example.com'
@@ -68,10 +74,12 @@ class TestUserManagementModule(unittest.TestCase):
 
         # Act and Assert
         with self.assertRaises(DuplicatedIDError):
-            user_management.create_user(username, email, password, user_preferences, user_id)
+            user_management.create_user(username, email, password, 
+                                        user_preferences, user_id)
 
     def test_create_blank_username(self):
-        """Test that create_user raises UsernameCantBeBlank when the username is blank"""
+        """Test that create_user raises UsernameCantBeBlank when the 
+        username is blank"""
         # Arrange
         username = ''
         email = 'email@example.com'
@@ -82,7 +90,8 @@ class TestUserManagementModule(unittest.TestCase):
         user_management = UserManagement(mock_db_module)
         # Act and Assert
         with self.assertRaises(UsernameCantBeBlank):
-            user_management.create_user(username, email, password, user_preferences, user_id)
+            user_management.create_user(username, email, password, 
+                                        user_preferences, user_id)
 
     def test_hash_password(self):
         """Test hashing a password"""
@@ -94,7 +103,8 @@ class TestUserManagementModule(unittest.TestCase):
         """Test that delete_user calls delete_data with the correct arguments"""
         # Arrange
         user_id = 'existing_user_id'
-        user_info = {'_id': user_id, 'username': 'username', 'email': 'email', 'schedules': []}
+        user_info = {'_id': user_id, 'username': 'username', 
+                     'email': 'email', 'schedules': []}
         user = User(**user_info)
         mock_db_module = MagicMock()
         mock_db_module.select_data.return_value = [user_info]
@@ -103,10 +113,12 @@ class TestUserManagementModule(unittest.TestCase):
         # Act
         user_management.delete_user(user_id)
         # Assert
-        mock_db_module.delete_data.assert_called_once_with('users', {"_id": user_id})
+        mock_db_module.delete_data.assert_called_once_with(
+            'users', {"_id": user_id})
 
     def test_delete_nonexistent_user(self):
-        """Test that delete_user raises NonExistentIDError when the user does not exist"""
+        """Test that delete_user raises NonExistentIDError when the user 
+        does not exist"""
         # Arrange
         user_id = 'non_existent_user_id'
         mock_db_module = MagicMock()
@@ -118,7 +130,8 @@ class TestUserManagementModule(unittest.TestCase):
             user_management.delete_user(user_id)
 
     def test_user_exists_returns_true(self):
-        """Test that user_exists returns True when a user with the given id exists"""
+        """Test that user_exists returns True when a user with the given 
+        id exists"""
         # Arrange
         user_id = 'existing_user_id'
         mock_db_module = MagicMock()
@@ -133,7 +146,8 @@ class TestUserManagementModule(unittest.TestCase):
         self.assertTrue(result)
 
     def test_user_exists_returns_false(self):
-        """Test that user_exists returns False when a user with the given id does not exist"""
+        """Test that user_exists returns False when a user with the given 
+        id does not exist"""
         # Arrange
         user_id = 'non_existent_user_id'
         mock_db_module = MagicMock()
@@ -163,11 +177,13 @@ class TestUserManagementModule(unittest.TestCase):
         user_management.update_user(user_id)
 
         # Assert
-        mock_db_module.update_data.assert_called_once_with('users', {"_id": user_id}, user_info)
+        mock_db_module.update_data.assert_called_once_with(
+            'users', {"_id": user_id}, user_info)
 
 
     def test_update_nonexistent_user(self):
-        """Test that update_user raises NonExistentIDError when the user does not exist"""
+        """Test that update_user raises NonExistentIDError when the 
+        user does not exist"""
         # Arrange
         user_id = 'non_existent_user_id'
         mock_db_module = MagicMock()
