@@ -34,8 +34,7 @@ class TestReminderElement(unittest.TestCase):
                                         self.title,
                                         self.reminder_date,
                                         self.schedules,
-                                        self.description,
-                                        self.element_type)
+                                        self.description)
 
         # Access private attributes for testing
         self.reminder._ReminderElement__id = self.id
@@ -245,7 +244,7 @@ class TestReminderElement(unittest.TestCase):
         elements are changed.  
         """
         element = ReminderElement("element1", "title1", datetime(
-            2021, 1, 1), ["schedule1"], "description1", "reminder")
+            2021, 1, 1), ["schedule1"], "description1")
         element_management = ElementManagement.get_instance(
             database_module=MagicMock())
         element_management.update_element = MagicMock()
