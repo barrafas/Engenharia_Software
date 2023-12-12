@@ -7,6 +7,7 @@ from src.app.views.main_view import MainView
 from src.app.state import State, StatesEnum
 
 from src.schedule.schedule_management import ScheduleManagement
+from src.user.user_management import UserManagement
 
 class MainState(State):
     """
@@ -86,11 +87,12 @@ class MainState(State):
         """
         user = self.context.user
         schedule_management = ScheduleManagement.get_instance()
+        user_management = UserManagement.get_instance()
         new_id = user.id + "_" + str(len(user.schedules))
-        new_schedule = schedule_management.create_schedule(schedule_id=new_id, description="", elements=[], permissions={user.id: "owner"})
-        user.add_schedule(new_schedule)
+        new_schedule = schedule_management.create_schedule(schedule_id=new_id, title=f"just created schedule {new_id}", description="", elements=[], permissions={user.id: "owner"})
+        user_management.add_schedule_to_user(user_id=user.id, schedule_id=new_id, permission="owner")
 
-        self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year, selected_schedules_ids=self.context.selected_schedules)
+        self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year)
 
     def logout(self, _event):
         """
