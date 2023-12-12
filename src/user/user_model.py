@@ -251,11 +251,13 @@ class User(Subject):
             if element.type != 'event':
                 continue
 
-            # Check if the start time of the element is within the given time period
+            # Check if the start time of the element is within the given
+            # time period
             if time[0] <= element.start_time < time[1]:
                 return False
 
-            # Check if the end time of the element is within the given time period
+            # Check if the end time of the element is within the given time
+            # period
             if time[0] < element.end_time <= time[1]:
                 return False
 
