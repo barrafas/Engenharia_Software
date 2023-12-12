@@ -19,7 +19,6 @@ class LoginState(State):
         self.context.ui.view = self.view
 
     def render(self):
-        print("Rendering logged out page...")
         self.view.show()
 
         # bind events

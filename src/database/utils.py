@@ -125,7 +125,6 @@ class TimeoutDecorator(DatabaseModule):
 
     def connect(self):
         """ Connect to the database."""
-        print("Connecting to the database...")
         # return self._timeout_wrapper(self._decorated.connect)()
         return self._decorated.connect()
 

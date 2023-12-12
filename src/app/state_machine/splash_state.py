@@ -22,7 +22,6 @@ class SplashState(State):
         self.view.database_password_entry = str(self.context._db.password) if self.context._db else ""
 
     def render(self):
-        print("Rendering splash (sign in/up) page...")
         self.view.show()
 
         # bind events
@@ -56,5 +55,3 @@ class SplashState(State):
         # set the database config
         self.context.initialize_database(database_url, database_port, database_user,
             database_password)
-
-        print(f"\033[92mDatabase initialized: {self.context.db}\033[0m")

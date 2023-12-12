@@ -86,11 +86,6 @@ class MainView(View):
         self.month_frame = customtkinter.CTkFrame(self.main_frame)
         self.month_frame.grid(row=1, column=0, padx=1, pady=1, sticky="nsew")
 
-        # self.user_events = customtkinter.CTkLabel(self.main_frame, text=">> User events: loading... ")
-        # self.user_events.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
-        
-        print(f">> User events: {self.elements}")
-
         self.show_calendar()
         self.show_next_month()
         self.show_previous_month()

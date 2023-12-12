@@ -211,5 +211,4 @@ class ElementManagement(Observer):
         Args:
             element: The element that was updated.
         """
-        print(f"Element {element.id} was updated.")
         self.update_element(element.id)
