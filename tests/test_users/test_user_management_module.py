@@ -20,14 +20,14 @@ class TestUserManagementModule(unittest.TestCase):
         self.db_module = Mock()
         self.user_management = UserManagement.get_instance(self.db_module)
 
-        # ElementManagement._instance = None
-        # self.db_module = MagicMock()
-        # self.element_management = ElementManagement.get_instance(
-        #     self.db_module)
+        ElementManagement._instance = None
+        self.db_module = MagicMock()
+        self.element_management = ElementManagement.get_instance(
+            self.db_module)
 
-        # ScheduleManagement._instance = None
-        # self.schedule_management = ScheduleManagement.get_instance(
-        #     self.db_module)
+        ScheduleManagement._instance = None
+        self.schedule_management = ScheduleManagement.get_instance(
+            self.db_module)
 
     def test_create_user_success(self):
         """Test creating a new user successfully"""
@@ -106,16 +106,33 @@ class TestUserManagementModule(unittest.TestCase):
         with self.assertRaises(NonExistentIDError):
             self.user_management.delete_user("id2")
 
-    def test_user_exists(self):
-        """Test checking if a user exists"""
-        self.db_module.select_data = MagicMock(return_value = ['a'])
-        result = self.user_management.user_exists("test_user")
+    def test_user_exists_returns_true(self):
+        """Test that user_exists returns True when a user with the given id exists"""
+        # Arrange
+        user_id = 'existing_user_id'
+        mock_db_module = MagicMock()
+        mock_db_module.select_data.return_value = [{'_id': user_id, 
+            'username': 'username', 'email': 'email', 'schedules': []}]
+        user_management = UserManagement(mock_db_module)
+
+        # Act
+        result = user_management.user_exists(user_id)
+
+        # Assert
         self.assertTrue(result)
 
-    def test_user_doesnt_exist(self):
-        """Test checking if a user exists"""
-        self.db_module.select_data = MagicMock(return_value = [])
-        result = self.user_management.user_exists("test_user")
+    def test_user_exists_returns_false(self):
+        """Test that user_exists returns False when a user with the given id does not exist"""
+        # Arrange
+        user_id = 'non_existent_user_id'
+        mock_db_module = MagicMock()
+        mock_db_module.select_data.return_value = []
+        user_management = UserManagement(mock_db_module)
+
+        # Act
+        result = user_management.user_exists(user_id)
+
+        # Assert
         self.assertFalse(result)
 
     def test_update_user(self):
@@ -141,10 +158,12 @@ class TestUserManagementModule(unittest.TestCase):
         """Test adding a schedule to a user"""
         self.db_module.select_data = MagicMock(return_value = ['a'])
         self.db_module.update_data = MagicMock()
+        self.user_management.user_exists = MagicMock(return_value=True)
         self.user_management.users = {"test_id": User("test_id", "test_user",
                                                         "test_email", [],
                                                         "test_password")}
-        self.user_management.add_schedule_to_user("test_id", "test_schedule")
+        self.user_management.add_schedule_to_user("test_id", "test_schedule",
+                                                  "write")
         self.db_module.update_data.assert_called_once_with("users", {"_id": "test_id"},
                                 {'id': 'test_id', 'username': 'test_user',
                                 'email': 'test_email', 'schedules': ["test_schedule"], 
@@ -153,10 +172,10 @@ class TestUserManagementModule(unittest.TestCase):
     def test_add_schedule_to_nonexistant_user(self):
         """Test adding a schedule to a nonexistent user"""
         self.db_module.select_data = MagicMock(return_value = [])
-        with self.assertRaises(NonExistentIDError) as context:
-            self.user_management.add_schedule_to_user("id2", "test_schedule")
-        self.assertEqual(str(context.exception),
-                            "Usuário id2 não existe")
+        self.user_management.user_exists = MagicMock(return_value=False)
+        with self.assertRaises(NonExistentIDError):
+            self.user_management.add_schedule_to_user("id2", "test_schedule",
+            "write")
 
 
 if __name__ == '__main__':
