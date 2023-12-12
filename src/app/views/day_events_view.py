@@ -129,7 +129,8 @@ class DayEventsView(View):
 
     def show_event_edditing_elements(self):
         self.event_name_entry.insert(0, self.currently_selected_event.title)
-        self.event_description_textbox.insert("0.0", self.currently_selected_event.description)
+        description = self.currently_selected_event.description 
+        self.event_description_textbox.insert("0.0", description if description is not None else "")
 
         self.event_type_selector.set(self.currently_selected_event.element_type)
         self.event_name_entry.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
