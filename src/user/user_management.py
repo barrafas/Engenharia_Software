@@ -7,7 +7,8 @@ Attributes:
     users: Dict of users, where the key is the id
 """
 import bcrypt
-from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
+from src.database.mongo_module import MongoModule, DuplicatedIDError
+from src.database.mongo_module import NonExistentIDError
 from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
 from .user_model import User, UsernameCantBeBlank
 
@@ -49,7 +50,8 @@ class UserManagement(Observer):
         """
 
         if not database_module:
-            raise DatabaseNotProvidedError("Database module not provided on object creation.")
+            raise DatabaseNotProvidedError(
+                "Database module not provided on object creation.")
         
         self.db_module = database_module
         self.users = users if users is not None else {}
@@ -76,7 +78,7 @@ class UserManagement(Observer):
             raise UsernameCantBeBlank("Username cannot be blank")
 
         if self.user_exists(user_id):
-            raise NonExistentIDError(f'User {user_id} already exists')
+            raise DuplicatedIDError(f'User {user_id} already exists')
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
@@ -188,7 +190,8 @@ class UserManagement(Observer):
 
 
 
-    def add_schedule_to_user(self, user_id: str, schedule_id: str, permission:str) -> None:
+    def add_schedule_to_user(self, user_id: str, schedule_id: str,
+                             permission:str) -> None:
         """Function to add a schedule to a user
 
         Arguments:
@@ -211,7 +214,8 @@ class UserManagement(Observer):
             schedule = schedule_manager.get_schedule(schedule_id)
             schedule.permissions = {**schedule.permissions, user_id: permission}
         else:
-            raise DuplicatedIDError(f'Usuário {user_id} já está no schedule {schedule_id}')
+            raise DuplicatedIDError(f'Usuário {user_id} já está no schedule \
+                                    {schedule_id}')
         return
 
     def update(self, user: Subject) -> None:

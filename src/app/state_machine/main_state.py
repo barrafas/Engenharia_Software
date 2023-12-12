@@ -1,9 +1,10 @@
 """
 Main state is the state that shows the user's calendar.
 """
-from src.app.state import State, StatesEnum
-from src.app.views.main_view import MainView
 import datetime
+
+from src.app.views.main_view import MainView
+from src.app.state import State, StatesEnum
 
 class MainState(State):
     """
@@ -11,6 +12,12 @@ class MainState(State):
     """
     def __init__(self, context, month = None, year = None):
         super().__init__(context)
+
+        if month is None:
+            month = datetime.date.today().month
+
+        if year is None:
+            year = datetime.date.today().year
 
         if not self.logged_in_user():
             # transition to splash state
@@ -34,11 +41,17 @@ class MainState(State):
 
     def render(self):
         print("Rendering main page...")
+        self.view.selected_date = datetime.date(self.selected_year, self.selected_month, 1)
         self.view.show()
 
         # bind events
         self.view.logout_button.bind("<Button-1>", self.logout)
         self.view.go_back_button.bind("<Button-1>", self.go_back)
+
+        self.view.next_month_button.bind("<Button-1>", self.go_next_month)
+        self.view.prev_month_button.bind("<Button-1>", self.go_prev_month)
+
+        self.view.export_data_button.bind("<Button-1>", self.export_data)
 
         # bind calendar buttons, each key of the tree is the (year, month, day) tuple
         for yy_mm_dd, button in self.view.calendar_buttons.items():
@@ -68,6 +81,36 @@ class MainState(State):
         day_events = self.events_tree.get(year, {}).get(month, {}).get(day, {})
 
         self.transition_to(StatesEnum.DAYEVENTS, day_events=day_events, selected_day=selected_day)
+
+    def go_next_month(self, _event):
+        """
+        Handle next month button click.
+        """
+        if self.selected_month == 12:
+            self.selected_month = 1
+            self.selected_year += 1
+        else:
+            self.selected_month += 1
+
+        self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year)
+
+    def go_prev_month(self, _event):
+        """
+        Handle previous month button click.
+        """
+        if self.selected_month == 1:
+            self.selected_month = 12
+            self.selected_year -= 1
+        else:
+            self.selected_month -= 1
+
+        self.transition_to(StatesEnum.MAIN, month=self.selected_month, year=self.selected_year)
+
+    def export_data(self, _event):
+        """
+        Handle export data button click.
+        """
+        self.context.export_data()
 
     def __str__(self):
         return "Main State"
