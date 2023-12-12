@@ -4,7 +4,7 @@ The Application defines the interface of interest to clients.
 
 from __future__ import annotations
 
-import datetime
+import random
 from src.user.user_management import UserManagement
 from src.calendar_elements.element_management import ElementManagement
 from src.schedule.schedule_management import ScheduleManagement
@@ -21,6 +21,7 @@ class Application:
         self._ui = ui
         self._db = db
         self._user = None
+        self.selected_schedules = []
 
         # initialize modules
         ScheduleManagement.get_instance(database_module=self._db)
@@ -44,6 +45,11 @@ class Application:
     @property
     def user(self):
         return self._user
+    
+    @user.setter
+    def user(self, user):
+        self._user = user
+        self.selected_schedules = user.schedules
     
     @property
     def ui(self):
@@ -75,7 +81,7 @@ class Application:
 
         if auth.authenticate_user(user_id, password):
             print(f"\033[92mUser {user_id} authenticated.\033[0m")
-            self._user = UserManagement(self._db).get_user(user_id)
+            self.user = UserManagement(self._db).get_user(user_id)
             return True
         else:
             print("Login failed.")
@@ -85,7 +91,7 @@ class Application:
         The Application delegates part of its behavior to the current State
         object.
         """
-        self._user = None
+        self.user = None
 
     def sign_up(self, user_id, username, email, password):
         """
@@ -132,7 +138,7 @@ class Application:
         }
 
         """
-        elements = self._user.get_elements()
+        elements = self.user.get_elements(self.selected_schedules)
 
         # get user events
         events = elements
@@ -160,35 +166,24 @@ class Application:
         print(f"\033[92mUser events: {elements}, with len ={len(elements)}\033[0m")
 
         return elements
-        
-    def create_event(self, event_name, event_type, selected_date):
+
+    def create_event(self, element_type: str, title: str,
+                       schedules: list, **kwargs):
         """
         The Application delegates part of its behavior to the current State
         object.
         """
-        print(f"Schedules: {self._user.schedules}")
-        schedule = self._user.schedules[0]
-        print(f"Schedule: {schedule}")
-
-        # selected date is datetime.date, it should be datetime.datetime:
-        selected_date = datetime.datetime(selected_date.year, selected_date.month, selected_date.day)
-
-        kwargs = {}
-        if event_type == "task":
-            kwargs["due_date"] = selected_date
-            kwargs["state"] = "TODO"
-        elif event_type == "reminder":
-            kwargs["reminder_date"] = selected_date
-        elif event_type == "event":
-            kwargs["start"] = selected_date
-            kwargs["end"] = datetime.datetime(selected_date.year,
-            selected_date.month, selected_date.day, selected_date.hour,
-            selected_date.minute) + datetime.timedelta(hours=1)
-
-        description = None
-
+        element_id = self.user.id + "_" + title + str(random.randint(0, 1000))
         element_management = ElementManagement.get_instance()
-        event = element_management.create_element(element_type = event_type, element_id = event_name,
-        title = event_name, description = description, schedules = [schedule], **kwargs)
+        event = element_management.create_element(element_type = element_type,
+            element_id = element_id, title = title, schedules = schedules, **kwargs)
 
         print(f"\033[92mEvent created: {event}\033[0m")
+        return event
+
+    def delete_element(self, element):
+        """
+        Deleting a element
+        """
+        element_management = ElementManagement.get_instance()
+        element_management.delete_element(element.id)

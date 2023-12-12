@@ -1,11 +1,10 @@
 """
 DayEventsView class, which is the view of the day events state.
 """
-import customtkinter
-import calendar
 import datetime
-from src.app.views.view import View
 from typing import Mapping, List
+import customtkinter
+from src.app.views.view import View
 from src.calendar_elements.element_interface import Element
 
 class DayEventsView(View):
@@ -38,12 +37,14 @@ class DayEventsView(View):
 
         self.go_back_button = None
         self.event_name_entry = None
+        self.event_description_textbox = None
         self.event_type_selector = None
         self.event_hour_selector = None
         self.event_minute_selector = None
 
         self.create_event_button = None
         self.update_event_button = None
+        self.delete_event_button = None
 
         self.day_events = day_events
 
@@ -85,6 +86,7 @@ class DayEventsView(View):
         self.go_back_button.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
         self.event_name_entry = customtkinter.CTkEntry(self.event_management_frame)
+        self.event_description_textbox = customtkinter.CTkTextbox(self.event_management_frame)
         self.event_type_selector = customtkinter.CTkOptionMenu(self.event_management_frame, values=self.event_types)
        
         self.show_time_picker()
@@ -92,6 +94,7 @@ class DayEventsView(View):
         # event buttons, only loading
         self.create_event_button = customtkinter.CTkButton(self.event_management_frame, text="Criar evento")
         self.update_event_button = customtkinter.CTkButton(self.event_management_frame, text="Atualizar evento")
+        self.delete_event_button = customtkinter.CTkButton(self.event_management_frame, text="Deletar evento")
 
         self.event_management_title = customtkinter.CTkLabel(self.event_management_frame, text=f"{self.date_text}: Selecione um horário para criar um evento, ou um evento para editá-lo.")
         self.event_management_title.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
@@ -110,8 +113,9 @@ class DayEventsView(View):
 
     def show_event_creation_elements(self):
         self.event_name_entry.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+        self.event_description_textbox.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
         self.event_type_selector.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
-        self.create_event_button.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
+        self.create_event_button.grid(row=6, column=0, padx=10, pady=10, sticky="ew")
         new_title = f"Criando um novo evento ({self.date_text})"
         self.event_management_title.configure(text=new_title)
 
@@ -121,22 +125,33 @@ class DayEventsView(View):
         # self.event_name_entry.grid_forget()
         # erase the event name
         self.event_name_entry.delete(0, "end")
+        self.event_description_textbox.delete("0.0", "end")
 
     def show_event_edditing_elements(self):
         self.event_name_entry.insert(0, self.currently_selected_event.title)
+        description = self.currently_selected_event.description 
+        self.event_description_textbox.insert("0.0", description if description is not None else "")
+
         self.event_type_selector.set(self.currently_selected_event.element_type)
         self.event_name_entry.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
-        self.update_event_button.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
+        self.event_description_textbox.grid(row=5, column=0, padx=10, pady=10, sticky="ew")
+
+        self.update_event_button.grid(row=6, column=0, padx=10, pady=10, sticky="ew")
         new_title = f"Editando {self.currently_selected_event.element_type}: \
             {self.currently_selected_event.title} ({self.date_text})"
         self.event_management_title.configure(text=new_title)
+
+        self.delete_event_button.grid(row=7, column=0, padx=10, pady=20, sticky="e")
 
     def hide_event_edditing_elements(self):
         # self.event_name_entry.grid_forget()
         # self.event_type_selector.grid_forget()
         self.update_event_button.grid_forget()
+        self.delete_event_button.grid_forget()
         # erase the event name
         self.event_name_entry.delete(0, "end")
+        self.event_description_textbox.delete("0.0", "end")
+
 
     def show_today_events(self):
         self.today_events_frame = customtkinter.CTkFrame(self.root)
@@ -217,8 +232,8 @@ class DayEventsView(View):
         event_time_frame = customtkinter.CTkFrame(self.event_management_frame)
         event_time_frame.grid(row=4, column=0, padx=10, pady=10, sticky="ew")
         time_picker_label = customtkinter.CTkLabel(event_time_frame, text="Horário do evento: (hh:mm)")
-        time_picker_label.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        time_picker_label.grid(row=0, column=0, padx=10, pady=2, sticky="ew")
         self.event_hour_selector = customtkinter.CTkOptionMenu(event_time_frame, values=[f"{hour:02d}" for hour in range(24)])
-        self.event_hour_selector.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        self.event_hour_selector.grid(row=1, column=0, padx=4, pady=2, sticky="ew")
         self.event_minute_selector = customtkinter.CTkOptionMenu(event_time_frame, values=[f"{minute:02d}" for minute in range(0, 60, 10)])
-        self.event_minute_selector.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
+        self.event_minute_selector.grid(row=1, column=1, padx=4, pady=2, sticky="ew")
