@@ -7,7 +7,8 @@ Attributes:
     users: Dict of users, where the key is the id
 """
 import bcrypt
-from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
+from src.database.mongo_module import MongoModule, DuplicatedIDError
+from src.database.mongo_module import NonExistentIDError
 from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
 from .user_model import User, UsernameCantBeBlank
 
@@ -49,7 +50,8 @@ class UserManagement(Observer):
         """
 
         if not database_module:
-            raise DatabaseNotProvidedError("Database module not provided on object creation.")
+            raise DatabaseNotProvidedError(
+                "Database module not provided on object creation.")
         
         self.db_module = database_module
         self.users = users if users is not None else {}
@@ -76,7 +78,7 @@ class UserManagement(Observer):
             raise UsernameCantBeBlank("Username cannot be blank")
 
         if self.user_exists(user_id):
-            raise NonExistentIDError(f'User {user_id} already exists')
+            raise DuplicatedIDError(f'User {user_id} already exists')
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
