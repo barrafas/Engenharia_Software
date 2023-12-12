@@ -1,3 +1,8 @@
+"""Tests for the User model
+
+This file contains unit tests for the User model.
+"""
+
 import unittest
 from datetime import datetime, timedelta
 from src.user.user_model import User, UserNotInSchedule, UsernameCantBeBlank, \
