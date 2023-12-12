@@ -6,15 +6,17 @@ Classes:
 """
 from ..calendar_elements.element_interface import Element
 
-
 class ElementFactory:
     """
     A Factory class for creating different types of calendar elements.
     """
 
     @staticmethod
-    def create_element(element_type: str, element_id: str, title: str, schedules: [str],
-                        **kwargs) -> Element:
+    def create_element(element_type: str,
+                        element_id: str,
+                        title: str,
+                        schedules: [str],
+                       **kwargs) -> Element:
         """
         Create a calendar element based on the provided type.
 
@@ -28,12 +30,27 @@ class ElementFactory:
         Returns:
             Element -- An instance of the specified calendar element type.
         """
-        from ..calendar_elements.element_types import EventElement, TaskElement, ReminderElement
+        from ..calendar_elements.element_types import EventElement,\
+                                                        TaskElement,\
+                                                        ReminderElement
         if element_type == "event":
-            return EventElement(element_id, title, kwargs['start'], kwargs['end'], schedules, kwargs['description'])
+            return EventElement(element_id,
+                                title,
+                                kwargs['start'],
+                                kwargs['end'],
+                                schedules,
+                                kwargs['description'])
         elif element_type == "task":
-            return TaskElement(element_id, title, kwargs['due_date'], schedules, kwargs['description'])
+            return TaskElement(element_id,
+                                title,
+                                kwargs['due_date'],
+                                schedules,
+                                kwargs['description'])
         elif element_type == "reminder":
-            return ReminderElement(element_id, title, kwargs['reminder_date'], schedules, kwargs['description'])
+            return ReminderElement(element_id,
+                                    title,
+                                    kwargs['reminder_date'],
+                                    schedules,
+                                    kwargs['description'])
         else:
             raise ValueError(f"Unsupported element type: {element_type}")

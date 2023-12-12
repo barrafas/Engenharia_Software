@@ -1,20 +1,27 @@
 """Module to test the TaskElement class."""
 
 import unittest
-from datetime import datetime
-from src.calendar_elements.element_types import TaskElement
-from src.schedule.schedule_model import Schedule
-from src.schedule.schedule_management import ScheduleManagement
-from src.user.user_management import UserManagement
-from unittest.mock import MagicMock, PropertyMock
-from src.user.user_model import User
 from typing import Optional
+from datetime import datetime
+from unittest.mock import MagicMock, PropertyMock
+
+from src.user.user_model import User
+from src.schedule.schedule_model import Schedule
+from src.user.user_management import UserManagement
+from src.calendar_elements.element_types import TaskElement
+from src.schedule.schedule_management import ScheduleManagement
 
 
 class TestTaskElement(unittest.TestCase):
     """Test the TaskElement class"""
 
     def setUp(self):
+        db_module_mock = MagicMock()
+
+        # initialize the Managements
+        ScheduleManagement.get_instance(db_module_mock)
+        UserManagement.get_instance(db_module_mock)
+
         self.id = "1"
         self.title = "Test Task"
         self.due_date = datetime(2023, 1, 1)
@@ -26,10 +33,9 @@ class TestTaskElement(unittest.TestCase):
                                 self.title,
                                 self.due_date,
                                 self.schedules,
-                                self.description, 
-                                self.state,
-                                self.element_type)
-        
+                                self.description,
+                                self.state)
+
         # Access private attributes for testing
         self.task._TaskElement__id = self.id
         self.task._TaskElement__element_type = self.element_type
@@ -52,7 +58,8 @@ class TestTaskElement(unittest.TestCase):
         Verify if the interval returned matches the one that was set in the 
         constructor
         """
-        expected_interval = (datetime(2022, 12, 31, 23, 50), datetime(2023, 1, 1))
+        expected_interval = (
+            datetime(2022, 12, 31, 23, 50), datetime(2023, 1, 1))
         self.assertEqual(self.task.get_display_interval(), expected_interval)
 
     def test_get_schedules(self):
@@ -63,7 +70,9 @@ class TestTaskElement(unittest.TestCase):
         # Set up the mock objects and functions
         get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
 
-        with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
+        with unittest.mock.patch.object(ScheduleManagement,
+                                        'get_schedule',
+                                        side_effect=get_schedule_mock):
             schedules = self.task.get_schedules()
             self.assertEqual(schedules, [schedule_1, schedule_2])
 
@@ -73,9 +82,9 @@ class TestTaskElement(unittest.TestCase):
         constructor
         """
         # Set up the mock objects and functions
-        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+        get_schedule_mock, _, _ = self.get_mock_schedule()
         get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
-        
+
         with unittest.mock.patch.object(ScheduleManagement, 'get_schedule', side_effect=get_schedule_mock):
             with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
                 users = self.task.get_users(['schedule_1', 'schedule_2'])
@@ -88,12 +97,14 @@ class TestTaskElement(unittest.TestCase):
         Default to all schedules.
         # """
         # Set up the mock objects and functions
-        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+        get_schedule_mock, _, _ = self.get_mock_schedule()
         get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
 
         with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
-                                            side_effect=get_schedule_mock):
-            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                                        side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement,
+                                            'get_user',
+                                            side_effect=get_user_mock):
                 users = self.task.get_users()
                 self.assertEqual(len(users), 4)
                 for user in users:
@@ -105,12 +116,14 @@ class TestTaskElement(unittest.TestCase):
         constructor and if they belong to the specified schedules
         """
         # Set up the mock objects
-        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule()
+        get_schedule_mock, _, _ = self.get_mock_schedule()
         get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
-        
+
         with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
-                                            side_effect=get_schedule_mock):
-            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                                        side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement,
+                                            'get_user',
+                                            side_effect=get_user_mock):
                 users = self.task.get_users(['schedule_1'])
                 self.assertEqual(len(users), 2)
                 for user in users:
@@ -119,12 +132,15 @@ class TestTaskElement(unittest.TestCase):
     def test_get_users_nonrepeat_users(self):
         """Test if the users returned are unique"""
         # Set up the mock objects
-        get_schedule_mock, schedule_1, schedule_2 = self.get_mock_schedule(repeat_user=True)
-        get_user_mock, user_1, user_2, user_3, user_4 = self.get_mock_user()
-        
+        get_schedule_mock, _, _ = self.get_mock_schedule(
+            repeat_user=True)
+        get_user_mock, user_1, user_2, _, _ = self.get_mock_user()
+
         with unittest.mock.patch.object(ScheduleManagement, 'get_schedule',
-                                            side_effect=get_schedule_mock):
-            with unittest.mock.patch.object(UserManagement, 'get_user', side_effect=get_user_mock):
+                                        side_effect=get_schedule_mock):
+            with unittest.mock.patch.object(UserManagement,
+                                            'get_user',
+                                            side_effect=get_user_mock):
                 users = self.task.get_users(['schedule_1', 'schedule_2'])
                 self.assertEqual(len(users), 2)
                 for user in users:
@@ -198,7 +214,7 @@ class TestTaskElement(unittest.TestCase):
         """Test setting a title that is too long"""
         with self.assertRaises(ValueError):
             self.task.set_title("a" * 51)
-    
+
     def test_set_title_max_length(self):
         """Test setting a title that is exactly at the maximum length"""
         max_length_title = "a" * 50
@@ -245,14 +261,14 @@ class TestTaskElement(unittest.TestCase):
         }
         self.assertDictEqual(self.task.to_dict(), expected_dict)
 
-    def get_mock_schedule(self, repeat_user = False) -> tuple[callable, MagicMock, MagicMock]:
+    def get_mock_schedule(self, repeat_user=False) -> tuple[callable, MagicMock, MagicMock]:
         """Mock function to return a schedule object"""
 
         # Set up the mock objects
         schedule_1 = MagicMock(spec=Schedule)
         type(schedule_1).id = PropertyMock(return_value='schedule_1')
         type(schedule_1).permissions = PropertyMock(return_value={"user_1": "owner",
-                                                        "user_2": "editor"})
+                                                                  "user_2": "editor"})
 
         schedule_2 = MagicMock(spec=Schedule)
         type(schedule_2).id = PropertyMock(return_value='schedule_2')
@@ -302,5 +318,5 @@ class TestTaskElement(unittest.TestCase):
         return get_user_mock, user_1, user_2, user_3, user_4
 
 
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == '__main__': # pragma: no cover
+    unittest.main() # pragma: no cover

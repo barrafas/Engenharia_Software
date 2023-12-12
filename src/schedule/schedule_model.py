@@ -1,5 +1,4 @@
-"""
-module that contains the Schedule class.
+""" Module that contains the Schedule class.
 The Schedule class represents a schedule in the calendar.
 
 Classes:
@@ -7,11 +6,6 @@ Classes:
     Schedule -- Class that represents a schedule in the calendar.
 """
 
-#from src.calendar_elements.element_interface import Element
-from tests.test_schedule.mocks import Element,\
-                                        ElementManagement,\
-                                        User,\
-                                        UserManagement
 from src.observer.observer import Observer, Subject
 
 class Schedule(Subject):
@@ -25,17 +19,21 @@ class Schedule(Subject):
         and each element can be assigned to one or more schedules.
         Each user can have a different permission in a schedule.
     """
-    def __init__(self, schedule_id: str, title: str, description: str,
-            permissions: dict, elements: [str] = None):
+
+    def __init__(self,
+                 schedule_id: str,
+                 title: str,
+                 description: str,
+                 permissions: dict,
+                 elements: [str] = None):
         """
             Schedule constructor.
             Arguments:
                 schedule_id -- id of the schedule.
                 title -- title of the schedule.
                 description -- description of the schedule.
-                permissions -- list of tuples (user_id, permission_type) 
-                        that represent the permissions of the users in the 
-                        schedule.
+                permissions -- dict where the key is the user id and the value
+                                 is the permission type.
                 elements -- list of elements ids that are displayed in the 
                             schedule.
         """
@@ -84,7 +82,7 @@ class Schedule(Subject):
         else:
             raise TypeError("Elements must be a list of strings")
 
-    def get_elements(self, types =  []) -> list:
+    def get_elements(self, types=[]) -> list:
         """
             Returns a list of elements IDs for elements that are displayed in 
             the schedule.
@@ -96,6 +94,8 @@ class Schedule(Subject):
                 [Element] -- List of element instances in the schedule that 
                 have the specified types.
         """
+        from src.calendar_elements.element_management import ElementManagement
+
         element_management = ElementManagement.get_instance()
         elements = []
         for element_id in self.__elements:
@@ -104,7 +104,7 @@ class Schedule(Subject):
                 elements.append(element)
         return elements
 
-    def get_users(self, permission_types = []) -> list:
+    def get_users(self, permission_types=[]) -> list:
         """
             Returns a list of users that have the specified permission types.
             If no permission types are specified, returns all the users in the 
@@ -116,6 +116,7 @@ class Schedule(Subject):
             Returns:
                 [User] -- List of users that have the specified permission types
         """
+        from src.user.user_management import UserManagement
 
         user_management = UserManagement.get_instance()
         users = []
@@ -135,7 +136,7 @@ class Schedule(Subject):
         if title is None:
             raise ValueError("Title cannot be None")
         if not isinstance(title, str):
-            raise TypeError("Title must be a string")
+            raise TypeError(f"Title must be a string, {type(title)} given]")
         if len(title.strip()) == 0:
             raise ValueError("Title cannot be empty")
         if len(title) > 50:

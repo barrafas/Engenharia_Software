@@ -3,11 +3,17 @@ The Application defines the interface of interest to clients.
 """
 
 from __future__ import annotations
-from src.user.user_management import UserManagement
+
+import random
+
 from src.calendar_elements.element_management import ElementManagement
 from src.schedule.schedule_management import ScheduleManagement
 from src.auth.authentication import AuthenticationModule
-import datetime
+from src.database.mongo_module import MongoModule
+from src.database.utils import TimeoutDecorator
+from src.database.export_module import ExportModule
+from src.user.user_management import UserManagement
+
 
 class Application:
     """
@@ -16,12 +22,46 @@ class Application:
     _state = None
 
     def __init__(self, state = None, ui = None, db = None) -> None:
-        if state is not None:
-            self.transition_to(state)
+        self._state = state
         self._ui = ui
         self._db = db
         self._user = None
+        self.selected_schedules = []
 
+    def initialize_database(self, database_url, database_port, database_user, database_password):
+        """
+        Initialize the database
+        """
+        if database_user == "None" or database_password == "":
+            database_user = None
+            database_password = None
+        if database_password == "None" or database_password == "":
+            database_password = None
+        database_port = int(database_port)
+        MongoModule._instance = None
+        user = {}
+        if database_user:
+            user = {"user": database_user, "password": database_password}
+        self._db = TimeoutDecorator(
+                    MongoModule(host = database_url,
+                        port = database_port,
+                        database_name = "calendar_app",
+                        **user)
+                    , 5)
+
+        self._db.connect()
+        print(f"\033[92mDatabase initialized: {self._db}\033[0m")
+
+        self.initialize_managers()
+
+    def initialize_managers(self):
+        """
+        Initialize the managers
+        """
+        # initialize modules
+        ScheduleManagement._instance = None
+        ElementManagement._instance = None
+        UserManagement._instance = None
         ScheduleManagement.get_instance(database_module=self._db)
         ElementManagement.get_instance(database_module=self._db)
         UserManagement.get_instance(database_module=self._db)
@@ -34,9 +74,40 @@ class Application:
             self._state.clear()
         print(f"Application: Transition to {type(state).__name__}")
         self._state = state
-        self._state.context = self
         state.render()
 
+    @property
+    def db(self):
+        return self._db
+    
+    @db.setter
+    def db(self, db):
+        self._db = db
+        self.initialize_managers()
+
+    @property
+    def state(self):
+        return self._state
+    
+    @property
+    def user(self):
+        return self._user
+    
+    @user.setter
+    def user(self, user):
+        self._user = user
+        if user:
+            self.selected_schedules = user.schedules
+        else:
+            self.selected_schedules = []
+
+    @property
+    def ui(self):
+        return self._ui
+
+    @ui.setter
+    def ui(self, ui):
+        self._ui = ui
 
     def run(self) -> None:
         """
@@ -60,10 +131,17 @@ class Application:
 
         if auth.authenticate_user(user_id, password):
             print(f"\033[92mUser {user_id} authenticated.\033[0m")
-            self._user = UserManagement(self._db).get_user(user_id)
+            self.user = UserManagement(self._db).get_user(user_id)
             return True
         else:
             print("Login failed.")
+
+    def logout(self):
+        """
+        The Application delegates part of its behavior to the current State
+        object.
+        """
+        self.user = None
 
     def sign_up(self, user_id, username, email, password):
         """
@@ -73,7 +151,6 @@ class Application:
         user_management = UserManagement.get_instance()
 
         user = user_management.create_user(username, email, password, user_id=user_id)
-        user.attach(user_management)
 
         if user:
             print(f"\033[92mSign up successful! User {username} created.\033[0m")
@@ -89,19 +166,29 @@ class Application:
             print(f"\033[92mSchedule created: {schedule}\033[0m")
             print(f"\033[92mUser schedules: {user.schedules}\033[0m")
 
+            self.login(user_id, password)
+
             return True
         else:
             print("Sign up failed.")
 
     def get_user_events(self):
         """
-        The Application delegates part of its behavior to the current State
-        object.
-        
-        Gets the events from the user and stores them in a dictionary
+        Return the user's events as a dictionary in the tree format:
+        {
+            year: {
+                month: {
+                    day: {
+                        hour: {
+                            minute: [event1, event2, ...]
+                        }
+                    }
+                }
+            }
+        }
 
         """
-        elements = self._user.get_elements()
+        elements = self.user.get_elements(self.selected_schedules)
 
         # get user events
         events = elements
@@ -128,34 +215,35 @@ class Application:
 
         print(f"\033[92mUser events: {elements}, with len ={len(elements)}\033[0m")
 
-
         return elements
-        
-    def create_event(self, event_name, event_type, selected_date):
+
+    def create_event(self, element_type: str, title: str,
+                       schedules: list, **kwargs):
         """
         The Application delegates part of its behavior to the current State
         object.
         """
-        print(f"Schedules: {self._user.schedules}")
-        schedule = self._user.schedules[0]
-        print(f"Schedule: {schedule}")
-
-        kwargs = {}
-        if event_type == "Task":
-            kwargs["due_date"] = selected_date
-            kwargs["state"] = "TODO"
-        elif event_type == "Reminder":
-            kwargs["reminder_date"] = selected_date
-        elif event_type == "Event":
-            kwargs["start"] = selected_date
-            kwargs["end"] = datetime.datetime(selected_date.year,
-            selected_date.month, selected_date.day, selected_date.hour,
-            selected_date.minute) + datetime.timedelta(hours=1)
-
-        description = None
-
+        element_id = self.user.id + "_" + title + str(random.randint(0, 1000))
         element_management = ElementManagement.get_instance()
-        event = element_management.create_element(element_type = event_type, element_id = event_name,
-        title = event_name, description = description, schedules = [schedule], **kwargs)
+        event = element_management.create_element(element_type = element_type,
+            element_id = element_id, title = title, schedules = schedules, **kwargs)
 
         print(f"\033[92mEvent created: {event}\033[0m")
+        return event
+
+    def delete_element(self, element):
+        """
+        Deleting a element
+        """
+        element_management = ElementManagement.get_instance()
+        element_management.delete_element(element.id)
+
+    def export_data(self):
+        """
+        Handle export data request.
+        """
+        user_id = self.user.id
+
+        export_module = ExportModule(self._db)
+
+        export_module.export_data(user_id)

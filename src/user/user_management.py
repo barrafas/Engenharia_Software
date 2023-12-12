@@ -7,15 +7,15 @@ Attributes:
     users: Dict of users, where the key is the id
 """
 import bcrypt
-from src.database.mongo_module import MongoModule, DuplicatedIDError, NonExistentIDError
-from src.observer.observer import Observer, Subject
+from src.database.mongo_module import MongoModule, DuplicatedIDError
+from src.database.mongo_module import NonExistentIDError
+from src.observer.observer import Observer, Subject, DatabaseNotProvidedError
 from .user_model import User, UsernameCantBeBlank
 
 class UserAlreadyExistsError(Exception):
     """
     Custom exception class for when a user already exists.
     """
-
 
 class UserManagement(Observer):
     """
@@ -29,28 +29,32 @@ class UserManagement(Observer):
     _instance = None
 
     @classmethod
-    def get_instance(cls, database_module: MongoModule = None, users: dict = None):
+    def get_instance(cls,
+                    database_module: MongoModule = None,
+                    users: dict = None) -> 'UserManagement':
         """
         Get the instance of the UserManagement class
         """
         if not cls._instance:
-            if not database_module:
-                raise Exception("Database module not provided")
             cls._instance = cls(database_module, users)
         return cls._instance
 
-    def __init__(self, database_module: MongoModule, users: dict = None):
+    def __init__(self,
+                database_module: MongoModule,
+                users: dict = None):
         """
         Constructor for the UserManagement class
 
         Args:
             database_module: Database module
         """
-        from src.schedule.schedule_management import ScheduleManagement
+
+        if not database_module:
+            raise DatabaseNotProvidedError(
+                "Database module not provided on object creation.")
+        
         self.db_module = database_module
         self.users = users if users is not None else {}
-
-        ScheduleManagement.get_instance(database_module=self.db_module)
 
     def create_user(self, username: str, email: str, password: str,
                     user_preferences: dict = None, user_id: str = None) -> User:
@@ -74,13 +78,10 @@ class UserManagement(Observer):
             raise UsernameCantBeBlank("Username cannot be blank")
 
         if self.user_exists(user_id):
-            raise NonExistentIDError(f'User {user_id} already exists')
+            raise DuplicatedIDError(f'User {user_id} already exists')
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
-
-        # if not id:
-        #     id = self.db.get_next_id("users")
 
         user_info = {"_id": user_id,
                     "username": username,
@@ -189,7 +190,8 @@ class UserManagement(Observer):
 
 
 
-    def add_schedule_to_user(self, user_id: str, schedule_id: str, permission:str) -> None:
+    def add_schedule_to_user(self, user_id: str, schedule_id: str,
+                             permission:str) -> None:
         """Function to add a schedule to a user
 
         Arguments:
@@ -212,7 +214,8 @@ class UserManagement(Observer):
             schedule = schedule_manager.get_schedule(schedule_id)
             schedule.permissions = {**schedule.permissions, user_id: permission}
         else:
-            raise DuplicatedIDError(f'Usuário {user_id} já está no schedule {schedule_id}')
+            raise DuplicatedIDError(f'Usuário {user_id} já está no schedule \
+                                    {schedule_id}')
         return
 
     def update(self, user: Subject) -> None:
