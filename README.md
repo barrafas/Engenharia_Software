@@ -20,10 +20,10 @@ Utilizamos a ferramenta SonarQube e SonarScanner para realizar a verificação d
 Decidimos atualizar a entrega inicial referente aos casos de uso para melhor refletir as modificações que ocorreram no sistema ao longo do desenvolvimento. O arquivo Entrega_A1_Atualizado.pdf dentro da pasta de documentação é referente à essa entrega atualizada.
 
 **Testes realizados durante TDD:**
-Os testes realizados durante o processo de TDD foram registrados em notebooks Jupyter, que estão disponíveis dentro da pasta de testes de cada classe específica, contendo o histórico de iterações das funções testadas. 
+Os testes realizados durante o processo de TDD foram registrados em notebooks Jupyter e posteriormente transformados em PDFs que estão disponíveis dentro da pasta 'docs/history'. 
 
 **Relatórios**
-O relatório do projeto (observações, padrões, desenvolvimento...) e relatório da cobertura do código estão presentes na pasta de documentação. 
+O relatório - Engenharia_de_Software_Relatório - do projeto (observações, padrões, desenvolvimento...) e relatório da cobertura do código - Covarage_report - estão presentes na pasta de documentação docs. 
 
 **Requisitos do sistema:**
 -   Gerenciamento de eventos pessoais:
