@@ -22,8 +22,8 @@ Decidimos atualizar a entrega inicial referente aos casos de uso para melhor ref
 **Testes realizados durante TDD:**
 Os testes realizados durante o processo de TDD foram registrados em notebooks Jupyter e posteriormente transformados em PDFs que estão disponíveis dentro da pasta 'docs/history'. 
 
-**Relatórios**
-O relatório - Engenharia_de_Software_Relatório - do projeto (observações, padrões, desenvolvimento...) e relatório da cobertura do código - Covarage_report - estão presentes na pasta de documentação docs. 
+**Relatórios:**
+O relatório do projeto (observações, padrões, desenvolvimento...) - Engenharia_de_Software_Relatório - e relatório da cobertura do código - Covarage_report - estão presentes na pasta de documentação docs. 
 
 **Requisitos do sistema:**
 -   Gerenciamento de eventos pessoais:
