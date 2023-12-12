@@ -3,3 +3,4 @@ customtkinter
 pytest
 bcrypt
 pandas
+coverage
