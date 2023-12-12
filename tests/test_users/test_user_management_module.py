@@ -30,19 +30,28 @@ class TestUserManagementModule(unittest.TestCase):
             self.db_module)
 
     def test_create_user_success(self):
-        """Test creating a new user successfully"""
-        self.db_module.insert_data = MagicMock(return_value =
-                                    [{"username": "test_user",
-                                      "email": "test_email", 
-                                      "hashed_password": "test_hashed_password"}])
-        self.db_module.select_data = MagicMock(return_value = [])
-        result = self.user_management.create_user(username="test_user",
-                        email="test_email", password="test_password", user_id="1")
-        self.assertEqual(result.username, "test_user")
-        self.assertEqual(result.email, "test_email")
-        self.assertTrue(bcrypt.checkpw("test_password".encode('utf-8'),
-                                       result.hashed_password.encode('utf-8')),
-                        result.hashed_password)
+        """Test that create_user calls insert_data with the correct arguments"""
+        # Arrange
+        username = 'username'
+        email = 'email@example.com'
+        password = 'password'
+        user_preferences = {'preference': 'value'}
+        user_id = 'new_user_id'
+        hashed_password = 'hashed_password'
+        mock_db_module = MagicMock()
+        mock_db_module.select_data.return_value = []
+        user_management = UserManagement(mock_db_module)
+        user_management.hash_password = MagicMock(return_value=hashed_password.encode('utf-8'))
+        expected_user_info = {"_id": user_id,
+                            "username": username,
+                            "email": email,
+                            "schedules": [],
+                            "hashed_password": hashed_password,
+                            "user_preferences": user_preferences}
+        # Act
+        user_management.create_user(username, email, password, user_preferences, user_id)
+        # Assert
+        mock_db_module.insert_data.assert_called_once_with('users', expected_user_info)
 
         # def mock_select_data(collection, query):
         #     if collection == "users" and query == {"_id": "test_user1"}:
@@ -67,25 +76,34 @@ class TestUserManagementModule(unittest.TestCase):
 
 
     def test_create_existing_user(self):
-        """Test creating a user that already exists"""
-        self.db_module.select_data = MagicMock(return_value =
-                                    [{"username": "test_user",
-                                      "email": "test_email", 
-                                      "hashed_password": "test_hashed_password"}])
+        """Test that create_user raises DuplicatedIDError when the user id already exists"""
+        # Arrange
+        username = 'username'
+        email = 'email@example.com'
+        password = 'password'
+        user_preferences = {'preference': 'value'}
+        user_id = 'existing_user_id'
+        mock_db_module = MagicMock()
+        mock_db_module.select_data.return_value = [{'_id': user_id}]
+        user_management = UserManagement(mock_db_module)
 
-        with self.assertRaises(DuplicatedIDError) as context:
-            self.user_management.create_user(username="test_user",
-                            email="test_email", password="test_password", id="1")
-        self.assertEqual(str(context.exception),
-                            "Usuário test_user já existe")
+        # Act and Assert
+        with self.assertRaises(DuplicatedIDError):
+            user_management.create_user(username, email, password, user_preferences, user_id)
 
     def test_create_blank_username(self):
-        """Test creating a user with a blank username"""
-        with self.assertRaises(UsernameCantBeBlank) as context:
-            self.user_management.create_user(username="",
-                            email="test_email", password="test_password", id="1")
-        self.assertEqual(str(context.exception),
-                            "Nome de usuário não pode ser vazio")
+        """Test that create_user raises UsernameCantBeBlank when the username is blank"""
+        # Arrange
+        username = ''
+        email = 'email@example.com'
+        password = 'password'
+        user_preferences = {'preference': 'value'}
+        user_id = 'new_user_id'
+        mock_db_module = MagicMock()
+        user_management = UserManagement(mock_db_module)
+        # Act and Assert
+        with self.assertRaises(UsernameCantBeBlank):
+            user_management.create_user(username, email, password, user_preferences, user_id)
 
     def test_hash_password(self):
         """Test hashing a password"""

@@ -76,7 +76,7 @@ class UserManagement(Observer):
             raise UsernameCantBeBlank("Username cannot be blank")
 
         if self.user_exists(user_id):
-            raise NonExistentIDError(f'User {user_id} already exists')
+            raise DuplicatedIDError(f'User {user_id} already exists')
 
         hashed_password = self.hash_password(password)
         hashed_password = hashed_password.decode('utf-8')
