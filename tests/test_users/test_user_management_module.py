@@ -94,17 +94,31 @@ class TestUserManagementModule(unittest.TestCase):
         self.assertTrue(bcrypt.checkpw(password.encode('utf-8'), hashed_password))
 
     def test_delete_user(self):
-        """Test deleting a user"""
-        self.db_module.select_data = MagicMock(return_value = ['a'])
-        self.db_module.delete_data = MagicMock()
-        self.user_management.delete_user("test_user")
-        self.db_module.delete_data.assert_called_once_with("users", {"_id": "test_user"})
+        """Test that delete_user calls delete_data with the correct arguments"""
+        # Arrange
+        user_id = 'existing_user_id'
+        user_info = {'_id': user_id, 'username': 'username', 'email': 'email', 'schedules': []}
+        user = User(**user_info)
+        mock_db_module = MagicMock()
+        mock_db_module.select_data.return_value = [user_info]
+        user_management = UserManagement(mock_db_module)
+        user_management.users[user_id] = user
+        # Act
+        user_management.delete_user(user_id)
+        # Assert
+        mock_db_module.delete_data.assert_called_once_with('users', {"_id": user_id})
 
     def test_delete_nonexistent_user(self):
-        """Test deleting a nonexistent user"""
-        self.db_module.select_data = MagicMock(return_value = [])
+        """Test that delete_user raises NonExistentIDError when the user does not exist"""
+        # Arrange
+        user_id = 'non_existent_user_id'
+        mock_db_module = MagicMock()
+        mock_db_module.select_data.return_value = []
+        user_management = UserManagement(mock_db_module)
+
+        # Act and Assert
         with self.assertRaises(NonExistentIDError):
-            self.user_management.delete_user("id2")
+            user_management.delete_user(user_id)
 
     def test_user_exists_returns_true(self):
         """Test that user_exists returns True when a user with the given id exists"""
