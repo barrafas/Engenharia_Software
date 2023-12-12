@@ -16,6 +16,8 @@ class MainView(View):
         self.logout_button = None
         self.go_back_button = None
 
+        self.logged_user_name = ""
+
         self.elements = elements
 
         self.sidebar = None
@@ -68,8 +70,11 @@ class MainView(View):
         self.show_navbar_elements()
 
     def show_navbar_elements(self):
+        self.logged_user_name_label = customtkinter.CTkLabel(self.navbar, text=f"Bem vindo {self.logged_user_name}!")
+        self.logged_user_name_label.grid(row=0, column=0, padx=10, pady=10, sticky="we")
+
         self.go_back_button = customtkinter.CTkButton(self.navbar, text="Voltar")
-        self.go_back_button.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        self.go_back_button.grid(row=0, column=1, padx=10, pady=10, sticky="e")
 
     def show_main(self):
         self.main_frame = customtkinter.CTkFrame(self.root)
